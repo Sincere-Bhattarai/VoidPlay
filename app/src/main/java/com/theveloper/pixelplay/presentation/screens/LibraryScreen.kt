@@ -575,8 +575,21 @@ fun LibraryScreen(
                                 SelectionActionRow(
                                     selectedCount = selectedSongs.size,
                                     onSelectAll = { 
-                                        val allSongsToSelect = playerViewModel.playerUiState.value.allSongs
-                                        multiSelectionState.selectAll(allSongsToSelect)
+                                        val songsToSelect = when (tabTitles.getOrNull(pagerState.currentPage)?.toLibraryTabIdOrNull()) {
+                                            LibraryTabId.LIKED -> playerViewModel.favoriteSongs.value
+                                            LibraryTabId.FOLDERS -> {
+                                                // If we are deep in a folder, select songs of that folder.
+                                                // If we are at root, there are no songs to select.
+                                                playerViewModel.playerUiState.value.currentFolder?.songs ?: emptyList()
+                                            }
+                                            // For SONGS and others fallback to all songs? 
+                                            // Actually ALBUMS/ARTISTS don't show songs list directly, they show items. 
+                                            // Selection mode is likely disabled there or not reachable.
+                                            // But for SONGS tab:
+                                            LibraryTabId.SONGS -> playerViewModel.playerUiState.value.allSongs
+                                            else -> emptyList()
+                                        }
+                                        multiSelectionState.selectAll(songsToSelect)
                                     },
                                     onDeselect = { multiSelectionState.clearSelection() },
                                     onOptionsClick = { showMultiSelectionSheet = true }
@@ -2753,9 +2766,9 @@ fun LibraryArtistsTab(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(bottom = bottomBarHeight + MiniPlayerHeight + ListExtraBottomGap)
                     ) {
-                        item(key = "artists_top_spacer") {
-                            Spacer(Modifier.height(4.dp))
-                        }
+//                        item(key = "artists_top_spacer") {
+//                            Spacer(Modifier.height(4.dp))
+//                        }
                         items(artists, key = { "artist_${it.id}" }) { artist ->
                             val rememberedOnClick = remember(artist) { { onArtistClick(artist.id) } }
                             ArtistListItem(artist = artist, onClick = rememberedOnClick)
@@ -2783,17 +2796,6 @@ fun LibraryArtistsTab(
                     )
                 }
             }
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(10.dp)
-//                    .background(
-//                        brush = Brush.verticalGradient(
-//                            colors = listOf(MaterialTheme.colorScheme.surface, Color.Transparent)
-//                        )
-//                    )
-//                    .align(Alignment.TopCenter)
-//            )
         }
     }
 }

@@ -212,6 +212,7 @@ fun MultiSelectionBottomSheet(
                                 text = {
                                     Text(
                                         modifier = Modifier.padding(end = 0.dp),
+                                        style = MaterialTheme.typography.titleMediumEmphasized,
                                         text = "Play All"
                                     )
                                 }
@@ -265,7 +266,7 @@ fun MultiSelectionBottomSheet(
                             ) {
                                 Icon(
                                     modifier = Modifier.size(FloatingActionButtonDefaults.LargeIconSize),
-                                    imageVector = Icons.Rounded.FolderZip,
+                                    imageVector = Icons.Rounded.Share,
                                     contentDescription = "Share all as ZIP"
                                 )
                             }
@@ -289,6 +290,7 @@ fun MultiSelectionBottomSheet(
                                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                                 ),
+                                contentPadding = PaddingValues(horizontal = 0.dp),
                                 shape = CircleShape,
                                 onClick = {
                                     onAddToQueue()
@@ -311,6 +313,7 @@ fun MultiSelectionBottomSheet(
                                     containerColor = MaterialTheme.colorScheme.tertiary,
                                     contentColor = MaterialTheme.colorScheme.onTertiary
                                 ),
+                                contentPadding = PaddingValues(horizontal = 0.dp),
                                 shape = CircleShape,
                                 onClick = {
                                     onPlayNext()

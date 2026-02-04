@@ -321,6 +321,7 @@ fun SongInfoBottomSheet(
                                                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                                                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                                             ),
+                                            contentPadding = PaddingValues(horizontal = 0.dp),
                                             shape = CircleShape,
                                             onClick = onAddToQueue
                                         ) {
@@ -339,6 +340,7 @@ fun SongInfoBottomSheet(
                                                 containerColor = MaterialTheme.colorScheme.tertiary,
                                                 contentColor = MaterialTheme.colorScheme.onTertiary
                                             ),
+                                            contentPadding = PaddingValues(horizontal = 0.dp),
                                             shape = CircleShape,
                                             onClick = onAddNextToQueue
                                         ) {

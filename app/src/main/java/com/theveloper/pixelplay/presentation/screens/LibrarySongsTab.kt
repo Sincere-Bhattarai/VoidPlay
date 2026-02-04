@@ -170,7 +170,7 @@ fun LibrarySongsTab(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             contentPadding = PaddingValues(bottom = bottomBarHeight + MiniPlayerHeight + 30.dp)
                         ) {
-                            item(key = "songs_top_spacer") { Spacer(Modifier.height(0.dp)) }
+                            //item(key = "songs_top_spacer") { Spacer(Modifier.height(0.dp)) }
 
                             items(
                                 items = songs,
@@ -226,18 +226,18 @@ fun LibrarySongsTab(
                     }
                 }
                 // Top gradient fade effect
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(10.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.surface, Color.Transparent
-                                )
-                            )
-                        )
-                )
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(10.dp)
+//                        .background(
+//                            brush = Brush.verticalGradient(
+//                                colors = listOf(
+//                                    MaterialTheme.colorScheme.surface, Color.Transparent
+//                                )
+//                            )
+//                        )
+//                )
             }
         }
     }
