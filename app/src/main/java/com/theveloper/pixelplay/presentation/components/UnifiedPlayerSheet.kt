@@ -1460,82 +1460,88 @@ fun UnifiedPlayerSheet(
 
                                 val liveSong = liveSongState ?: staticSong
 
-                                SongInfoBottomSheet(
-                                    song = liveSong,
-                                    isFavorite = liveSong.isFavorite,
-                                    
-                                    onToggleFavorite = { playerViewModel.toggleFavoriteSpecificSong(liveSong) },
-                                    onDismiss = { selectedSongForInfo = null },
-                                    onPlaySong = { 
-                                        playerViewModel.playSongs(currentPlaybackQueue, liveSong, currentQueueSourceName)
-                                        selectedSongForInfo = null
-                                    },
-                                    onAddToQueue = { 
-                                        playerViewModel.addSongToQueue(liveSong)
-                                        selectedSongForInfo = null
-                                        Toast.makeText(context, "Added to queue", Toast.LENGTH_SHORT).show()
-                                    },
-                                    onAddNextToQueue = { 
-                                        playerViewModel.addSongNextToQueue(liveSong)
-                                        selectedSongForInfo = null
-                                         Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show()
-                                    },
-                                    onAddToPlayList = { 
-                                        // Trigger playlist selection dialog (if implemented in ViewModel or UI)
-                                        // For now we might need a placeholder or check how it is implemented elsewhere.
-                                        // playerViewModel doesn't seem to have 'openAddToPlaylistDialog'.
-                                        // Maybe we can skip this or implement if simple.
-                                        // SongInfoBottomSheet usually handles the UI for it? No, it has onAddToPlayList callback.
-                                        // Let's leave it empty or log for now if we don't have a ready handler
-                                        Log.d("UnifiedPlayerSheet", "Add to playlist clicked for ${liveSong.title}")
-                                         selectedSongForInfo = null
-                                    },
-                                    onDeleteFromDevice = { activity, songToDelete, onResult ->
-                                         playerViewModel.deleteFromDevice(activity, songToDelete, onResult)
-                                         selectedSongForInfo = null
-                                    },
-                                    onNavigateToAlbum = {
-                                        scope.launch {
-                                            sheetAnimationMutex.mutate {
-                                                currentSheetTranslationY.snapTo(sheetCollapsedTargetY)
-                                                playerContentExpansionFraction.snapTo(0f)
-                                            }
-                                        }
-                                        playerViewModel.collapsePlayerSheet()
-                                        animateQueueSheet(false)
-                                        selectedSongForInfo = null
+                                MaterialTheme(
+                                    colorScheme = albumColorScheme,
+                                    typography = MaterialTheme.typography,
+                                    shapes = MaterialTheme.shapes
+                                ) {
+                                    SongInfoBottomSheet(
+                                        song = liveSong,
+                                        isFavorite = liveSong.isFavorite,
 
-                                         if (liveSong.albumId != -1L) {
-                                            navController.navigate(Screen.AlbumDetail.createRoute(liveSong.albumId))
-                                         }
-                                    },
-                                    onNavigateToArtist = {
-                                        scope.launch {
-                                            sheetAnimationMutex.mutate {
-                                                currentSheetTranslationY.snapTo(sheetCollapsedTargetY)
-                                                playerContentExpansionFraction.snapTo(0f)
+                                        onToggleFavorite = { playerViewModel.toggleFavoriteSpecificSong(liveSong) },
+                                        onDismiss = { selectedSongForInfo = null },
+                                        onPlaySong = {
+                                            playerViewModel.playSongs(currentPlaybackQueue, liveSong, currentQueueSourceName)
+                                            selectedSongForInfo = null
+                                        },
+                                        onAddToQueue = {
+                                            playerViewModel.addSongToQueue(liveSong)
+                                            selectedSongForInfo = null
+                                            Toast.makeText(context, "Added to queue", Toast.LENGTH_SHORT).show()
+                                        },
+                                        onAddNextToQueue = {
+                                            playerViewModel.addSongNextToQueue(liveSong)
+                                            selectedSongForInfo = null
+                                            Toast.makeText(context, "Playing next", Toast.LENGTH_SHORT).show()
+                                        },
+                                        onAddToPlayList = {
+                                            // Trigger playlist selection dialog (if implemented in ViewModel or UI)
+                                            // For now we might need a placeholder or check how it is implemented elsewhere.
+                                            // playerViewModel doesn't seem to have 'openAddToPlaylistDialog'.
+                                            // Maybe we can skip this or implement if simple.
+                                            // SongInfoBottomSheet usually handles the UI for it? No, it has onAddToPlayList callback.
+                                            // Let's leave it empty or log for now if we don't have a ready handler
+                                            Log.d("UnifiedPlayerSheet", "Add to playlist clicked for ${liveSong.title}")
+                                            selectedSongForInfo = null
+                                        },
+                                        onDeleteFromDevice = { activity, songToDelete, onResult ->
+                                            playerViewModel.deleteFromDevice(activity, songToDelete, onResult)
+                                            selectedSongForInfo = null
+                                        },
+                                        onNavigateToAlbum = {
+                                            scope.launch {
+                                                sheetAnimationMutex.mutate {
+                                                    currentSheetTranslationY.snapTo(sheetCollapsedTargetY)
+                                                    playerContentExpansionFraction.snapTo(0f)
+                                                }
                                             }
+                                            playerViewModel.collapsePlayerSheet()
+                                            animateQueueSheet(false)
+                                            selectedSongForInfo = null
+
+                                            if (liveSong.albumId != -1L) {
+                                                navController.navigate(Screen.AlbumDetail.createRoute(liveSong.albumId))
+                                            }
+                                        },
+                                        onNavigateToArtist = {
+                                            scope.launch {
+                                                sheetAnimationMutex.mutate {
+                                                    currentSheetTranslationY.snapTo(sheetCollapsedTargetY)
+                                                    playerContentExpansionFraction.snapTo(0f)
+                                                }
+                                            }
+                                            playerViewModel.collapsePlayerSheet()
+                                            animateQueueSheet(false)
+                                            selectedSongForInfo = null
+                                            if (liveSong.artistId != -1L) {
+                                                navController.navigate(Screen.ArtistDetail.createRoute(liveSong.artistId))
+                                            }
+                                        },
+                                        onEditSong = { title, artist, album, genre, lyrics, trackNumber, coverArtUpdate ->
+                                            playerViewModel.editSongMetadata(liveSong, title, artist, album, genre, lyrics, trackNumber, coverArtUpdate)
+                                            selectedSongForInfo = null
+                                        },
+                                        generateAiMetadata = { fields -> playerViewModel.generateAiMetadata(liveSong, fields) },
+                                        removeFromListTrigger = {
+                                            // This is usually used to remove from a specific list (like 'Favorites').
+                                            // In Queue, we have specific 'Remove' button.
+                                            // But maybe the user wants to remove from queue via this menu?
+                                            playerViewModel.removeSongFromQueue(liveSong.id)
+                                            selectedSongForInfo = null
                                         }
-                                        playerViewModel.collapsePlayerSheet()
-                                        animateQueueSheet(false)
-                                        selectedSongForInfo = null
-                                        if (liveSong.artistId != -1L) {
-                                            navController.navigate(Screen.ArtistDetail.createRoute(liveSong.artistId))
-                                        }
-                                    },
-                                    onEditSong = { title, artist, album, genre, lyrics, trackNumber, coverArtUpdate ->
-                                        playerViewModel.editSongMetadata(liveSong, title, artist, album, genre, lyrics, trackNumber, coverArtUpdate)
-                                         selectedSongForInfo = null
-                                    },
-                                    generateAiMetadata = { fields -> playerViewModel.generateAiMetadata(liveSong, fields) },
-                                    removeFromListTrigger = {
-                                         // This is usually used to remove from a specific list (like 'Favorites').
-                                         // In Queue, we have specific 'Remove' button. 
-                                         // But maybe the user wants to remove from queue via this menu?
-                                         playerViewModel.removeSongFromQueue(liveSong.id)
-                                         selectedSongForInfo = null
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }

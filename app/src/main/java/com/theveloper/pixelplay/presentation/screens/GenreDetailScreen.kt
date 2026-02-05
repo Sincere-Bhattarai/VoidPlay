@@ -454,7 +454,11 @@ fun GenreDetailScreen(
             showSongOptionsSheet?.let { song ->
                 val isFavorite = favoriteSongIds.contains(song.id)
 
-                MaterialTheme(colorScheme = baseColorScheme) {
+                MaterialTheme(
+                    colorScheme = genreColorScheme,
+                    typography = MaterialTheme.typography,
+                    shapes = MaterialTheme.shapes
+                ) {
                     SongInfoBottomSheet(
                         song = song,
                         isFavorite = isFavorite,
