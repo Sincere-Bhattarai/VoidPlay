@@ -146,6 +146,7 @@ class PlayerViewModel @Inject constructor(
     val playerUiState: StateFlow<PlayerUiState> = _playerUiState.asStateFlow()
     
     val stablePlayerState: StateFlow<StablePlayerState> = playbackStateHolder.stablePlayerState
+    val playbackHistory = listeningStatsTracker.playbackHistory
     
     private val _masterAllSongs = MutableStateFlow<ImmutableList<Song>>(persistentListOf())
 

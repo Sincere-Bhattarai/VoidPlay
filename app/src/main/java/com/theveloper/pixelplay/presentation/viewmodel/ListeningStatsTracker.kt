@@ -7,6 +7,10 @@ import com.theveloper.pixelplay.data.model.Song
 import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -27,12 +31,19 @@ class ListeningStatsTracker @Inject constructor(
     private var currentSession: ActiveSession? = null
     private var pendingVoluntarySongId: String? = null
     private var scope: CoroutineScope? = null
+    private val _playbackHistory = MutableStateFlow<List<PlaybackStatsRepository.PlaybackHistoryEntry>>(emptyList())
+    val playbackHistory: StateFlow<List<PlaybackStatsRepository.PlaybackHistoryEntry>> = _playbackHistory.asStateFlow()
 
     /**
      * Must be called to set the coroutine scope for async operations.
      */
     fun initialize(coroutineScope: CoroutineScope) {
         scope = coroutineScope
+        scope?.launch(Dispatchers.IO) {
+            _playbackHistory.value = playbackStatsRepository.loadPlaybackHistory(
+                limit = MAX_INTERNAL_PLAYBACK_HISTORY_ITEMS
+            )
+        }
     }
 
     fun onVoluntarySelection(songId: String) {
@@ -149,6 +160,13 @@ class ListeningStatsTracker @Inject constructor(
                 .coerceAtLeast(session.startedAtEpochMs.coerceAtLeast(0L))
                 .coerceAtMost(System.currentTimeMillis())
             val songId = session.songId
+            val historyEntry = PlaybackStatsRepository.PlaybackHistoryEntry(
+                songId = songId,
+                timestamp = timestamp
+            )
+            _playbackHistory.update { current ->
+                (listOf(historyEntry) + current).take(MAX_INTERNAL_PLAYBACK_HISTORY_ITEMS)
+            }
             scope?.launch(Dispatchers.IO) {
                 dailyMixManager.recordPlay(
                     songId = songId,
@@ -179,6 +197,7 @@ class ListeningStatsTracker @Inject constructor(
 
     companion object {
         private val MIN_SESSION_LISTEN_MS = TimeUnit.SECONDS.toMillis(5)
+        private const val MAX_INTERNAL_PLAYBACK_HISTORY_ITEMS = 500
     }
 }
 

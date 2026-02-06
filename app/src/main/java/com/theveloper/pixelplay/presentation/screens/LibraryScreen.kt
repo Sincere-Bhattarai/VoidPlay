@@ -571,7 +571,11 @@ fun LibraryScreen(
                         }
                     }
                 } else {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    CompactLibraryPagerIndicator(
+                        currentIndex = currentTabIndex,
+                        pageCount = tabTitles.size,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
+                    )
                 }
 
                 Surface(
@@ -1351,6 +1355,43 @@ fun LibraryScreen(
             },
             onDismiss = { showReorderTabsSheet = false }
         )
+    }
+}
+
+@Composable
+private fun CompactLibraryPagerIndicator(
+    currentIndex: Int,
+    pageCount: Int,
+    modifier: Modifier = Modifier
+) {
+    if (pageCount <= 1) return
+
+    val safeIndex = positiveMod(currentIndex, pageCount)
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(pageCount) { index ->
+            val selected = index == safeIndex
+            val width by animateDpAsState(
+                targetValue = if (selected) 22.dp else 10.dp,
+                label = "LibraryCompactPagerIndicatorWidth"
+            )
+            val alpha by animateFloatAsState(
+                targetValue = if (selected) 1f else 0.35f,
+                label = "LibraryCompactPagerIndicatorAlpha"
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 3.dp)
+                    .height(4.dp)
+                    .width(width)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
+            )
+        }
     }
 }
 
