@@ -154,6 +154,7 @@ class PlayerViewModel @Inject constructor(
     val playerUiState: StateFlow<PlayerUiState> = _playerUiState.asStateFlow()
     
     val stablePlayerState: StateFlow<StablePlayerState> = playbackStateHolder.stablePlayerState
+    val playbackHistory = listeningStatsTracker.playbackHistory
     
     private val _masterAllSongs = MutableStateFlow<ImmutableList<Song>>(persistentListOf())
 
@@ -264,6 +265,14 @@ class PlayerViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = CarouselStyle.NO_PEEK
+        )
+
+    val hasGeminiApiKey: StateFlow<Boolean> = userPreferencesRepository.geminiApiKey
+        .map { it.isNotBlank() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
         )
 
     val fullPlayerLoadingTweaks: StateFlow<FullPlayerLoadingTweaks> = userPreferencesRepository.fullPlayerLoadingTweaksFlow
@@ -2561,8 +2570,24 @@ class PlayerViewModel @Inject constructor(
         aiStateHolder.dismissAiPlaylistSheet()
     }
 
-    fun generateAiPlaylist(prompt: String, minLength: Int, maxLength: Int, saveAsPlaylist: Boolean = false) {
-        aiStateHolder.generateAiPlaylist(prompt, minLength, maxLength, saveAsPlaylist)
+    fun clearAiPlaylistError() {
+        aiStateHolder.clearAiPlaylistError()
+    }
+
+    fun generateAiPlaylist(
+        prompt: String,
+        minLength: Int,
+        maxLength: Int,
+        saveAsPlaylist: Boolean = false,
+        playlistName: String? = null
+    ) {
+        aiStateHolder.generateAiPlaylist(
+            prompt = prompt,
+            minLength = minLength,
+            maxLength = maxLength,
+            saveAsPlaylist = saveAsPlaylist,
+            playlistName = playlistName
+        )
     }
 
     fun regenerateDailyMixWithPrompt(prompt: String) {

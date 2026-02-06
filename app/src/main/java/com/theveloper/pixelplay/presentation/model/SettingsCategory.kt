@@ -38,7 +38,7 @@ enum class SettingsCategory(
     BEHAVIOR(
         id = "behavior",
         title = "Behavior",
-        subtitle = "Gestures and navigation behavior",
+        subtitle = "Gestures, haptics, and navigation behavior",
         iconRes = R.drawable.rounded_touch_app_24
     ),
     AI_INTEGRATION(
@@ -46,6 +46,12 @@ enum class SettingsCategory(
         title = "AI Integration (Beta)",
         subtitle = "Gemini API key and AI features",
         iconRes = R.drawable.gemini_ai
+    ),
+    BACKUP_RESTORE(
+        id = "backup_restore",
+        title = "Backup & Restore",
+        subtitle = "Export and recover your personal app data",
+        iconRes = R.drawable.rounded_upload_file_24
     ),
     DEVELOPER(
         id = "developer",

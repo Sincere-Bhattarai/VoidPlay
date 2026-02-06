@@ -155,6 +155,7 @@ constructor(
         val BASS_BOOST_DISMISSED = booleanPreferencesKey("bass_boost_dismissed")
         val VIRTUALIZER_DISMISSED = booleanPreferencesKey("virtualizer_dismissed")
         val LOUDNESS_DISMISSED = booleanPreferencesKey("loudness_dismissed")
+        val BACKUP_INFO_DISMISSED = booleanPreferencesKey("backup_info_dismissed")
         
         // View Mode
         // val IS_GRAPH_VIEW = booleanPreferencesKey("is_graph_view") // Deprecated
@@ -270,6 +271,14 @@ constructor(
 
     suspend fun setLoudnessDismissed(dismissed: Boolean) {
         dataStore.edit { preferences -> preferences[PreferencesKeys.LOUDNESS_DISMISSED] = dismissed }
+    }
+
+    val backupInfoDismissedFlow: Flow<Boolean> = dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.BACKUP_INFO_DISMISSED] ?: false
+    }
+
+    suspend fun setBackupInfoDismissed(dismissed: Boolean) {
+        dataStore.edit { preferences -> preferences[PreferencesKeys.BACKUP_INFO_DISMISSED] = dismissed }
     }
 
     enum class EqualizerViewMode {
@@ -1633,6 +1642,29 @@ constructor(
     suspend fun setHapticsEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKeys.HAPTICS_ENABLED] = enabled
+        }
+    }
+
+    suspend fun clearPreferencesByKeys(keyNames: Set<String>) {
+        if (keyNames.isEmpty()) return
+        dataStore.edit { preferences ->
+            preferences.asMap().keys
+                .filter { key -> key.name in keyNames }
+                .forEach { key ->
+                    @Suppress("UNCHECKED_CAST")
+                    preferences.remove(key as Preferences.Key<Any>)
+                }
+        }
+    }
+
+    suspend fun clearPreferencesExceptKeys(excludedKeyNames: Set<String>) {
+        dataStore.edit { preferences ->
+            preferences.asMap().keys
+                .filterNot { key -> key.name in excludedKeyNames }
+                .forEach { key ->
+                    @Suppress("UNCHECKED_CAST")
+                    preferences.remove(key as Preferences.Key<Any>)
+                }
         }
     }
 

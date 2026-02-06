@@ -86,6 +86,8 @@ import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
 import com.theveloper.pixelplay.utils.getContrastColor
 import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
+import com.theveloper.pixelplay.utils.resolvePlaylistCoverContentColor
+import kotlin.collections.set
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -382,7 +384,10 @@ fun PlaylistItem(
                        Icon(
                             imageVector = getIconByName(playlist.coverIconName) ?: Icons.Filled.MusicNote,
                             contentDescription = null,
-                            tint = getContrastColor(Color(playlist.coverColorArgb)),
+                            tint = resolvePlaylistCoverContentColor(
+                                playlist.coverColorArgb,
+                                MaterialTheme.colorScheme
+                            ),
                             modifier = Modifier.size(24.dp).then(iconMod)
                        )
                    }

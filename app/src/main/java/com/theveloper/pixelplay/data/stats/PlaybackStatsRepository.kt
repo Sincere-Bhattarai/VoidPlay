@@ -45,6 +45,11 @@ class PlaybackStatsRepository @Inject constructor(
         val endTimestamp: Long? = null
     )
 
+    data class PlaybackHistoryEntry(
+        val songId: String,
+        val timestamp: Long
+    )
+
     data class SongPlaybackSummary(
         val songId: String,
         val title: String,
@@ -414,6 +419,47 @@ class PlaybackStatsRepository @Inject constructor(
             peakDayLabel = peakDayLabel,
             peakDayDurationMs = peakDayDuration
         )
+    }
+
+    fun exportEventsForBackup(): List<PlaybackEvent> = synchronized(fileLock) {
+        readEventsLocked().map { event -> sanitizeEvent(event) }
+    }
+
+    fun loadPlaybackHistory(limit: Int = DEFAULT_PLAYBACK_HISTORY_LIMIT): List<PlaybackHistoryEntry> {
+        if (limit <= 0) return emptyList()
+        val safeLimit = limit.coerceAtMost(MAX_PLAYBACK_HISTORY_LIMIT)
+        return readEvents()
+            .asSequence()
+            .sortedByDescending { event -> event.timestamp }
+            .take(safeLimit)
+            .map { event ->
+                PlaybackHistoryEntry(
+                    songId = event.songId,
+                    timestamp = event.timestamp.coerceAtLeast(0L)
+                )
+            }
+            .toList()
+    }
+
+    fun importEventsFromBackup(
+        events: List<PlaybackEvent>,
+        clearExisting: Boolean = true
+    ) {
+        synchronized(fileLock) {
+            val base = if (clearExisting) {
+                emptyList()
+            } else {
+                readEventsLocked()
+            }
+            val merged = (base + events)
+                .map { event -> sanitizeEvent(event) }
+                .distinctBy { event ->
+                    "${event.songId}:${event.startMillis()}:${event.endMillis()}:${event.durationMs}"
+                }
+                .sortedBy { event -> event.timestamp }
+                .toMutableList()
+            writeEventsLocked(merged)
+        }
     }
 
     private fun readEvents(): List<PlaybackEvent> = synchronized(fileLock) { readEventsLocked() }
@@ -930,6 +976,8 @@ class PlaybackStatsRepository @Inject constructor(
     }
 
     companion object {
+        private const val DEFAULT_PLAYBACK_HISTORY_LIMIT = 500
+        private const val MAX_PLAYBACK_HISTORY_LIMIT = 5_000
         private val MAX_HISTORY_AGE_MS = TimeUnit.DAYS.toMillis(730) // Keep roughly two years of history
         private val MAX_REASONABLE_EVENT_DURATION_MS = TimeUnit.HOURS.toMillis(8)
         private val SEGMENT_JOIN_TOLERANCE_MS = TimeUnit.SECONDS.toMillis(2)

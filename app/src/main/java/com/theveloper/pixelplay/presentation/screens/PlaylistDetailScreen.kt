@@ -97,7 +97,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.HapticFeedbackConstantsCompat
-import androidx.core.view.ViewCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
@@ -117,6 +116,8 @@ import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
 import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel.Companion.FOLDER_PLAYLIST_PREFIX
+import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.pixelplay.presentation.utils.performAppCompatHapticFeedback
 import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistSongsOrderMode
 import com.theveloper.pixelplay.utils.formatTotalDuration
@@ -193,6 +194,7 @@ fun PlaylistDetailScreen(
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val view = LocalView.current
+    val appHapticsConfig = LocalAppHapticsConfig.current
     var lastMovedFrom by remember { mutableStateOf<Int?>(null) }
     var lastMovedTo by remember { mutableStateOf<Int?>(null) }
 
@@ -614,14 +616,16 @@ fun PlaylistDetailScreen(
                                                 modifier = Modifier
                                                     .draggableHandle(
                                                         onDragStarted = {
-                                                            ViewCompat.performHapticFeedback(
+                                                            performAppCompatHapticFeedback(
                                                                 view,
+                                                                appHapticsConfig,
                                                                 HapticFeedbackConstantsCompat.GESTURE_START
                                                             )
                                                         },
                                                         onDragStopped = {
-                                                            ViewCompat.performHapticFeedback(
+                                                            performAppCompatHapticFeedback(
                                                                 view,
+                                                                appHapticsConfig,
                                                                 HapticFeedbackConstantsCompat.GESTURE_END
                                                             )
                                                         }

@@ -7,10 +7,16 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +37,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ClearAll
@@ -43,16 +52,25 @@ import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Style
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Science
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.LinearWavyProgressIndicator
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,9 +78,12 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -84,8 +105,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
@@ -94,7 +120,9 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.theveloper.pixelplay.R
+import com.theveloper.pixelplay.data.backup.BackupOperationType
 import com.theveloper.pixelplay.data.backup.BackupSection
+import com.theveloper.pixelplay.data.backup.BackupTransferProgressUpdate
 import com.theveloper.pixelplay.data.preferences.AppThemeMode
 import com.theveloper.pixelplay.data.preferences.CarouselStyle
 import com.theveloper.pixelplay.data.preferences.LaunchTab
@@ -103,7 +131,6 @@ import com.theveloper.pixelplay.data.preferences.NavBarStyle
 import com.theveloper.pixelplay.data.preferences.ThemePreference
 import com.theveloper.pixelplay.data.model.Song
 import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.worker.SyncProgress
 import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
 import com.theveloper.pixelplay.presentation.components.FileExplorerDialog
 import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
@@ -112,9 +139,10 @@ import com.theveloper.pixelplay.presentation.navigation.Screen
 import com.theveloper.pixelplay.presentation.viewmodel.LyricsRefreshProgress
 import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
 import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
 
 @androidx.annotation.OptIn(UnstableApi::class)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsCategoryScreen(
     categoryId: String,
@@ -141,6 +169,7 @@ fun SettingsCategoryScreen(
     val isExplorerReady by settingsViewModel.isExplorerReady.collectAsState()
     val isSyncing by settingsViewModel.isSyncing.collectAsState()
     val syncProgress by settingsViewModel.syncProgress.collectAsState()
+    val dataTransferProgress by settingsViewModel.dataTransferProgress.collectAsState()
     val allSongs by playerViewModel.allSongsFlow.collectAsState()
     val explorerRoot = settingsViewModel.explorerRoot()
 
@@ -157,7 +186,7 @@ fun SettingsCategoryScreen(
     var importSections by remember { mutableStateOf(BackupSection.defaultSelection) }
 
     val exportLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/json")
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri ->
         if (uri != null) {
             settingsViewModel.exportAppData(uri, exportSections)
@@ -617,19 +646,11 @@ fun SettingsCategoryScreen(
                                     onCheckedChange = { settingsViewModel.setTapBackgroundClosesPlayer(it) },
                                     leadingIcon = { Icon(painterResource(R.drawable.rounded_touch_app_24), null, tint = MaterialTheme.colorScheme.secondary) }
                                 )
-                                SwitchSettingItem(
-                                    title = "Haptic feedback",
-                                    subtitle = "Enable vibration feedback across the app.",
-                                    checked = uiState.hapticsEnabled,
-                                    onCheckedChange = { settingsViewModel.setHapticsEnabled(it) },
-                                    leadingIcon = { Icon(painterResource(R.drawable.rounded_touch_app_24), null, tint = MaterialTheme.colorScheme.secondary) }
-                                )
                             }
                         }
                         SettingsCategory.BEHAVIOR -> {
                             SettingsSubsection(
-                                title = "Folders",
-                                addBottomSpace = false
+                                title = "Folders"
                             ) {
                                 SwitchSettingItem(
                                     title = "Back gesture controls folders",
@@ -643,6 +664,18 @@ fun SettingsCategoryScreen(
                                             tint = MaterialTheme.colorScheme.secondary
                                         )
                                     }
+                                )
+                            }
+                            SettingsSubsection(
+                                title = "Haptics",
+                                addBottomSpace = false
+                            ) {
+                                SwitchSettingItem(
+                                    title = "Haptic feedback",
+                                    subtitle = "Enable vibration feedback across the app.",
+                                    checked = uiState.hapticsEnabled,
+                                    onCheckedChange = { settingsViewModel.setHapticsEnabled(it) },
+                                    leadingIcon = { Icon(painterResource(R.drawable.rounded_touch_app_24), null, tint = MaterialTheme.colorScheme.secondary) }
                                 )
                             }
                         }
@@ -720,6 +753,51 @@ fun SettingsCategoryScreen(
                                 )
                             }
                         }
+                        SettingsCategory.BACKUP_RESTORE -> {
+                            if (!uiState.backupInfoDismissed) {
+                                BackupInfoNoticeCard(
+                                    onDismiss = { settingsViewModel.setBackupInfoDismissed(true) }
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+
+                            SettingsSubsection(title = "Create Backup") {
+                                ActionSettingsItem(
+                                    title = "Export Backup",
+                                    subtitle = "${buildBackupSelectionSummary(exportSections)} Creates a .pxpl backup file.",
+                                    icon = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.outline_save_24),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary
+                                        )
+                                    },
+                                    primaryActionLabel = "Select & Export",
+                                    onPrimaryAction = { showExportDataDialog = true },
+                                    enabled = !uiState.isDataTransferInProgress
+                                )
+                            }
+
+                            SettingsSubsection(
+                                title = "Restore Backup",
+                                addBottomSpace = false
+                            ) {
+                                ActionSettingsItem(
+                                    title = "Import Backup",
+                                    subtitle = "${buildBackupSelectionSummary(importSections)} Selected data will replace current data.",
+                                    icon = {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Restore,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary
+                                        )
+                                    },
+                                    primaryActionLabel = "Select & Restore",
+                                    onPrimaryAction = { showImportDataDialog = true },
+                                    enabled = !uiState.isDataTransferInProgress
+                                )
+                            }
+                        }
                         SettingsCategory.DEVELOPER -> {
                             SettingsSubsection(title = "Experiments") {
                                 SettingsItem(
@@ -753,17 +831,6 @@ fun SettingsCategoryScreen(
                                     icon = { Icon(painterResource(R.drawable.rounded_monitoring_24), null, tint = MaterialTheme.colorScheme.secondary) },
                                     primaryActionLabel = "Regenerate Stats",
                                     onPrimaryAction = { showRegenerateStatsDialog = true }
-                                )
-                                ActionSettingsItem(
-                                    title = "Backup and Restore",
-                                    subtitle = "Export or import selected app data sections.",
-                                    icon = { Icon(Icons.Outlined.Info, null, tint = MaterialTheme.colorScheme.secondary) },
-                                    primaryActionLabel = "Export Data",
-                                    onPrimaryAction = { showExportDataDialog = true },
-                                    secondaryActionLabel = "Import Data",
-                                    onSecondaryAction = { showImportDataDialog = true },
-                                    enabled = !uiState.isDataTransferInProgress
-                                   
                                 )
                                 ActionSettingsItem(
                                     title = "Force Album Palette Regeneration",
@@ -852,6 +919,10 @@ fun SettingsCategoryScreen(
                 }
             )
         }
+    }
+
+    dataTransferProgress?.let { progress ->
+        BackupTransferProgressDialog(progress = progress)
     }
 
     // Dialogs
@@ -996,133 +1067,540 @@ fun SettingsCategoryScreen(
     }
 
     if (showExportDataDialog) {
-        val sectionLabels = remember {
-            mapOf(
-                BackupSection.PREFERENCES to "Preferences and playlists",
-                BackupSection.FAVORITES to "Favorites",
-                BackupSection.LYRICS to "Lyrics",
-                BackupSection.SEARCH_HISTORY to "Search history",
-                BackupSection.TRANSITIONS to "Transition rules"
-            )
-        }
-        AlertDialog(
-            title = { Text("Export Data") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    BackupSection.entries.forEach { section ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .pointerInput(section, exportSections) {
-                                    detectTapGestures {
-                                        exportSections = if (section in exportSections) {
-                                            exportSections - section
-                                        } else {
-                                            exportSections + section
-                                        }
-                                    }
-                                }
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = section in exportSections,
-                                onCheckedChange = { checked ->
-                                    exportSections = if (checked) exportSections + section else exportSections - section
-                                }
-                            )
-                            Text(sectionLabels[section] ?: section.key)
-                        }
-                    }
-                }
-            },
-            onDismissRequest = { showExportDataDialog = false },
-            confirmButton = {
-                TextButton(
-                    enabled = exportSections.isNotEmpty() && !uiState.isDataTransferInProgress,
-                    onClick = {
-                        showExportDataDialog = false
-                        val fileName = "PixelPlayer_Backup_${System.currentTimeMillis()}.json"
-                        exportLauncher.launch(fileName)
-                    }
-                ) {
-                    Text("Export")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showExportDataDialog = false }) {
-                    Text("Cancel")
-                }
+        BackupSectionSelectionDialog(
+            operation = BackupOperationType.EXPORT,
+            title = "Export Backup",
+            supportingText = "Choose exactly what you want to include in the backup package.",
+            selectedSections = exportSections,
+            confirmLabel = "Export .pxpl",
+            inProgress = uiState.isDataTransferInProgress,
+            onDismiss = { showExportDataDialog = false },
+            onSelectionChanged = { exportSections = it },
+            onConfirm = {
+                showExportDataDialog = false
+                val fileName = "PixelPlayer_Backup_${System.currentTimeMillis()}.pxpl"
+                exportLauncher.launch(fileName)
             }
         )
     }
 
     if (showImportDataDialog) {
-        val sectionLabels = remember {
-            mapOf(
-                BackupSection.PREFERENCES to "Preferences and playlists",
-                BackupSection.FAVORITES to "Favorites",
-                BackupSection.LYRICS to "Lyrics",
-                BackupSection.SEARCH_HISTORY to "Search history",
-                BackupSection.TRANSITIONS to "Transition rules"
+        BackupSectionSelectionDialog(
+            operation = BackupOperationType.IMPORT,
+            title = "Import Backup",
+            supportingText = "Selected sections will replace your current app data.",
+            selectedSections = importSections,
+            confirmLabel = "Import Backup",
+            inProgress = uiState.isDataTransferInProgress,
+            onDismiss = { showImportDataDialog = false },
+            onSelectionChanged = { importSections = it },
+            onConfirm = {
+                showImportDataDialog = false
+                importLauncher.launch("*/*")
+            }
+        )
+    }
+}
+
+private fun buildBackupSelectionSummary(selected: Set<BackupSection>): String {
+    if (selected.isEmpty()) return "No sections selected."
+    val total = BackupSection.entries.size
+    return if (selected.size == total) {
+        "All sections selected."
+    } else {
+        "Selected ${selected.size} of $total sections."
+    }
+}
+
+private fun backupSectionIconRes(section: BackupSection): Int {
+    return when (section) {
+        BackupSection.PLAYLISTS -> R.drawable.rounded_playlist_play_24
+        BackupSection.GLOBAL_SETTINGS -> R.drawable.rounded_settings_24
+        BackupSection.FAVORITES -> R.drawable.rounded_favorite_24
+        BackupSection.LYRICS -> R.drawable.rounded_lyrics_24
+        BackupSection.SEARCH_HISTORY -> R.drawable.rounded_search_24
+        BackupSection.TRANSITIONS -> R.drawable.rounded_align_justify_space_even_24
+        BackupSection.ENGAGEMENT_STATS -> R.drawable.rounded_monitoring_24
+        BackupSection.PLAYBACK_HISTORY -> R.drawable.rounded_schedule_24
+    }
+}
+
+@Composable
+private fun BackupInfoNoticeCard(
+    onDismiss: () -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.rounded_upload_file_24),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .size(20.dp)
             )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "How backup works",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Choose sections, export a .pxpl file, and import it later. Restore only replaces the sections you select.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
+                )
+            }
+
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.rounded_close_24),
+                    contentDescription = "Close notice",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
-        AlertDialog(
-            title = { Text("Import Data") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(
-                        text = "Selected sections will replace current data.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BackupSectionSelectionDialog(
+    operation: BackupOperationType,
+    title: String,
+    supportingText: String,
+    selectedSections: Set<BackupSection>,
+    confirmLabel: String,
+    inProgress: Boolean,
+    onDismiss: () -> Unit,
+    onSelectionChanged: (Set<BackupSection>) -> Unit,
+    onConfirm: () -> Unit
+) {
+    val listState = rememberLazyListState()
+    val selectedCount = selectedSections.size
+    val totalCount = BackupSection.entries.size
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.surfaceContainerLowest
+        ) {
+            Scaffold(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                contentWindowInsets = WindowInsets.systemBars,
+                topBar = {
+                    CenterAlignedTopAppBar(
+                        title = {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontSize = 24.sp,
+                                    textGeometricTransform = TextGeometricTransform(scaleX = 1.2f),
+                                ),
+                                fontFamily = GoogleSansRounded,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        navigationIcon = {
+                            FilledIconButton(
+                                modifier = Modifier.padding(start = 6.dp),
+                                onClick = onDismiss,
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                                    contentColor = MaterialTheme.colorScheme.onSurface
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = "Close"
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        )
                     )
-                    BackupSection.entries.forEach { section ->
+                },
+                bottomBar = {
+                    BottomAppBar(
+                        windowInsets = WindowInsets.navigationBars,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .pointerInput(section, importSections) {
-                                    detectTapGestures {
-                                        importSections = if (section in importSections) {
-                                            importSections - section
-                                        } else {
-                                            importSections + section
-                                        }
-                                    }
-                                }
-                                .padding(vertical = 4.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Checkbox(
-                                checked = section in importSections,
-                                onCheckedChange = { checked ->
-                                    importSections = if (checked) importSections + section else importSections - section
+                            Row(
+                                modifier = Modifier.padding(start = 10.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                FilledIconButton(
+                                    onClick = { onSelectionChanged(BackupSection.entries.toSet()) },
+                                    enabled = !inProgress,
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.round_select_all_24),
+                                        contentDescription = "Select all"
+                                    )
                                 }
-                            )
-                            Text(sectionLabels[section] ?: section.key)
+                                FilledIconButton(
+                                    onClick = { onSelectionChanged(emptySet()) },
+                                    enabled = !inProgress,
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                        contentColor = MaterialTheme.colorScheme.onSurface
+                                    )
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_deselect_24),
+                                        contentDescription = "Clear selection"
+                                    )
+                                }
+                            }
+
+                            ExtendedFloatingActionButton(
+                                onClick = onConfirm,
+                                modifier = Modifier
+                                    .padding(end = 6.dp)
+                                    .height(48.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                containerColor = if (operation == BackupOperationType.EXPORT) {
+                                    MaterialTheme.colorScheme.tertiaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                },
+                                contentColor = if (operation == BackupOperationType.EXPORT) {
+                                    MaterialTheme.colorScheme.onTertiaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                }
+                            ) {
+                                if (inProgress) {
+                                    LoadingIndicator(modifier = Modifier.height(20.dp))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (operation == BackupOperationType.EXPORT) "Exporting" else "Importing",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                } else {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(
+                                                if (operation == BackupOperationType.EXPORT) {
+                                                    R.drawable.outline_save_24
+                                                } else {
+                                                    R.drawable.rounded_upload_file_24
+                                                }
+                                            ),
+                                            contentDescription = confirmLabel
+                                        )
+
+                                        Text(
+                                            text = if (operation == BackupOperationType.EXPORT) {
+                                                "Export Backup"
+                                            } else {
+                                                "Import Backup"
+                                            }
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            },
-            onDismissRequest = { showImportDataDialog = false },
-            confirmButton = {
-                TextButton(
-                    enabled = importSections.isNotEmpty() && !uiState.isDataTransferInProgress,
-                    onClick = {
-                        showImportDataDialog = false
-                        importLauncher.launch("application/json")
-                    }
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .padding(horizontal = 18.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text("Import")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showImportDataDialog = false }) {
-                    Text("Cancel")
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.62f),
+                        shape = RoundedCornerShape(18.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = supportingText,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "$selectedCount of $totalCount sections selected",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            if (inProgress) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    LoadingIndicator(modifier = Modifier.height(24.dp))
+                                    Text(
+                                        text = "Transfer in progress...",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 18.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(BackupSection.entries, key = { it.key }) { section ->
+                            val isSelected = section in selectedSections
+                            BackupSectionSelectableCard(
+                                section = section,
+                                selected = isSelected,
+                                enabled = !inProgress,
+                                onToggle = {
+                                    onSelectionChanged(
+                                        if (isSelected) selectedSections - section else selectedSections + section
+                                    )
+                                }
+                            )
+                        }
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BackupSectionSelectableCard(
+    section: BackupSection,
+    selected: Boolean,
+    enabled: Boolean,
+    onToggle: () -> Unit
+) {
+    val borderColor by animateColorAsState(
+        targetValue = if (selected) {
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+        } else {
+            Color.Transparent
+        },
+        label = "backup_section_border"
+    )
+    val borderWidth by animateDpAsState(
+        targetValue = if (selected) 2.5.dp else 1.dp,
+        label = "backup_section_border_width"
+    )
+    val iconContainerColor by animateColorAsState(
+        targetValue = if (selected) {
+            MaterialTheme.colorScheme.secondaryContainer
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerHighest
+        },
+        label = "backup_section_icon_bg"
+    )
+    val iconTint by animateColorAsState(
+        targetValue = if (selected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        label = "backup_section_icon_tint"
+    )
+
+    Surface(
+        onClick = onToggle,
+        enabled = enabled,
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        border = BorderStroke(width = borderWidth, color = borderColor),
+        tonalElevation = if (selected) 2.dp else 0.dp,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Surface(
+                    color = iconContainerColor,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(backupSectionIconRes(section)),
+                            contentDescription = null,
+                            tint = iconTint,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = section.label,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = GoogleSansRounded
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = section.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Switch(
+                    checked = selected,
+                    onCheckedChange = { onToggle() },
+                    enabled = enabled,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun BackupTransferProgressDialog(progress: BackupTransferProgressUpdate) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress.progress,
+        animationSpec = spring(stiffness = Spring.StiffnessLow),
+        label = "BackupTransferProgress"
+    )
+
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
         )
+    ) {
+        Surface(
+            shape = RoundedCornerShape(28.dp),
+            tonalElevation = 6.dp,
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = if (progress.operation == BackupOperationType.EXPORT) {
+                        "Creating Backup"
+                    } else {
+                        "Restoring Backup"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                CircularWavyProgressIndicator(modifier = Modifier.size(44.dp))
+                LoadingIndicator(modifier = Modifier.height(24.dp))
+
+                LinearWavyProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(50)),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                )
+
+                Text(
+                    text = "Step ${progress.step.coerceAtLeast(1)} of ${progress.totalSteps}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                AnimatedContent(
+                    targetState = progress.title,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "BackupStepTitle"
+                ) { animatedTitle ->
+                    Text(
+                        text = animatedTitle,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Text(
+                    text = progress.detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 

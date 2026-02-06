@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import com.theveloper.pixelplay.data.model.Song
 import com.theveloper.pixelplay.presentation.components.subcomps.LibraryActionRow
 import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
@@ -44,6 +46,7 @@ import com.theveloper.pixelplay.presentation.viewmodel.PlaylistUiState
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
 import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PlaylistBottomSheet(
@@ -67,6 +70,7 @@ fun PlaylistBottomSheet(
         if (searchQuery.isBlank()) playlistUiState.playlists
         else playlistUiState.playlists.filter { it.name.contains(searchQuery, true) }
     }
+    val hasGeminiApiKey by playerViewModel.hasGeminiApiKey.collectAsState()
 
     val selectedPlaylists = remember {
         mutableStateMapOf<String, Boolean>().apply {
@@ -148,11 +152,9 @@ fun PlaylistBottomSheet(
                     },
                     iconRotation = 0f,
                     showSortButton = false,
-                    showGenerateButton = false,
                     onSortClick = { },
                     isPlaylistTab = true,
                     isFoldersTab = false,
-                    onGenerateWithAiClick = { },
                     currentFolder = null,
                     folderRootPath = "",
                     folderRootLabel = "Internal Storage",
@@ -187,7 +189,11 @@ fun PlaylistBottomSheet(
                         },
                         onGenerateClick = {
                             showCreatePlaylistDialog = false
-                            playerViewModel.showAiPlaylistSheet()
+                            if (hasGeminiApiKey) {
+                                playerViewModel.showAiPlaylistSheet()
+                            } else {
+                                playerViewModel.sendToast("Set your Gemini API key first")
+                            }
                         }
                     )
                 }

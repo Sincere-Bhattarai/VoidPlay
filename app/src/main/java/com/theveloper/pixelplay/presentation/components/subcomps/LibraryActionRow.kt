@@ -80,9 +80,7 @@ fun LibraryActionRow(
     onLocateClick: () -> Unit = {},
     showSortButton: Boolean,
     showLocateButton: Boolean = false,
-    showGenerateButton: Boolean = true,
     isPlaylistTab: Boolean,
-    onGenerateWithAiClick: () -> Unit,
     onImportM3uClick: () -> Unit = {},
     isFoldersTab: Boolean,
     modifier: Modifier = Modifier,
@@ -125,12 +123,12 @@ fun LibraryActionRow(
                 )
             } else {
                 val newButtonEndCorner by animateDpAsState(
-                    targetValue = if (isPlaylistTab && showGenerateButton) 6.dp else 26.dp,
+                    targetValue = if (isPlaylistTab) 8.dp else 26.dp,
                     label = "NewButtonEndCorner"
                 )
-                val generateButtonStartCorner by animateDpAsState(
+                val importButtonStartCorner by animateDpAsState(
                     targetValue = if (isPlaylistTab) 6.dp else 26.dp,
-                    label = "GenerateButtonStartCorner"
+                    label = "ImportButtonStartCorner"
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Determine button colors based on shuffle state (not for playlist tab)
@@ -204,54 +202,11 @@ fun LibraryActionRow(
                         Row(modifier = Modifier.height(genHeight), verticalAlignment = Alignment.CenterVertically) {
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            if (showGenerateButton) {
-                                FilledTonalButton(
-                                    onClick = onGenerateWithAiClick,
-                                    shape = RoundedCornerShape(
-                                        topStart = generateButtonStartCorner,
-                                        bottomStart = generateButtonStartCorner,
-                                        topEnd = 8.dp,
-                                        bottomEnd = 8.dp
-                                    ),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ),
-                                    elevation = ButtonDefaults.buttonElevation(
-                                        defaultElevation = 4.dp,
-                                        pressedElevation = 6.dp
-                                    ),
-                                    contentPadding = PaddingValues(
-                                        horizontal = 14.dp,
-                                        vertical = 10.dp
-                                    ),
-                                    modifier = Modifier.height(genHeight)
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.generate_playlist_ai),
-                                            contentDescription = "Generate with AI",
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Text(
-                                            text = "AI",
-                                            overflow = TextOverflow.Ellipsis,
-                                            style = MaterialTheme.typography.labelLarge,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(6.dp))
-                            }
-
                             FilledTonalButton(
                                 onClick = onImportM3uClick,
                                 shape = RoundedCornerShape(
-                                    topStart = if (showGenerateButton) 8.dp else generateButtonStartCorner,
-                                    bottomStart = if (showGenerateButton) 8.dp else generateButtonStartCorner,
+                                    topStart = importButtonStartCorner,
+                                    bottomStart = importButtonStartCorner,
                                     topEnd = 26.dp,
                                     bottomEnd = 26.dp
                                 ),

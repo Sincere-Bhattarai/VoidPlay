@@ -21,7 +21,6 @@ import com.google.android.gms.cast.MediaStatus
 import timber.log.Timber
 import com.theveloper.pixelplay.utils.QueueUtils
 import com.theveloper.pixelplay.utils.MediaItemBuilder
-import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.abs
 
 @Singleton
@@ -337,6 +336,59 @@ class PlaybackStateHolder @Inject constructor(
     /*                               Shuffle & Repeat                             */
     /* -------------------------------------------------------------------------- */
 
+    private fun reorderQueueInPlace(player: Player, desiredQueue: List<Song>): Boolean {
+        if (desiredQueue.isEmpty()) return false
+
+        val currentCount = player.mediaItemCount
+        if (currentCount != desiredQueue.size) {
+            Timber.tag(TAG).w(
+                "Cannot reorder queue in place: size mismatch (player=%d, desired=%d)",
+                currentCount,
+                desiredQueue.size
+            )
+            return false
+        }
+
+        val currentIds = MutableList(currentCount) { index ->
+            player.getMediaItemAt(index).mediaId
+        }
+        val desiredIds = desiredQueue.map { it.id }
+
+        val currentCounts = currentIds.groupingBy { it }.eachCount()
+        val desiredCounts = desiredIds.groupingBy { it }.eachCount()
+        if (currentCounts != desiredCounts) {
+            Timber.tag(TAG).w("Cannot reorder queue in place: mediaId mismatch")
+            return false
+        }
+
+        for (targetIndex in desiredIds.indices) {
+            val desiredId = desiredIds[targetIndex]
+            if (currentIds[targetIndex] == desiredId) continue
+
+            var fromIndex = -1
+            for (searchIndex in targetIndex + 1 until currentIds.size) {
+                if (currentIds[searchIndex] == desiredId) {
+                    fromIndex = searchIndex
+                    break
+                }
+            }
+
+            if (fromIndex == -1) {
+                Timber.tag(TAG).w(
+                    "Cannot reorder queue in place: target mediaId '%s' not found",
+                    desiredId
+                )
+                return false
+            }
+
+            player.moveMediaItem(fromIndex, targetIndex)
+            val movedId = currentIds.removeAt(fromIndex)
+            currentIds.add(targetIndex, movedId)
+        }
+
+        return true
+    }
+
     fun toggleShuffle(
         currentSongs: List<Song>,
         currentSong: Song?,
@@ -375,20 +427,20 @@ class PlaybackStateHolder @Inject constructor(
                     val targetIndex = shuffledQueue.indexOfFirst { it.id == currentMediaId }
                         .takeIf { it != -1 } ?: currentIndex
 
-                    // Prepare player for seamless transition - maintains playback state
-                    val wasPlaying = player.isPlaying
-                    
-                    dualPlayerEngine.masterPlayer.setMediaItems(
-                         shuffledQueue.map { MediaItemBuilder.build(it) },
-                         targetIndex,
-                         currentPosition
-                    )
-                    
-                    // Resume if was playing - player should continue seamlessly
-                    if (wasPlaying && !player.isPlaying) {
-                        player.play()
+                    val reordered = reorderQueueInPlace(player, shuffledQueue)
+                    if (!reordered) {
+                        // Last-resort fallback if local queue snapshot got desynced from player timeline.
+                        val wasPlaying = player.isPlaying
+                        dualPlayerEngine.masterPlayer.setMediaItems(
+                            shuffledQueue.map { MediaItemBuilder.build(it) },
+                            targetIndex,
+                            currentPosition
+                        )
+                        if (wasPlaying && !player.isPlaying) {
+                            player.play()
+                        }
                     }
-                    
+
                     updateQueueCallback(shuffledQueue)
                     _stablePlayerState.update { it.copy(isShuffleEnabled = true) }
                     
@@ -423,17 +475,17 @@ class PlaybackStateHolder @Inject constructor(
                     }
 
                     // Preserve playback state during queue rebuild
-                    val wasPlaying = player.isPlaying
-
-                     dualPlayerEngine.masterPlayer.setMediaItems(
-                         originalQueue.map { MediaItemBuilder.build(it) },
-                         originalIndex,
-                         currentPosition
-                    )
-                    
-                    // Resume if was playing
-                    if (wasPlaying && !player.isPlaying) {
-                        player.play()
+                    val reordered = reorderQueueInPlace(player, originalQueue)
+                    if (!reordered) {
+                        val wasPlaying = player.isPlaying
+                        dualPlayerEngine.masterPlayer.setMediaItems(
+                            originalQueue.map { MediaItemBuilder.build(it) },
+                            originalIndex,
+                            currentPosition
+                        )
+                        if (wasPlaying && !player.isPlaying) {
+                            player.play()
+                        }
                     }
 
                     updateQueueCallback(originalQueue)

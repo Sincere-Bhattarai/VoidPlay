@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.theveloper.pixelplay.data.backup.AppDataBackupManager
 import com.theveloper.pixelplay.data.backup.BackupSection
+import com.theveloper.pixelplay.data.backup.BackupOperationType
+import com.theveloper.pixelplay.data.backup.BackupTransferProgressUpdate
 import com.theveloper.pixelplay.data.preferences.AppThemeMode
 import com.theveloper.pixelplay.data.preferences.CarouselStyle
 import com.theveloper.pixelplay.data.preferences.LibraryNavigationMode
@@ -65,6 +67,7 @@ data class SettingsUiState(
     val hapticsEnabled: Boolean = true,
     val immersiveLyricsEnabled: Boolean = false,
     val immersiveLyricsTimeout: Long = 4000L,
+    val backupInfoDismissed: Boolean = false,
     val isDataTransferInProgress: Boolean = false
 )
 
@@ -171,6 +174,9 @@ class SettingsViewModel @Inject constructor(
     private val _dataTransferEvents = MutableSharedFlow<String>()
     val dataTransferEvents: SharedFlow<String> = _dataTransferEvents.asSharedFlow()
 
+    private val _dataTransferProgress = MutableStateFlow<BackupTransferProgressUpdate?>(null)
+    val dataTransferProgress: StateFlow<BackupTransferProgressUpdate?> = _dataTransferProgress.asStateFlow()
+
     init {
         // Consolidated collectors using combine() to reduce coroutine overhead
         // Instead of 20 separate coroutines, we use 2 combined flows
@@ -276,6 +282,12 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferencesRepository.fullPlayerLoadingTweaksFlow.collect { tweaks ->
                 _uiState.update { it.copy(fullPlayerLoadingTweaks = tweaks) }
+            }
+        }
+
+        viewModelScope.launch {
+            userPreferencesRepository.backupInfoDismissedFlow.collect { dismissed ->
+                _uiState.update { it.copy(backupInfoDismissed = dismissed) }
             }
         }
 
@@ -659,25 +671,50 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setBackupInfoDismissed(dismissed: Boolean) {
+        viewModelScope.launch {
+            userPreferencesRepository.setBackupInfoDismissed(dismissed)
+        }
+    }
+
     fun exportAppData(uri: Uri, sections: Set<BackupSection>) {
-        if (sections.isEmpty()) return
+        if (sections.isEmpty() || _uiState.value.isDataTransferInProgress) return
         viewModelScope.launch {
             _uiState.update { it.copy(isDataTransferInProgress = true) }
-            val result = appDataBackupManager.exportToUri(uri, sections)
-            _uiState.update { it.copy(isDataTransferInProgress = false) }
+            _dataTransferProgress.value = BackupTransferProgressUpdate(
+                operation = BackupOperationType.EXPORT,
+                step = 0,
+                totalSteps = 1,
+                title = "Preparing backup",
+                detail = "Starting backup task."
+            )
+            val result = appDataBackupManager.exportToUri(uri, sections) { progress ->
+                _dataTransferProgress.value = progress
+            }
             result.fold(
                 onSuccess = { _dataTransferEvents.emit("Data exported successfully") },
                 onFailure = { _dataTransferEvents.emit("Export failed: ${it.localizedMessage ?: "Unknown error"}") }
             )
+            delay(450)
+            _uiState.update { it.copy(isDataTransferInProgress = false) }
+            _dataTransferProgress.value = null
         }
     }
 
     fun importAppData(uri: Uri, sections: Set<BackupSection>) {
-        if (sections.isEmpty()) return
+        if (sections.isEmpty() || _uiState.value.isDataTransferInProgress) return
         viewModelScope.launch {
             _uiState.update { it.copy(isDataTransferInProgress = true) }
-            val result = appDataBackupManager.importFromUri(uri, sections)
-            _uiState.update { it.copy(isDataTransferInProgress = false) }
+            _dataTransferProgress.value = BackupTransferProgressUpdate(
+                operation = BackupOperationType.IMPORT,
+                step = 0,
+                totalSteps = 1,
+                title = "Preparing restore",
+                detail = "Starting restore task."
+            )
+            val result = appDataBackupManager.importFromUri(uri, sections) { progress ->
+                _dataTransferProgress.value = progress
+            }
             result.fold(
                 onSuccess = {
                     _dataTransferEvents.emit("Data imported successfully")
@@ -685,6 +722,9 @@ class SettingsViewModel @Inject constructor(
                 },
                 onFailure = { _dataTransferEvents.emit("Import failed: ${it.localizedMessage ?: "Unknown error"}") }
             )
+            delay(450)
+            _uiState.update { it.copy(isDataTransferInProgress = false) }
+            _dataTransferProgress.value = null
         }
     }
 }

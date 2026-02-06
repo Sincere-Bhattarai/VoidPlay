@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.annotation.OptIn
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -18,8 +17,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.background
@@ -650,6 +647,9 @@ fun UnifiedPlayerSheet(
     val queueDragThresholdPx by remember(queueHiddenOffsetPx) {
         derivedStateOf { queueHiddenOffsetPx * 0.08f }
     }
+    val queueMinFlingTravelPx by remember(density) {
+        derivedStateOf { with(density) { 18.dp.toPx() } }
+    }
     var pendingSaveQueueOverlay by remember { mutableStateOf<SaveQueueOverlayData?>(null) }
     var showCastSheet by remember { mutableStateOf(false) }
     var castSheetOpenFraction by remember { mutableFloatStateOf(0f) }
@@ -666,6 +666,12 @@ fun UnifiedPlayerSheet(
             queueHiddenOffsetPx
         }
         queueSheetOffset.snapTo(targetOffset)
+    }
+
+    LaunchedEffect(showQueueSheet, queueHiddenOffsetPx) {
+        if (!showQueueSheet && queueHiddenOffsetPx > 0f && queueSheetOffset.value != queueHiddenOffsetPx) {
+            queueSheetOffset.snapTo(queueHiddenOffsetPx)
+        }
     }
 
     suspend fun animateQueueSheetInternal(targetExpanded: Boolean) {
@@ -706,8 +712,13 @@ fun UnifiedPlayerSheet(
         if (queueHiddenOffsetPx == 0f || !allowQueueSheetInteraction) return
         val isFastUpward = velocity < -650f
         val isFastDownward = velocity > 650f
+        val hasMeaningfulUpwardTravel = totalDrag < -queueMinFlingTravelPx
         val shouldExpand =
-            isFastUpward || (!isFastDownward && (queueSheetOffset.value < queueHiddenOffsetPx - queueDragThresholdPx || totalDrag < -queueDragThresholdPx))
+            (isFastUpward && hasMeaningfulUpwardTravel) ||
+                    (!isFastDownward && (
+                            queueSheetOffset.value < queueHiddenOffsetPx - queueDragThresholdPx ||
+                                    totalDrag < -queueDragThresholdPx
+                            ))
         animateQueueSheet(shouldExpand)
     }
 
@@ -781,24 +792,21 @@ fun UnifiedPlayerSheet(
         derivedStateOf { showQueueSheet && queueHiddenOffsetPx > 0f && queueSheetOffset.value < queueHiddenOffsetPx }
     }
 
-    val queueOpenFraction by remember(queueSheetOffset, queueHiddenOffsetPx) {
+    val queueVisualOpenFraction by remember(queueSheetOffset, showQueueSheet, screenHeightPx) {
         derivedStateOf {
-            if (queueHiddenOffsetPx == 0f) 0f else (1f - (queueSheetOffset.value / queueHiddenOffsetPx)).coerceIn(
-                0f,
-                1f
-            )
+            if (!showQueueSheet || screenHeightPx <= 0f) {
+                0f
+            } else {
+                val revealPx = (screenHeightPx - queueSheetOffset.value).coerceAtLeast(0f)
+                (revealPx / screenHeightPx).coerceIn(0f, 1f)
+            }
         }
     }
-    val effectiveQueueOpenFraction by remember(queueOpenFraction, showQueueSheet, queueHiddenOffsetPx) {
-        derivedStateOf {
-            if (queueHiddenOffsetPx == 0f && showQueueSheet) 1f else queueOpenFraction
-        }
+    val bottomSheetOpenFraction by remember(queueVisualOpenFraction, castSheetOpenFraction) {
+        derivedStateOf { max(queueVisualOpenFraction, castSheetOpenFraction) }
     }
-    val bottomSheetOpenFraction by remember(effectiveQueueOpenFraction, castSheetOpenFraction) {
-        derivedStateOf { max(effectiveQueueOpenFraction, castSheetOpenFraction) }
-    }
-    val queueScrimAlpha by remember(effectiveQueueOpenFraction) {
-        derivedStateOf { (effectiveQueueOpenFraction * 0.45f).coerceIn(0f, 0.45f) }
+    val queueScrimAlpha by remember(queueVisualOpenFraction) {
+        derivedStateOf { (queueVisualOpenFraction * 0.45f).coerceIn(0f, 0.45f) }
     }
 
     val updatedPendingSaveOverlay = rememberUpdatedState(pendingSaveQueueOverlay)
@@ -1151,6 +1159,10 @@ fun UnifiedPlayerSheet(
 
                                             val targetState =
                                                 when {
+                                                    currentSheetContentState == PlayerSheetState.EXPANDED &&
+                                                            accumulatedDragYSinceStart <= 0f ->
+                                                        PlayerSheetState.EXPANDED
+
                                                     abs(accumulatedDragYSinceStart) > minDragThresholdPx ->
                                                         if (accumulatedDragYSinceStart < 0) PlayerSheetState.EXPANDED else PlayerSheetState.COLLAPSED
 
@@ -1385,17 +1397,11 @@ fun UnifiedPlayerSheet(
                         LocalMaterialTheme provides (albumColorScheme ?: MaterialTheme.colorScheme)
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            AnimatedVisibility(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .zIndex(0f),
-                                visible = queueScrimAlpha > 0f,
-                                enter = fadeIn(animationSpec = tween(ANIMATION_DURATION_MS)),
-                                exit = fadeOut(animationSpec = tween(ANIMATION_DURATION_MS))
-                            ) {
+                            if (queueScrimAlpha > 0f) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
+                                        .matchParentSize()
+                                        .zIndex(0f)
                                         .graphicsLayer { alpha = queueScrimAlpha }
                                         .background(MaterialTheme.colorScheme.scrim)
                                 )

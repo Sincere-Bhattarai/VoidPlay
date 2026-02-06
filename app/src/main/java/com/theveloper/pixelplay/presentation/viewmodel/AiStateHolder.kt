@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,6 +52,16 @@ class AiStateHolder @Inject constructor(
     private var playSongsCallback: ((List<Song>, Song, String) -> Unit)? = null // songs, startSong, queueName
     private var openPlayerSheetCallback: (() -> Unit)? = null
 
+    private val titleStopWords = setOf(
+        "a", "an", "the", "and", "or", "for", "to", "of", "in", "on", "with", "by", "from",
+        "de", "la", "el", "los", "las", "y", "o", "para", "con", "por", "del", "al", "un", "una",
+        "core", "request", "mood", "target", "activity", "context", "era", "focus", "prioritize",
+        "genres", "avoid", "preferred", "language", "energy", "level", "discovery", "where",
+        "familiar", "deep", "cuts", "keep", "transitions", "smooth", "repetitive", "artist",
+        "clustering", "songs", "listener", "favorites", "explicit", "lyrics", "alternatives",
+        "whenever", "possible"
+    )
+
     fun initialize(
         scope: CoroutineScope,
         allSongsProvider: () -> List<Song>,
@@ -77,7 +88,17 @@ class AiStateHolder @Inject constructor(
         _isGeneratingAiPlaylist.value = false
     }
 
-    fun generateAiPlaylist(prompt: String, minLength: Int, maxLength: Int, saveAsPlaylist: Boolean = false) {
+    fun clearAiPlaylistError() {
+        _aiError.value = null
+    }
+
+    fun generateAiPlaylist(
+        prompt: String,
+        minLength: Int,
+        maxLength: Int,
+        saveAsPlaylist: Boolean = false,
+        playlistName: String? = null
+    ) {
         val scope = this.scope ?: return
         val allSongs = allSongsProvider?.invoke() ?: emptyList()
         val favoriteIds = favoriteSongIdsProvider?.invoke() ?: emptySet()
@@ -87,6 +108,11 @@ class AiStateHolder @Inject constructor(
             _aiError.value = null
 
             try {
+                val existingPlaylistNames = userPreferencesRepository.userPlaylistsFlow.first()
+                    .map { it.name.trim() }
+                    .filter { it.isNotEmpty() }
+                    .toSet()
+
                 // Generate candidate pool using DailyMixManager logic
                 val candidatePool = dailyMixManager.generateDailyMix(
                     allSongs = allSongs,
@@ -105,14 +131,18 @@ class AiStateHolder @Inject constructor(
                 result.onSuccess { generatedSongs ->
                     if (generatedSongs.isNotEmpty()) {
                         if (saveAsPlaylist) {
-                            val playlistName = "AI: ${prompt.take(25)}${if (prompt.length > 25) "..." else ""}"
+                            val resolvedPlaylistName = resolveAiPlaylistName(
+                                requestedName = playlistName,
+                                prompt = prompt,
+                                existingNames = existingPlaylistNames
+                            )
                             val songIds = generatedSongs.map { it.id }
                             userPreferencesRepository.createPlaylist(
-                                name = playlistName,
+                                name = resolvedPlaylistName,
                                 songIds = songIds,
                                 isAiGenerated = true
                             )
-                            toastEmitter?.invoke("AI Playlist '$playlistName' created!")
+                            toastEmitter?.invoke("AI Playlist '$resolvedPlaylistName' created!")
                             dismissAiPlaylistSheet()
                         } else {
                             // Play immediately logic
@@ -199,5 +229,78 @@ class AiStateHolder @Inject constructor(
 
     fun onCleared() {
         scope = null
+    }
+
+    private fun resolveAiPlaylistName(
+        requestedName: String?,
+        prompt: String,
+        existingNames: Set<String>
+    ): String {
+        val normalizedExisting = existingNames.map { it.lowercase() }.toSet()
+        val baseName = requestedName?.trim().takeUnless { it.isNullOrEmpty() }
+            ?: generateShortAiTitle(prompt)
+
+        var candidate = baseName.ifBlank { "AI Mix" }
+        if (candidate.lowercase() !in normalizedExisting) {
+            return candidate
+        }
+
+        var counter = 2
+        while ("$candidate $counter".lowercase() in normalizedExisting) {
+            counter++
+        }
+        return "$candidate $counter"
+    }
+
+    private fun generateShortAiTitle(prompt: String): String {
+        val coreRequest = Regex("(?i)core request:\\s*([^.]*)")
+            .find(prompt)
+            ?.groupValues
+            ?.getOrNull(1)
+            ?.trim()
+            .orEmpty()
+
+        val source = if (coreRequest.isNotBlank()) coreRequest else prompt
+        val normalizedText = source
+            .lowercase()
+            .replace(Regex("[^\\p{L}\\p{N}\\s]"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+
+        val tokens = normalizedText
+            .split(" ")
+            .filter { token ->
+                token.length >= 3 && token !in titleStopWords
+            }
+
+        val compactTitle = when {
+            tokens.size >= 2 -> tokens.take(2).joinToString(" ")
+            tokens.size == 1 -> "${tokens.first()} mix"
+            else -> fallbackTitleByKeyword(normalizedText)
+        }
+
+        return compactTitle
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            .split(" ")
+            .joinToString(" ") { part ->
+                part.replaceFirstChar { ch -> if (ch.isLowerCase()) ch.titlecase() else ch.toString() }
+            }
+            .take(26)
+            .trim()
+            .ifBlank { "AI Mix" }
+    }
+
+    private fun fallbackTitleByKeyword(text: String): String {
+        return when {
+            listOf("workout", "gym", "run", "cardio").any { text.contains(it) } -> "Workout Mix"
+            listOf("focus", "study", "work", "productivity").any { text.contains(it) } -> "Focus Flow"
+            listOf("chill", "relax", "calm", "lofi").any { text.contains(it) } -> "Chill Vibes"
+            listOf("party", "dance", "club").any { text.contains(it) } -> "Party Mix"
+            listOf("night", "late", "sleep").any { text.contains(it) } -> "Night Vibes"
+            listOf("road", "trip", "drive").any { text.contains(it) } -> "Road Trip"
+            listOf("romantic", "love").any { text.contains(it) } -> "Love Notes"
+            listOf("sad", "melancholic").any { text.contains(it) } -> "Blue Hour"
+            else -> "Fresh Mix"
+        }
     }
 }

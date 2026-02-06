@@ -339,11 +339,17 @@ interface MusicDao {
     @Query("SELECT image_url FROM artists WHERE id = :artistId")
     suspend fun getArtistImageUrl(artistId: Long): String?
 
+    @Query("SELECT image_url FROM artists WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name)) LIMIT 1")
+    suspend fun getArtistImageUrlByNormalizedName(name: String): String?
+
     @Query("UPDATE artists SET image_url = :imageUrl WHERE id = :artistId")
     suspend fun updateArtistImageUrl(artistId: Long, imageUrl: String)
 
     @Query("SELECT id FROM artists WHERE name = :name LIMIT 1")
     suspend fun getArtistIdByName(name: String): Long?
+
+    @Query("SELECT id FROM artists WHERE LOWER(TRIM(name)) = LOWER(TRIM(:name)) LIMIT 1")
+    suspend fun getArtistIdByNormalizedName(name: String): Long?
 
     @Query("SELECT MAX(id) FROM artists")
     suspend fun getMaxArtistId(): Long?

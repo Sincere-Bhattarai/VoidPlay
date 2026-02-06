@@ -133,7 +133,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.core.view.HapticFeedbackConstantsCompat
-import androidx.core.view.ViewCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -145,6 +144,8 @@ import com.theveloper.pixelplay.presentation.components.subcomps.PlayingEqIcon
 import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
 import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.pixelplay.presentation.utils.performAppCompatHapticFeedback
 import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import sh.calvin.reorderable.ReorderableItem
@@ -297,6 +298,7 @@ fun QueueBottomSheet(
     var draggingSheetFromList by remember { mutableStateOf(false) }
     var listDragAccumulated by remember { mutableStateOf(0f) }
     val view = LocalView.current
+    val appHapticsConfig = LocalAppHapticsConfig.current
     var lastMovedFrom by remember { mutableStateOf<Int?>(null) }
     var lastMovedTo by remember { mutableStateOf<Int?>(null) }
     var pendingReorderSongId by remember { mutableStateOf<String?>(null) }
@@ -655,18 +657,20 @@ fun QueueBottomSheet(
                                                 onClick = {},
                                                 modifier = Modifier
                                                     .draggableHandle(
-                                                            onDragStarted = {
-                                                                draggingSheetFromList = false
-                                                                reorderHandleInUse = true
-                                                                ViewCompat.performHapticFeedback(
-                                                                    view,
+                                                        onDragStarted = {
+                                                            draggingSheetFromList = false
+                                                            reorderHandleInUse = true
+                                                            performAppCompatHapticFeedback(
+                                                                view,
+                                                                appHapticsConfig,
                                                                 HapticFeedbackConstantsCompat.GESTURE_START
                                                             )
                                                         },
                                                         onDragStopped = {
                                                             reorderHandleInUse = false
-                                                            ViewCompat.performHapticFeedback(
+                                                            performAppCompatHapticFeedback(
                                                                 view,
+                                                                appHapticsConfig,
                                                                 HapticFeedbackConstantsCompat.GESTURE_END
                                                             )
                                                         }
@@ -1716,6 +1720,7 @@ fun QueuePlaylistSongItem(
         )
 
         val hapticView = LocalView.current
+        val appHapticsConfig = LocalAppHapticsConfig.current
         var dismissHapticPlayed by remember { mutableStateOf(false) }
 
         LaunchedEffect(dismissProgress, enableSwipeToDismiss) {
@@ -1728,8 +1733,9 @@ fun QueuePlaylistSongItem(
 
             if (dismissProgress > hapticTriggerProgress && !dismissHapticPlayed) {
                 dismissHapticPlayed = true
-                ViewCompat.performHapticFeedback(
+                performAppCompatHapticFeedback(
                     hapticView,
+                    appHapticsConfig,
                     HapticFeedbackConstantsCompat.GESTURE_END
                 )
             } else if (dismissProgress < resetThreshold) {

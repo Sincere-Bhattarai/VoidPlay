@@ -67,6 +67,7 @@ import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.size.Size
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -440,6 +441,7 @@ private fun CustomCollapsingTopBar(
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(artist.imageUrl)
+                        .size(Size.ORIGINAL)
                         .crossfade(true)
                         .build(),
                     contentDescription = artist.name,

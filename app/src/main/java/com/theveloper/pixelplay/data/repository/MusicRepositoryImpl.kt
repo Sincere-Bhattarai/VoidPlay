@@ -210,13 +210,14 @@ class MusicRepositoryImpl @Inject constructor(
             getAudioFiles(),
             musicDao.getAllArtistsRaw()
         ) { songs, dbArtists ->
-            val dbArtistsMap = dbArtists.associateBy { it.id }
+            val dbArtistsByNormalizedName = dbArtists.associateBy { it.name.trim().lowercase() }
             
             val artists = songs.groupBy { it.artistId }
                 .map { (artistId, songs) ->
                     val first = songs.first()
-                    // Get image URL from DB cache if available
-                    val imageUrl = dbArtistsMap[artistId]?.imageUrl
+                    val normalizedArtistName = first.artist.trim().lowercase()
+                    // Read image from DB using artist name to avoid ID mismatches across data sources.
+                    val imageUrl = dbArtistsByNormalizedName[normalizedArtistName]?.imageUrl
                     
                     Artist(
                         id = artistId,
@@ -229,7 +230,15 @@ class MusicRepositoryImpl @Inject constructor(
             
             // Trigger prefetch for missing images
             // We use a separate list to avoid passing the entire heavy payload to the IO dispatcher if not needed
-            val missingImages = artists.filter { it.imageUrl == null }.map { it.id to it.name }
+            val missingImages = artists.asSequence()
+                .filter { it.imageUrl.isNullOrEmpty() && it.name.isNotBlank() }
+                .map { artist ->
+                    val normalizedArtistName = artist.name.trim().lowercase()
+                    val cacheArtistId = dbArtistsByNormalizedName[normalizedArtistName]?.id ?: artist.id
+                    cacheArtistId to artist.name
+                }
+                .distinctBy { (_, artistName) -> artistName.trim().lowercase() }
+                .toList()
             if (missingImages.isNotEmpty()) {
                 // Ensure this doesn't block the UI flow emission
                kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch {

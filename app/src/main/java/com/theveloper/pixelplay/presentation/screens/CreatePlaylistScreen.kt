@@ -112,6 +112,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
+import com.theveloper.pixelplay.utils.resolvePlaylistCoverContentColor
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Outline
@@ -1376,19 +1377,7 @@ fun ThickSlider(
 
 
 fun getThemeContentColor(colorArgb: Int, scheme: androidx.compose.material3.ColorScheme): Color {
-    return when (colorArgb) {
-        scheme.primary.toArgb() -> scheme.onPrimary
-        scheme.primaryContainer.toArgb() -> scheme.onPrimaryContainer
-        scheme.secondary.toArgb() -> scheme.onSecondary
-        scheme.secondaryContainer.toArgb() -> scheme.onSecondaryContainer
-        scheme.tertiary.toArgb() -> scheme.onTertiary
-        scheme.tertiaryContainer.toArgb() -> scheme.onTertiaryContainer
-        scheme.error.toArgb() -> scheme.onError
-        scheme.errorContainer.toArgb() -> scheme.onErrorContainer
-        scheme.surfaceContainerHigh.toArgb() -> scheme.onSurface
-        scheme.inverseSurface.toArgb() -> scheme.inverseOnSurface
-        else -> scheme.onPrimaryContainer
-    }
+    return resolvePlaylistCoverContentColor(colorArgb, scheme)
 }
 
 // End of file

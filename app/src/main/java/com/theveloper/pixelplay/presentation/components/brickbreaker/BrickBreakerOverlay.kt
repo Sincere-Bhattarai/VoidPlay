@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
+import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.pixelplay.presentation.utils.performAppHapticFeedback
 import kotlinx.coroutines.isActive
 import kotlin.math.abs
 import kotlin.math.max
@@ -113,6 +115,7 @@ fun BrickBreakerOverlay(
     val colorScheme = MaterialTheme.colorScheme
     val density = LocalDensity.current
     val view = androidx.compose.ui.platform.LocalView.current
+    val appHapticsConfig = LocalAppHapticsConfig.current
 
     // Game Physics Constants
     val baseBallVelocity = 800f
@@ -366,7 +369,10 @@ fun BrickBreakerOverlay(
                 nextPos = nextPos.copy(y = paddleRect.top - ballRadius - 1f)
                 
                 // Haptic on paddle hit
-                view.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                view.performAppHapticFeedback(
+                    appHapticsConfig,
+                    android.view.HapticFeedbackConstants.KEYBOARD_TAP
+                )
             }
 
             // --- Brick Collisions ---
@@ -395,7 +401,10 @@ fun BrickBreakerOverlay(
                     }
 
                     // Haptic on impact
-                   view.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
+                    view.performAppHapticFeedback(
+                        appHapticsConfig,
+                        android.view.HapticFeedbackConstants.CLOCK_TICK
+                    )
 
                     if (brick.type != BrickType.Solid) {
                         val newHits = brick.hitsRemaining - 1
@@ -411,8 +420,11 @@ fun BrickBreakerOverlay(
                             bricks[index] = brick.copy(hitsRemaining = newHits) // Will be skipped next frame
                             score += if (brick.type == BrickType.Hard) 100 else 50
                             
-                             // Stronger haptic on break
-                            view.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                            // Stronger haptic on break
+                            view.performAppHapticFeedback(
+                                appHapticsConfig,
+                                android.view.HapticFeedbackConstants.LONG_PRESS
+                            )
                         }
                         
                         nextVelocity = nextVelocity * 1.015f

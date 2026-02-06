@@ -88,6 +88,7 @@ import androidx.compose.material.icons.automirrored.rounded.PlaylistPlay
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
@@ -100,6 +101,7 @@ import com.theveloper.pixelplay.presentation.navigation.Screen // Required for S
 import com.theveloper.pixelplay.presentation.screens.search.components.GenreCategoriesGrid
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
@@ -130,6 +132,7 @@ fun SearchScreen(
     val favoriteSongIds by playerViewModel.favoriteSongIds.collectAsState()
     var showSongInfoBottomSheet by remember { mutableStateOf(false) }
     var selectedSongForInfo by remember { mutableStateOf<Song?>(null) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(Unit) {
         playerViewModel.searchNavDoubleTapEvents.collect {
@@ -180,8 +183,14 @@ fun SearchScreen(
 
     val colorScheme = MaterialTheme.colorScheme
 
-    LaunchedEffect(active) {
+    LaunchedEffect(active, keyboardController) {
         onSearchBarActiveChange(active)
+        if (active) {
+            delay(90L)
+            keyboardController?.show()
+        } else {
+            keyboardController?.hide()
+        }
     }
 
     DisposableEffect(Unit) {

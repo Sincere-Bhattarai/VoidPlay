@@ -112,7 +112,7 @@ fun LibrarySortBottomSheet(
                             bottomEnd = 20.dp
                         )
                     ),
-                verticalArrangement = Arrangement.spacedBy(3.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 safeOptions.forEach { option ->
                     // Defensive null-check for selectedOption in case it's null at runtime
