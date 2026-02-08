@@ -34,6 +34,8 @@ class ThemeStateHolder @Inject constructor(
 
     private val _currentAlbumArtColorSchemePair = MutableStateFlow<ColorSchemePair?>(null)
     val currentAlbumArtColorSchemePair: StateFlow<ColorSchemePair?> = _currentAlbumArtColorSchemePair.asStateFlow()
+    private val _currentAlbumArtUri = MutableStateFlow<String?>(null)
+    val currentAlbumArtUri: StateFlow<String?> = _currentAlbumArtUri.asStateFlow()
 
     private val _lavaLampColors = MutableStateFlow<ImmutableList<Color>>(persistentListOf())
     val lavaLampColors: StateFlow<ImmutableList<Color>> = _lavaLampColors.asStateFlow()
@@ -65,7 +67,7 @@ class ThemeStateHolder @Inject constructor(
 
                 if (!styleChanged) return@collect
 
-                val uri = currentAlbumArtUri ?: return@collect
+                val uri = _currentAlbumArtUri.value ?: return@collect
                 val refreshedScheme = colorSchemeProcessor.getOrGenerateColorScheme(
                     albumArtUri = uri,
                     paletteStyle = style
@@ -82,15 +84,13 @@ class ThemeStateHolder @Inject constructor(
         }
     }
 
-    private var currentAlbumArtUri: String? = null
-
     suspend fun extractAndGenerateColorScheme(albumArtUriAsUri: Uri?, currentSongUriString: String?, isPreload: Boolean = false) {
         Trace.beginSection("ThemeStateHolder.extractAndGenerateColorScheme")
         try {
             if (albumArtUriAsUri == null) {
                 if (!isPreload && currentSongUriString == null) {
                     _currentAlbumArtColorSchemePair.value = null
-                    currentAlbumArtUri = null
+                    _currentAlbumArtUri.value = null
                 }
                 return
             }
@@ -104,12 +104,12 @@ class ThemeStateHolder @Inject constructor(
 
             if (!isPreload && currentSongUriString == uriString) {
                 _currentAlbumArtColorSchemePair.value = schemePair
-                currentAlbumArtUri = uriString
+                _currentAlbumArtUri.value = uriString
             }
         } catch (e: Exception) {
             if (!isPreload && albumArtUriAsUri != null && currentSongUriString == albumArtUriAsUri.toString()) {
                 _currentAlbumArtColorSchemePair.value = null
-                currentAlbumArtUri = null
+                _currentAlbumArtUri.value = null
             }
         } finally {
             Trace.endSection()
@@ -167,7 +167,7 @@ class ThemeStateHolder @Inject constructor(
         regenerateAllStyles: Boolean = false
     ) {
          android.util.Log.d("ThemeStateHolder", "forceRegenerateColorScheme called for: $uriString")
-         android.util.Log.d("ThemeStateHolder", "Current tracked global URI: $currentAlbumArtUri")
+         android.util.Log.d("ThemeStateHolder", "Current tracked global URI: ${_currentAlbumArtUri.value}")
          
          colorSchemeProcessor.invalidateScheme(uriString)
 
@@ -200,7 +200,7 @@ class ThemeStateHolder @Inject constructor(
          
          // Also update the main current album art scheme if it matches the one we are tracking
          // We use equality check. If they are the same string object or equal content.
-         if (currentAlbumArtUri == uriString) {
+         if (_currentAlbumArtUri.value == uriString) {
              android.util.Log.d("ThemeStateHolder", "Updating global color scheme flow directly.")
              _currentAlbumArtColorSchemePair.value = newScheme
          } else {

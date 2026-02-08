@@ -1,4 +1,4 @@
-@file:kotlin.OptIn(ExperimentalMaterial3Api::class)
+@file:kotlin.OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 
 package com.theveloper.pixelplay.presentation.components
 
@@ -43,8 +43,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -186,6 +188,10 @@ fun UnifiedPlayerSheet(
     val currentQueueSourceName by remember {
         playerViewModel.playerUiState.map { it.currentQueueSourceName }.distinctUntilChanged()
     }.collectAsState(initial = "")
+
+    val preparingSongId by remember {
+        playerViewModel.playerUiState.map { it.preparingSongId }.distinctUntilChanged()
+    }.collectAsState(initial = null as String?)
 
     val showDismissUndoBar by remember {
         playerViewModel.playerUiState.map { it.showDismissUndoBar }.distinctUntilChanged()
@@ -751,6 +757,7 @@ fun UnifiedPlayerSheet(
 
     // val currentAlbumColorSchemePair by playerViewModel.currentAlbumArtColorSchemePair.collectAsState() // Replaced by activePlayerColorSchemePair
     val activePlayerSchemePair by playerViewModel.activePlayerColorSchemePair.collectAsState()
+    val themedAlbumArtUri by playerViewModel.currentThemedAlbumArtUri.collectAsState()
     val isDarkTheme = LocalPixelPlayDarkTheme.current
     val systemColorScheme = MaterialTheme.colorScheme // This is the standard M3 theme
     val isAlbumArtTheme = playerThemePreference == ThemePreference.ALBUM_ART
@@ -761,28 +768,62 @@ fun UnifiedPlayerSheet(
     val activePlayerScheme = remember(activePlayerSchemePair, isDarkTheme) {
         activePlayerSchemePair?.let { if (isDarkTheme) it.dark else it.light }
     }
-
-    var lastAlbumScheme by remember { mutableStateOf<ColorScheme?>(null) }
-    LaunchedEffect(activePlayerScheme) {
-        if (activePlayerScheme != null) {
-            lastAlbumScheme = activePlayerScheme
+    val currentSongActiveScheme = remember(activePlayerScheme, currentSong?.albumArtUriString, themedAlbumArtUri) {
+        if (
+            activePlayerScheme != null &&
+            !currentSong?.albumArtUriString.isNullOrBlank() &&
+            currentSong?.albumArtUriString == themedAlbumArtUri
+        ) {
+            activePlayerScheme
+        } else {
+            null
         }
     }
 
-    val albumColorScheme = activePlayerScheme ?: lastAlbumScheme ?: systemColorScheme
+    var lastAlbumScheme by remember { mutableStateOf<ColorScheme?>(null) }
+    var lastAlbumSchemeSongId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(currentSong?.id) {
+        if (currentSong?.id != lastAlbumSchemeSongId) {
+            lastAlbumScheme = null
+            lastAlbumSchemeSongId = null
+        }
+    }
+    LaunchedEffect(currentSongActiveScheme, currentSong?.id) {
+        val currentSongId = currentSong?.id
+        if (currentSongId != null && currentSongActiveScheme != null) {
+            lastAlbumScheme = currentSongActiveScheme
+            lastAlbumSchemeSongId = currentSongId
+        }
+    }
+
+    val sameSongLastAlbumScheme = remember(currentSong?.id, lastAlbumSchemeSongId, lastAlbumScheme) {
+        if (currentSong?.id != null && currentSong?.id == lastAlbumSchemeSongId) {
+            lastAlbumScheme
+        } else {
+            null
+        }
+    }
+    val isPreparingPlayback = remember(preparingSongId, currentSong?.id) {
+        preparingSongId != null && preparingSongId == currentSong?.id
+    }
+
+    val albumColorScheme = if (isAlbumArtTheme) {
+        currentSongActiveScheme ?: sameSongLastAlbumScheme ?: systemColorScheme
+    } else {
+        systemColorScheme
+    }
 
     val miniPlayerScheme = when {
         !needsAlbumScheme -> systemColorScheme
-        activePlayerScheme != null -> activePlayerScheme
-        else -> lastAlbumScheme
+        currentSongActiveScheme != null -> currentSongActiveScheme
+        sameSongLastAlbumScheme != null -> sameSongLastAlbumScheme
+        else -> systemColorScheme
     }
     val miniAppearProgress = remember { Animatable(0f) }
-    LaunchedEffect(currentSong?.id, needsAlbumScheme, lastAlbumScheme, activePlayerScheme) {
-        val canShow = !needsAlbumScheme || activePlayerScheme != null || lastAlbumScheme != null
-        miniAppearProgress.snapTo(if (canShow) 1f else 0f)
-    }
-    LaunchedEffect(activePlayerScheme, needsAlbumScheme, currentSong?.id) {
-        if (needsAlbumScheme && activePlayerScheme != null && miniAppearProgress.value < 1f) {
+    LaunchedEffect(currentSong?.id) {
+        if (currentSong == null) {
+            miniAppearProgress.snapTo(0f)
+        } else if (miniAppearProgress.value < 1f) {
             miniAppearProgress.animateTo(
                 targetValue = 1f,
                 animationSpec = tween(durationMillis = 260, easing = FastOutSlowInEasing)
@@ -1147,6 +1188,7 @@ fun UnifiedPlayerSheet(
                                                     cornerRadiusAlb = (overallSheetTopCornerRadius.value * 0.5).dp,
                                                     isPlaying = infrequentPlayerState.isPlaying, // from top-level stablePlayerState
                                                     isCastConnecting = isCastConnecting,
+                                                    isPreparingPlayback = isPreparingPlayback,
                                                     onPlayPause = { playerViewModel.playPause() },
                                                     onPrevious = { playerViewModel.previousSong() },
                                                     onNext = { playerViewModel.nextSong() },
@@ -1593,6 +1635,7 @@ private fun MiniPlayerContentInternal(
     song: Song,
     isPlaying: Boolean,
     isCastConnecting: Boolean,
+    isPreparingPlayback: Boolean,
     onPlayPause: () -> Unit,
     onPrevious: () -> Unit,
     cornerRadiusAlb: Dp,
@@ -1600,6 +1643,7 @@ private fun MiniPlayerContentInternal(
     modifier: Modifier = Modifier
 ) {
     val hapticFeedback = LocalHapticFeedback.current
+    val controlsEnabled = !isCastConnecting && !isPreparingPlayback
 
     val interaction = remember { MutableInteractionSource() }
     val indication: Indication = ripple(bounded = false)
@@ -1624,6 +1668,8 @@ private fun MiniPlayerContentInternal(
                     strokeWidth = 2.dp,
                     color = LocalMaterialTheme.current.onPrimaryContainer
                 )
+            } else if (isPreparingPlayback) {
+                CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
             }
         }
         Spacer(modifier = Modifier.width(12.dp))
@@ -1646,12 +1692,16 @@ private fun MiniPlayerContentInternal(
             )
 
             AutoScrollingText(
-                text = if (isCastConnecting) "Connecting to device…" else song.title,
+                text = when {
+                    isCastConnecting -> "Connecting to device…"
+                    isPreparingPlayback -> "Preparing playback…"
+                    else -> song.title
+                },
                 style = titleStyle,
                 gradientEdgeColor = LocalMaterialTheme.current.primaryContainer
             )
             AutoScrollingText(
-                text = song.displayArtist,
+                text = if (isPreparingPlayback) "Loading audio…" else song.displayArtist,
                 style = artistStyle,
                 gradientEdgeColor = LocalMaterialTheme.current.primaryContainer
             )
@@ -1666,7 +1716,7 @@ private fun MiniPlayerContentInternal(
                 .clickable(
                     interactionSource = interaction,
                     indication = indication,
-                    enabled = !isCastConnecting
+                    enabled = controlsEnabled
                 ) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onPrevious()
@@ -1691,7 +1741,7 @@ private fun MiniPlayerContentInternal(
                 .clickable(
                     interactionSource = interaction,
                     indication = indication,
-                    enabled = !isCastConnecting
+                    enabled = controlsEnabled
                 ) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onPlayPause()
@@ -1716,7 +1766,7 @@ private fun MiniPlayerContentInternal(
                 .clickable(
                     interactionSource = interaction,
                     indication = indication,
-                    enabled = !isCastConnecting
+                    enabled = controlsEnabled
                 ) { onNext() },
             contentAlignment = Alignment.Center
         ) {

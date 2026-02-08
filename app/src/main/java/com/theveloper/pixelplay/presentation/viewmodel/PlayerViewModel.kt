@@ -217,6 +217,7 @@ class PlayerViewModel @Inject constructor(
     // Theme & Colors - delegated to ThemeStateHolder
     val currentAlbumArtColorSchemePair: StateFlow<ColorSchemePair?> = themeStateHolder.currentAlbumArtColorSchemePair
     val activePlayerColorSchemePair: StateFlow<ColorSchemePair?> = themeStateHolder.activePlayerColorSchemePair
+    val currentThemedAlbumArtUri: StateFlow<String?> = themeStateHolder.currentAlbumArtUri
 
     val playerThemePreference: StateFlow<String> = userPreferencesRepository.playerThemePreferenceFlow
         .stateIn(
@@ -1655,9 +1656,7 @@ class PlayerViewModel @Inject constructor(
                 )
                 if (isPlaying) {
                     _isSheetVisible.value = true
-                    if (_playerUiState.value.preparingSongId != null) {
-                        _playerUiState.update { it.copy(preparingSongId = null) }
-                    }
+                    clearPreparingSongIfMatching(playerCtrl.currentMediaItem?.mediaId)
                     startProgressUpdates()
                 } else {
                     stopProgressUpdates()
@@ -1751,6 +1750,7 @@ class PlayerViewModel @Inject constructor(
                 if (isRemoteSessionControllingPlayback()) return
                 refreshPlaybackAudioMetadata(playerCtrl)
                 if (playbackState == Player.STATE_READY) {
+                    clearPreparingSongIfMatching(playerCtrl.currentMediaItem?.mediaId)
                     val songDurationHint = playbackStateHolder.stablePlayerState.value.currentSong?.duration ?: 0L
                     val resolvedDuration = playbackStateHolder.resolveDurationForPlaybackState(
                         reportedDurationMs = playerCtrl.duration,
@@ -1765,6 +1765,7 @@ class PlayerViewModel @Inject constructor(
                     listeningStatsTracker.finalizeCurrentSession()
                 }
                 if (playbackState == Player.STATE_IDLE && playerCtrl.mediaItemCount == 0) {
+                    clearPreparingSongIfMatching()
                     if (!isCastConnecting.value && !isRemotePlaybackActive.value) {
                         listeningStatsTracker.onPlaybackStopped()
                         lyricsStateHolder.cancelLoading()
@@ -1935,6 +1936,39 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
+    private fun setPreparingSong(songId: String?) {
+        _playerUiState.update { state ->
+            if (state.preparingSongId == songId) state else state.copy(preparingSongId = songId)
+        }
+    }
+
+    private fun beginPreparingSong(song: Song) {
+        setPreparingSong(song.id)
+        viewModelScope.launch(Dispatchers.IO) {
+            val albumArtUri = song.albumArtUriString
+            if (albumArtUri.isNullOrBlank()) {
+                themeStateHolder.extractAndGenerateColorScheme(
+                    albumArtUriAsUri = null,
+                    currentSongUriString = null,
+                    isPreload = false
+                )
+            } else {
+                themeStateHolder.extractAndGenerateColorScheme(
+                    albumArtUriAsUri = albumArtUri.toUri(),
+                    currentSongUriString = albumArtUri,
+                    isPreload = false
+                )
+            }
+        }
+    }
+
+    private fun clearPreparingSongIfMatching(mediaId: String? = null) {
+        val preparingSongId = _playerUiState.value.preparingSongId ?: return
+        if (mediaId == null || preparingSongId == mediaId) {
+            setPreparingSong(null)
+        }
+    }
+
 
 
     private suspend fun internalPlaySongs(songsToPlay: List<Song>, startSong: Song, queueName: String = "None", playlistId: String? = null) {
@@ -1945,6 +1979,7 @@ class PlayerViewModel @Inject constructor(
         
         val castSession = castStateHolder.castSession.value
         if (castSession != null && castSession.remoteMediaClient != null) {
+            clearPreparingSongIfMatching()
             castTransferStateHolder.playRemoteQueue(
                 songsToPlay = songsToPlay,
                 startSong = startSong,
@@ -1960,6 +1995,22 @@ class PlayerViewModel @Inject constructor(
                 )
             }
         } else {
+            beginPreparingSong(startSong)
+            _playerUiState.update {
+                it.copy(
+                    currentPlaybackQueue = songsToPlay.toImmutableList(),
+                    currentQueueSourceName = queueName
+                )
+            }
+            playbackStateHolder.updateStablePlayerState {
+                it.copy(
+                    currentSong = startSong,
+                    isPlaying = true,
+                    totalDuration = startSong.duration.coerceAtLeast(0L)
+                )
+            }
+            _isSheetVisible.value = true
+
             val playSongsAction = {
                 // Use Direct Engine Access to avoid TransactionTooLargeException on Binder
                 val enginePlayer = dualPlayerEngine.masterPlayer
@@ -1990,15 +2041,8 @@ class PlayerViewModel @Inject constructor(
                     enginePlayer.setMediaItems(mediaItems, startIndex, 0L)
                     enginePlayer.prepare()
                     enginePlayer.play()
-                    
-                    _playerUiState.update { it.copy(currentPlaybackQueue = songsToPlay.toImmutableList(), currentQueueSourceName = queueName) }
-                    playbackStateHolder.updateStablePlayerState {
-                        it.copy(
-                            currentSong = startSong,
-                            isPlaying = true,
-                            totalDuration = startSong.duration.coerceAtLeast(0L)
-                        )
-                    }
+                } else {
+                    clearPreparingSongIfMatching(startSong.id)
                 }
                 _playerUiState.update { it.copy(isLoadingInitialSongs = false) }
             }
@@ -2016,6 +2060,12 @@ class PlayerViewModel @Inject constructor(
 
 
     private fun loadAndPlaySong(song: Song) {
+        beginPreparingSong(song)
+        playbackStateHolder.updateStablePlayerState {
+            it.copy(currentSong = song, isPlaying = true)
+        }
+        _isSheetVisible.value = true
+
         val controller = mediaController
         if (controller == null) {
             pendingPlaybackAction = {
@@ -2035,13 +2085,6 @@ class PlayerViewModel @Inject constructor(
             controller.setMediaItem(mediaItem)
             controller.prepare()
             controller.play()
-        }
-        playbackStateHolder.updateStablePlayerState { it.copy(currentSong = song, isPlaying = true) }
-        viewModelScope.launch {
-            song.albumArtUriString?.toUri()?.let { uri ->
-                val currentUri = playbackStateHolder.stablePlayerState.value.currentSong?.albumArtUriString
-                themeStateHolder.extractAndGenerateColorScheme(uri, currentUri, isPreload = false)
-            }
         }
     }
 
