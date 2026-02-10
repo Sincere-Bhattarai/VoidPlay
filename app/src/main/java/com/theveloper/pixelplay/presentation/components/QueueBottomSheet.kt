@@ -96,6 +96,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.rememberUpdatedState
@@ -278,6 +281,13 @@ fun QueueBottomSheet(
 
     var items by remember { mutableStateOf(displaySongs.map { QueueUiItem(song = it) }) }
     var justReordered by remember { mutableStateOf(false) }
+
+    // --- Incremental rendering (pagination) ---
+    // Only render a window of items initially, then load more as user scrolls.
+    val queuePageSize = 50
+    var renderedItemCount by remember { mutableIntStateOf(
+        kotlin.math.min(displaySongs.size, maxOf(queuePageSize, currentSongDisplayIndex + queuePageSize))
+    ) }
     
     // Update items when queue changes, but skip if we just reordered to avoid flicker
     LaunchedEffect(displaySongs) {
@@ -286,13 +296,36 @@ fun QueueBottomSheet(
         } else {
             items = reconcileQueueUiItems(items, displaySongs)
         }
+        // Reset rendered count for new queue, ensuring current song is visible
+        renderedItemCount = kotlin.math.min(
+            items.size,
+            maxOf(queuePageSize, currentSongDisplayIndex + queuePageSize)
+        )
     }
     
     // Animate scroll when current song changes
     LaunchedEffect(currentSongDisplayIndex) {
         if (currentSongDisplayIndex > 0) {
+            // Ensure the current song index is within the rendered window
+            if (currentSongDisplayIndex >= renderedItemCount) {
+                renderedItemCount = kotlin.math.min(
+                    items.size,
+                    currentSongDisplayIndex + queuePageSize
+                )
+            }
             listState.animateScrollToItem(currentSongDisplayIndex)
         }
+    }
+
+    // Load more items as the user scrolls near the end of the rendered window
+    LaunchedEffect(listState, items.size) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0 }
+            .distinctUntilChanged()
+            .collect { lastVisibleIndex ->
+                if (lastVisibleIndex >= renderedItemCount - 15 && renderedItemCount < items.size) {
+                    renderedItemCount = kotlin.math.min(items.size, renderedItemCount + queuePageSize)
+                }
+            }
     }
     val canDragSheetFromList by remember {
         derivedStateOf {
@@ -339,6 +372,13 @@ fun QueueBottomSheet(
         derivedStateOf { reorderableState.isAnyItemDragging }
     }
     val updatedIsReordering by rememberUpdatedState(isReordering)
+
+    // During reorder, render all items so drag indices map correctly
+    LaunchedEffect(isReordering) {
+        if (isReordering) {
+            renderedItemCount = items.size
+        }
+    }
     val updatedOnQueueDragStart by rememberUpdatedState(onQueueDragStart)
     val updatedOnQueueDrag by rememberUpdatedState(onQueueDrag)
     val updatedOnQueueRelease by rememberUpdatedState(onQueueRelease)
@@ -624,7 +664,8 @@ fun QueueBottomSheet(
                                 Spacer(modifier = Modifier.height(6.dp))
                             }
 
-                            itemsIndexed(items, key = { _, item -> item.uniqueId }) { index, item ->
+                            val visibleItems = items.take(renderedItemCount)
+                            itemsIndexed(visibleItems, key = { _, item -> item.uniqueId }) { index, item ->
                                 val song = item.song
                                 // Use currentSongDisplayIndex for comparison since index is in displayQueue
                                 val canReorder = index > currentSongDisplayIndex
@@ -695,6 +736,23 @@ fun QueueBottomSheet(
                                             }
                                         }
                                     )
+                                }
+                            }
+
+                            // Loading indicator when more items are available
+                            if (renderedItemCount < items.size) {
+                                item("queue_loading_more") {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(24.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                    }
                                 }
                             }
                         }
