@@ -19,12 +19,28 @@ interface MusicRepository {
      * @return Flow que emite una lista completa de objetos Song.
      */
     fun getAudioFiles(): Flow<List<Song>> // Existing Flow for reactive updates
-    
+
     /**
      * Returns paginated songs for efficient display of large libraries.
      * @return Flow of PagingData<Song> for use with LazyPagingItems.
      */
     fun getPaginatedSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption): Flow<PagingData<Song>>
+
+    /**
+     * Returns paginated favorite songs for efficient display.
+     * @return Flow of PagingData<Song> for use with LazyPagingItems.
+     */
+    fun getPaginatedFavoriteSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption): Flow<PagingData<Song>>
+
+    /**
+     * Returns all favorite songs as a list (for playback queue on shuffle).
+     */
+    suspend fun getFavoriteSongsOnce(): List<Song>
+
+    /**
+     * Returns the count of favorite songs (reactive).
+     */
+    fun getFavoriteSongCountFlow(): Flow<Int>
 
     /**
      * Returns the count of songs in the library.
@@ -148,6 +164,18 @@ interface MusicRepository {
      * @return El nuevo estado de favorito (true si es favorito, false si no).
      */
     suspend fun toggleFavoriteStatus(songId: String): Boolean
+
+    /**
+     * Setea explícitamente el estado favorito de una canción.
+     * @param songId El ID de la canción.
+     * @param isFavorite Estado objetivo.
+     */
+    suspend fun setFavoriteStatus(songId: String, isFavorite: Boolean)
+
+    /**
+     * Obtiene IDs de canciones favoritas directamente desde Room (tabla favorites).
+     */
+    suspend fun getFavoriteSongIdsOnce(): Set<String>
 
     /**
      * Obtiene una canción específica por su ID.

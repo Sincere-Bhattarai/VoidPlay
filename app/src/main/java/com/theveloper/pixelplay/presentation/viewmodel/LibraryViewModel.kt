@@ -8,8 +8,12 @@ import javax.inject.Inject
 class LibraryViewModel @Inject constructor(
     private val libraryStateHolder: LibraryStateHolder
 ) : ViewModel() {
-    
+
     val songsPagingFlow = libraryStateHolder.songsPagingFlow
-    
+
+    val favoritesPagingFlow = libraryStateHolder.favoritesPagingFlow
+
+    val favoriteSongCountFlow = libraryStateHolder.favoriteSongCountFlow
+
     val isLoadingLibrary = libraryStateHolder.isLoadingLibrary
 }

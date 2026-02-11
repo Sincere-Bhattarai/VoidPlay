@@ -126,16 +126,16 @@ interface MusicDao {
                 deleteSongsByIds(chunk)
             }
         }
-        
+
         // Upsert artists, albums, and songs.
         insertArtists(artists)
         insertAlbums(albums)
-        
+
         // Insert songs in chunks to allow concurrent reads
         songs.chunked(SONG_BATCH_SIZE).forEach { chunk ->
             insertSongs(chunk)
         }
-        
+
         // Delete old cross-refs for updated songs and insert new ones
         val updatedSongIds = songs.map { it.id }
         updatedSongIds.chunked(CROSS_REF_BATCH_SIZE).forEach { chunk ->
@@ -144,7 +144,7 @@ interface MusicDao {
         crossRefs.chunked(CROSS_REF_BATCH_SIZE).forEach { chunk ->
             insertSongArtistCrossRefs(chunk)
         }
-        
+
         // Clean up orphaned albums and artists
         deleteOrphanedAlbums()
         deleteOrphanedArtists()
@@ -232,7 +232,7 @@ interface MusicDao {
         allowedParentDirs: List<String> = emptyList(),
         applyDirectoryFilter: Boolean = false
     ): Flow<List<SongEntity>>
-    
+
     // --- Paginated Queries for Large Libraries ---
     /**
      * Returns a PagingSource for songs, enabling efficient pagination for large libraries.
@@ -257,6 +257,105 @@ interface MusicDao {
         allowedParentDirs: List<String>,
         applyDirectoryFilter: Boolean,
         sortOrder: String
+    ): PagingSource<Int, SongEntity>
+
+    // --- Paginated Favorites Queries ---
+    /**
+     * Returns a PagingSource for favorite songs, enabling efficient pagination.
+     * Joins songs with favorites table and supports multi-sort.
+     */
+    @Query("""
+        SELECT songs.* FROM songs
+        INNER JOIN favorites ON songs.id = favorites.songId AND favorites.isFavorite = 1
+        WHERE (:applyDirectoryFilter = 0 OR songs.parent_directory_path IN (:allowedParentDirs))
+        ORDER BY
+            CASE WHEN :sortOrder = 'liked_title_az' THEN songs.title END ASC,
+            CASE WHEN :sortOrder = 'liked_title_za' THEN songs.title END DESC,
+            CASE WHEN :sortOrder = 'liked_artist' THEN songs.artist_name END ASC,
+            CASE WHEN :sortOrder = 'liked_album' THEN songs.album_name END ASC,
+            CASE WHEN :sortOrder = 'liked_date_liked' THEN favorites.timestamp END DESC,
+            songs.title ASC
+    """)
+    fun getFavoriteSongsPaginated(
+        allowedParentDirs: List<String>,
+        applyDirectoryFilter: Boolean,
+        sortOrder: String
+    ): PagingSource<Int, SongEntity>
+
+    /**
+     * Returns all favorite songs as a list (for playback queue when shuffling).
+     */
+    @Query("""
+        SELECT songs.* FROM songs
+        INNER JOIN favorites ON songs.id = favorites.songId AND favorites.isFavorite = 1
+        WHERE (:applyDirectoryFilter = 0 OR songs.parent_directory_path IN (:allowedParentDirs))
+        ORDER BY songs.title ASC
+    """)
+    suspend fun getFavoriteSongsList(
+        allowedParentDirs: List<String>,
+        applyDirectoryFilter: Boolean
+    ): List<SongEntity>
+
+    /**
+     * Returns the count of favorite songs (reactive).
+     */
+    @Query("""
+        SELECT COUNT(*) FROM songs
+        INNER JOIN favorites ON songs.id = favorites.songId AND favorites.isFavorite = 1
+        WHERE (:applyDirectoryFilter = 0 OR songs.parent_directory_path IN (:allowedParentDirs))
+    """)
+    fun getFavoriteSongCount(
+        allowedParentDirs: List<String>,
+        applyDirectoryFilter: Boolean
+    ): Flow<Int>
+
+    // --- Paginated Search Query ---
+    /**
+     * Returns a PagingSource for search results, enabling efficient pagination for large result sets.
+     */
+    @Query("""
+        SELECT * FROM songs
+        WHERE (:applyDirectoryFilter = 0 OR parent_directory_path IN (:allowedParentDirs))
+        AND (title LIKE '%' || :query || '%' OR artist_name LIKE '%' || :query || '%')
+        ORDER BY title ASC
+    """)
+    fun searchSongsPaginated(
+        query: String,
+        allowedParentDirs: List<String>,
+        applyDirectoryFilter: Boolean
+    ): PagingSource<Int, SongEntity>
+
+    /**
+     * Search songs with a result limit for non-paginated contexts.
+     */
+    @Query("""
+        SELECT * FROM songs
+        WHERE (:applyDirectoryFilter = 0 OR parent_directory_path IN (:allowedParentDirs))
+        AND (title LIKE '%' || :query || '%' OR artist_name LIKE '%' || :query || '%')
+        ORDER BY title ASC
+        LIMIT :limit
+    """)
+    fun searchSongsLimited(
+        query: String,
+        allowedParentDirs: List<String>,
+        applyDirectoryFilter: Boolean,
+        limit: Int
+    ): Flow<List<SongEntity>>
+
+    // --- Paginated Genre Query ---
+    /**
+     * Returns a PagingSource for songs in a specific genre.
+     */
+    @Query("""
+        SELECT * FROM songs
+        WHERE (:applyDirectoryFilter = 0 OR parent_directory_path IN (:allowedParentDirs))
+        AND genre LIKE :genreName
+        ORDER BY title ASC
+    """)
+    fun getSongsByGenrePaginated(
+        genreName: String,
+        allowedParentDirs: List<String>,
+        applyDirectoryFilter: Boolean
     ): PagingSource<Int, SongEntity>
 
     // --- Album Queries ---
@@ -641,7 +740,7 @@ interface MusicDao {
         private const val SQLITE_MAX_VARIABLE_NUMBER = 999 // Increase if you know your SQLite version supports more
         private const val CROSS_REF_FIELDS_PER_OBJECT = 3
         val CROSS_REF_BATCH_SIZE: Int = SQLITE_MAX_VARIABLE_NUMBER / CROSS_REF_FIELDS_PER_OBJECT
-        
+
         /**
          * Batch size for song inserts during incremental sync.
          * Allows database reads to interleave with writes for better UX.

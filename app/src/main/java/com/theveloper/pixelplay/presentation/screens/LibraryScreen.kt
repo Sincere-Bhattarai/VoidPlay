@@ -274,7 +274,7 @@ fun LibraryScreen(
 
     var showReorderTabsSheet by remember { mutableStateOf(false) }
     var showTabSwitcherSheet by remember { mutableStateOf(false) }
-    
+
     // Multi-selection state
     val multiSelectionState = playerViewModel.multiSelectionStateHolder
     val selectedSongs by multiSelectionState.selectedSongs.collectAsState()
@@ -288,12 +288,12 @@ fun LibraryScreen(
     var songsLocateAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     var likedLocateAction by remember { mutableStateOf<(() -> Unit)?>(null) }
     var foldersLocateAction by remember { mutableStateOf<(() -> Unit)?>(null) }
-    
+
     // Multi-selection callbacks
     val onSongLongPress: (Song) -> Unit = remember(multiSelectionState) {
         { song -> multiSelectionState.toggleSelection(song) }
     }
-    
+
     val onSongSelectionToggle: (Song) -> Unit = remember(multiSelectionState) {
         { song -> multiSelectionState.toggleSelection(song) }
     }
@@ -340,13 +340,13 @@ fun LibraryScreen(
     BackHandler(
         enabled =
             currentTabId == LibraryTabId.FOLDERS &&
-                libraryUiState.folderBackGestureNavigationEnabled &&
-                libraryUiState.currentFolder != null &&
-                !isSortSheetVisible
+                    libraryUiState.folderBackGestureNavigationEnabled &&
+                    libraryUiState.currentFolder != null &&
+                    !isSortSheetVisible
     ) {
         playerViewModel.navigateBackFolder()
     }
-    
+
     // Feedback for Playlist Creation
     LaunchedEffect(Unit) {
         playlistViewModel.playlistCreationEvent.collect { success ->
@@ -392,7 +392,7 @@ fun LibraryScreen(
         Trace.beginSection("LibraryScreen.PageChangeTabLoad")
         playerViewModel.onLibraryTabSelected(currentTabIndex)
         Trace.endSection()
-        
+
         // Clear selection when switching tabs
         multiSelectionState.clearSelection()
     }
@@ -625,6 +625,7 @@ fun LibraryScreen(
                         val playerUiState by playerViewModel.playerUiState.collectAsState()
                         val playlistUiState by playlistViewModel.uiState.collectAsState()
                         val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
+                        val favoritePagingItems = libraryViewModel.favoritesPagingFlow.collectAsLazyPagingItems()
 
                         val currentSelectedSortOption: SortOption? = when (currentTabId) {
                             LibraryTabId.SONGS -> playerUiState.currentSongSortOption
@@ -662,15 +663,15 @@ fun LibraryScreen(
                         }
 
                         //val playerUiState by playerViewModel.playerUiState.collectAsState()
-                            //val playerUiState by playerViewModel.playerUiState.collectAsState()
-                        
+                        //val playerUiState by playerViewModel.playerUiState.collectAsState()
+
                         // Switch between normal action row and selection action row
                         AnimatedContent(
                             targetState = isSelectionMode,
                             label = "ActionRowModeSwitch",
                             transitionSpec = {
                                 (slideInHorizontally { -it } + fadeIn()) togetherWith
-                                    (slideOutHorizontally { it } + fadeOut())
+                                        (slideOutHorizontally { it } + fadeOut())
                             },
                             modifier = Modifier
                                 .padding(
@@ -683,16 +684,16 @@ fun LibraryScreen(
                             if (inSelectionMode) {
                                 SelectionActionRow(
                                     selectedCount = selectedSongs.size,
-                                    onSelectAll = { 
+                                    onSelectAll = {
                                         val songsToSelect = when (tabTitles.getOrNull(currentTabIndex)?.toLibraryTabIdOrNull()) {
-                                            LibraryTabId.LIKED -> playerViewModel.favoriteSongs.value
+                                            LibraryTabId.LIKED -> favoritePagingItems.itemSnapshotList.items
                                             LibraryTabId.FOLDERS -> {
                                                 // If we are deep in a folder, select songs of that folder.
                                                 // If we are at root, there are no songs to select.
                                                 playerViewModel.playerUiState.value.currentFolder?.songs ?: emptyList()
                                             }
-                                            // For SONGS and others fallback to all songs? 
-                                            // Actually ALBUMS/ARTISTS don't show songs list directly, they show items. 
+                                            // For SONGS and others fallback to all songs?
+                                            // Actually ALBUMS/ARTISTS don't show songs list directly, they show items.
                                             // Selection mode is likely disabled there or not reachable.
                                             // But for SONGS tab:
                                             LibraryTabId.SONGS -> playerViewModel.allSongsFlow.value
@@ -747,7 +748,7 @@ fun LibraryScreen(
                                 }
                                 ?: sanitizedSortOptions.first()
 
-                            
+
                             val isAlbumTab = currentTabId == LibraryTabId.ALBUMS
                             val isFoldersTab = currentTabId == LibraryTabId.FOLDERS
 
@@ -776,7 +777,7 @@ fun LibraryScreen(
                                             val onPrimaryColor = MaterialTheme.colorScheme.onTertiaryContainer
                                             val surfaceColor = MaterialTheme.colorScheme.surfaceVariant
                                             val onSurfaceColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                            
+
                                             // Grid Item
                                             ToggleSegmentButton(
                                                 modifier = Modifier.weight(1f),
@@ -790,7 +791,7 @@ fun LibraryScreen(
                                                 text = "Grid",
                                                 imageVector = Icons.Rounded.ViewModule
                                             )
-                                            
+
                                             // List Item
                                             ToggleSegmentButton(
                                                 modifier = Modifier.weight(1f),
@@ -867,186 +868,188 @@ fun LibraryScreen(
                                 beyondViewportPageCount = 1, // Pre-load adjacent tabs to reduce lag when switching
                                 key = { it }
                             ) { page ->
-                            val tabIndex = resolveTabIndex(
-                                page = page,
-                                tabCount = tabTitles.size,
-                                compactMode = isCompactNavigation
-                            )
-                            when (tabTitles.getOrNull(tabIndex)?.toLibraryTabIdOrNull()) {
-                                LibraryTabId.SONGS -> {
-                                    // Use Paging 3 flow from LibraryStateHolder
-                                    val allSongsLazyPagingItems = libraryViewModel.songsPagingFlow.collectAsLazyPagingItems()
-                                    // We can use libraryViewModel.isLoadingLibrary or similar if needed for global loading state
-                                    val isLibraryLoading by libraryViewModel.isLoadingLibrary.collectAsState()
-                                    val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
-                                    val playerUiState by playerViewModel.playerUiState.collectAsState()
-
-                                    LibrarySongsTab(
-                                        songs = allSongsLazyPagingItems,
-                                        isLoading = isLibraryLoading,
-                                        stablePlayerState = stablePlayerState,
-                                        playerViewModel = playerViewModel,
-                                        bottomBarHeight = bottomBarHeightDp,
-                                        onMoreOptionsClick = stableOnMoreOptionsClick,
-                                        isRefreshing = isRefreshing,
-                                        onRefresh = {
-                                            onRefresh()
-                                            allSongsLazyPagingItems.refresh()
-                                        },
-                                        isSelectionMode = isSelectionMode,
-                                        selectedSongIds = selectedSongIds,
-                                        onSongLongPress = onSongLongPress,
-                                        onSongSelectionToggle = onSongSelectionToggle,
-                                        onLocateCurrentSongVisibilityChanged = { songsShowLocateButton = it },
-                                        onRegisterLocateCurrentSongAction = { songsLocateAction = it },
-                                        sortOption = playerUiState.currentSongSortOption
-                                    )
-                                }
-                                LibraryTabId.ALBUMS -> {
-                                    val albums by playerViewModel.albumsFlow.collectAsState()
-                                    val isLoading = libraryUiState.isLoadingLibraryCategories
-
-                                    val stableOnAlbumClick: (Long) -> Unit = remember(navController) {
-                                        { albumId: Long ->
-                                            navController.navigate(Screen.AlbumDetail.createRoute(albumId))
-                                        }
-                                    }
-                                    LibraryAlbumsTab(
-                                        albums = albums,
-                                        isLoading = isLoading,
-                                        playerViewModel = playerViewModel,
-                                        bottomBarHeight = bottomBarHeightDp,
-                                        onAlbumClick = stableOnAlbumClick,
-                                        isRefreshing = isRefreshing,
-                                        onRefresh = onRefresh
-                                    )
-                                }
-
-                                LibraryTabId.ARTISTS -> {
-                                    val artists by playerViewModel.artistsFlow.collectAsState()
-                                    val isLoading = libraryUiState.isLoadingLibraryCategories
-
-                                    LibraryArtistsTab(
-                                        artists = artists,
-                                        isLoading = isLoading,
-                                        playerViewModel = playerViewModel,
-                                        bottomBarHeight = bottomBarHeightDp,
-                                        onArtistClick = { artistId ->
-                                            navController.navigate(
-                                                Screen.ArtistDetail.createRoute(
-                                                    artistId
-                                                )
-                                            )
-                                        },
-                                        isRefreshing = isRefreshing,
-                                        onRefresh = onRefresh
-                                    )
-                                }
-
-                                LibraryTabId.PLAYLISTS -> {
-                                    val currentPlaylistUiState by playlistViewModel.uiState.collectAsState()
-                                    LibraryPlaylistsTab(
-                                        playlistUiState = currentPlaylistUiState,
-                                        navController = navController,
-                                        playerViewModel = playerViewModel,
-                                        bottomBarHeight = bottomBarHeightDp,
-                                        isRefreshing = isRefreshing,
-                                        onRefresh = onRefresh
-                                    )
-                                }
-
-                                LibraryTabId.LIKED -> {
-                                    val favoriteSongs by playerViewModel.favoriteSongs.collectAsState()
-                                    LibraryFavoritesTab(
-                                        favoriteSongs = favoriteSongs,
-                                        playerViewModel = playerViewModel,
-                                        bottomBarHeight = bottomBarHeightDp,
-                                        onMoreOptionsClick = stableOnMoreOptionsClick,
-                                        isRefreshing = isRefreshing,
-                                        onRefresh = onRefresh,
-                                        isSelectionMode = isSelectionMode,
-                                        selectedSongIds = selectedSongIds,
-                                        onSongLongPress = onSongLongPress,
-                                        onSongSelectionToggle = onSongSelectionToggle,
-                                        getSelectionIndex = playerViewModel.multiSelectionStateHolder::getSelectionIndex,
-                                        onLocateCurrentSongVisibilityChanged = { likedShowLocateButton = it },
-                                        onRegisterLocateCurrentSongAction = { likedLocateAction = it }
-                                    )
-                                }
-
-                                LibraryTabId.FOLDERS -> {
-                                    val context = LocalContext.current
-                                    var hasPermission by remember { mutableStateOf(Environment.isExternalStorageManager()) }
-                                    val launcher = rememberLauncherForActivityResult(
-                                        ActivityResultContracts.StartActivityForResult()
-                                    ) {
-                                        hasPermission = Environment.isExternalStorageManager()
-                                    }
-
-                                    if (hasPermission) {
-                                        val playerUiState by playerViewModel.playerUiState.collectAsState()
-                                        val folders = playerUiState.musicFolders
-                                        val currentFolder = playerUiState.currentFolder
-                                        val isLoading = playerUiState.isLoadingLibraryCategories
+                                val tabIndex = resolveTabIndex(
+                                    page = page,
+                                    tabCount = tabTitles.size,
+                                    compactMode = isCompactNavigation
+                                )
+                                when (tabTitles.getOrNull(tabIndex)?.toLibraryTabIdOrNull()) {
+                                    LibraryTabId.SONGS -> {
+                                        // Use Paging 3 flow from LibraryStateHolder
+                                        val allSongsLazyPagingItems = libraryViewModel.songsPagingFlow.collectAsLazyPagingItems()
+                                        // We can use libraryViewModel.isLoadingLibrary or similar if needed for global loading state
+                                        val isLibraryLoading by libraryViewModel.isLoadingLibrary.collectAsState()
                                         val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
+                                        val playerUiState by playerViewModel.playerUiState.collectAsState()
 
-                                        LibraryFoldersTab(
-                                            folders = folders,
-                                            currentFolder = currentFolder,
-                                            isLoading = isLoading,
-                                            bottomBarHeight = bottomBarHeightDp,
+                                        LibrarySongsTab(
+                                            songs = allSongsLazyPagingItems,
+                                            isLoading = isLibraryLoading,
                                             stablePlayerState = stablePlayerState,
-                                            onNavigateBack = { playerViewModel.navigateBackFolder() },
-                                            onFolderClick = { folderPath -> playerViewModel.navigateToFolder(folderPath) },
-                                            onFolderAsPlaylistClick = { folder ->
-                                                val encodedPath = Uri.encode(folder.path)
+                                            playerViewModel = playerViewModel,
+                                            bottomBarHeight = bottomBarHeightDp,
+                                            onMoreOptionsClick = stableOnMoreOptionsClick,
+                                            isRefreshing = isRefreshing,
+                                            onRefresh = {
+                                                onRefresh()
+                                                allSongsLazyPagingItems.refresh()
+                                            },
+                                            isSelectionMode = isSelectionMode,
+                                            selectedSongIds = selectedSongIds,
+                                            onSongLongPress = onSongLongPress,
+                                            onSongSelectionToggle = onSongSelectionToggle,
+                                            onLocateCurrentSongVisibilityChanged = { songsShowLocateButton = it },
+                                            onRegisterLocateCurrentSongAction = { songsLocateAction = it },
+                                            sortOption = playerUiState.currentSongSortOption
+                                        )
+                                    }
+                                    LibraryTabId.ALBUMS -> {
+                                        val albums by playerViewModel.albumsFlow.collectAsState()
+                                        val isLoading = libraryUiState.isLoadingLibraryCategories
+
+                                        val stableOnAlbumClick: (Long) -> Unit = remember(navController) {
+                                            { albumId: Long ->
+                                                navController.navigate(Screen.AlbumDetail.createRoute(albumId))
+                                            }
+                                        }
+                                        LibraryAlbumsTab(
+                                            albums = albums,
+                                            isLoading = isLoading,
+                                            playerViewModel = playerViewModel,
+                                            bottomBarHeight = bottomBarHeightDp,
+                                            onAlbumClick = stableOnAlbumClick,
+                                            isRefreshing = isRefreshing,
+                                            onRefresh = onRefresh
+                                        )
+                                    }
+
+                                    LibraryTabId.ARTISTS -> {
+                                        val artists by playerViewModel.artistsFlow.collectAsState()
+                                        val isLoading = libraryUiState.isLoadingLibraryCategories
+
+                                        LibraryArtistsTab(
+                                            artists = artists,
+                                            isLoading = isLoading,
+                                            playerViewModel = playerViewModel,
+                                            bottomBarHeight = bottomBarHeightDp,
+                                            onArtistClick = { artistId ->
                                                 navController.navigate(
-                                                    Screen.PlaylistDetail.createRoute(
-                                                        "${PlaylistViewModel.FOLDER_PLAYLIST_PREFIX}$encodedPath"
+                                                    Screen.ArtistDetail.createRoute(
+                                                        artistId
                                                     )
                                                 )
                                             },
-                                            onPlaySong = { song, queue ->
-                                                playerViewModel.showAndPlaySong(song, queue, currentFolder?.name ?: "Folder")
-                                            },
-                                            onMoreOptionsClick = stableOnMoreOptionsClick,
-                                            isPlaylistView = playerUiState.isFoldersPlaylistView,
-                                            currentSortOption = playerUiState.currentFolderSortOption,
                                             isRefreshing = isRefreshing,
-                                            onRefresh = onRefresh,
+                                            onRefresh = onRefresh
+                                        )
+                                    }
+
+                                    LibraryTabId.PLAYLISTS -> {
+                                        val currentPlaylistUiState by playlistViewModel.uiState.collectAsState()
+                                        LibraryPlaylistsTab(
+                                            playlistUiState = currentPlaylistUiState,
+                                            navController = navController,
+                                            playerViewModel = playerViewModel,
+                                            bottomBarHeight = bottomBarHeightDp,
+                                            isRefreshing = isRefreshing,
+                                            onRefresh = onRefresh
+                                        )
+                                    }
+
+                                    LibraryTabId.LIKED -> {
+                                        LibraryFavoritesTab(
+                                            favoriteSongs = favoritePagingItems,
+                                            playerViewModel = playerViewModel,
+                                            bottomBarHeight = bottomBarHeightDp,
+                                            onMoreOptionsClick = stableOnMoreOptionsClick,
+                                            isRefreshing = isRefreshing,
+                                            onRefresh = {
+                                                onRefresh()
+                                                favoritePagingItems.refresh()
+                                            },
                                             isSelectionMode = isSelectionMode,
                                             selectedSongIds = selectedSongIds,
                                             onSongLongPress = onSongLongPress,
                                             onSongSelectionToggle = onSongSelectionToggle,
                                             getSelectionIndex = playerViewModel.multiSelectionStateHolder::getSelectionIndex,
-                                            onLocateCurrentSongVisibilityChanged = { foldersShowLocateButton = it },
-                                            onRegisterLocateCurrentSongAction = { foldersLocateAction = it }
+                                            onLocateCurrentSongVisibilityChanged = { likedShowLocateButton = it },
+                                            onRegisterLocateCurrentSongAction = { likedLocateAction = it }
                                         )
-                                    } else {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .padding(16.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
+                                    }
+
+                                    LibraryTabId.FOLDERS -> {
+                                        val context = LocalContext.current
+                                        var hasPermission by remember { mutableStateOf(Environment.isExternalStorageManager()) }
+                                        val launcher = rememberLauncherForActivityResult(
+                                            ActivityResultContracts.StartActivityForResult()
                                         ) {
-                                            Text("All files access is required to browse folders.")
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Button(onClick = {
-                                                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                                                intent.data = Uri.fromParts("package", context.packageName, null)
-                                                launcher.launch(intent)
-                                            }) {
-                                                Text("Grant Permission")
+                                            hasPermission = Environment.isExternalStorageManager()
+                                        }
+
+                                        if (hasPermission) {
+                                            val playerUiState by playerViewModel.playerUiState.collectAsState()
+                                            val folders = playerUiState.musicFolders
+                                            val currentFolder = playerUiState.currentFolder
+                                            val isLoading = playerUiState.isLoadingLibraryCategories
+                                            val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
+
+                                            LibraryFoldersTab(
+                                                folders = folders,
+                                                currentFolder = currentFolder,
+                                                isLoading = isLoading,
+                                                bottomBarHeight = bottomBarHeightDp,
+                                                stablePlayerState = stablePlayerState,
+                                                onNavigateBack = { playerViewModel.navigateBackFolder() },
+                                                onFolderClick = { folderPath -> playerViewModel.navigateToFolder(folderPath) },
+                                                onFolderAsPlaylistClick = { folder ->
+                                                    val encodedPath = Uri.encode(folder.path)
+                                                    navController.navigate(
+                                                        Screen.PlaylistDetail.createRoute(
+                                                            "${PlaylistViewModel.FOLDER_PLAYLIST_PREFIX}$encodedPath"
+                                                        )
+                                                    )
+                                                },
+                                                onPlaySong = { song, queue ->
+                                                    playerViewModel.showAndPlaySong(song, queue, currentFolder?.name ?: "Folder")
+                                                },
+                                                onMoreOptionsClick = stableOnMoreOptionsClick,
+                                                isPlaylistView = playerUiState.isFoldersPlaylistView,
+                                                currentSortOption = playerUiState.currentFolderSortOption,
+                                                isRefreshing = isRefreshing,
+                                                onRefresh = onRefresh,
+                                                isSelectionMode = isSelectionMode,
+                                                selectedSongIds = selectedSongIds,
+                                                onSongLongPress = onSongLongPress,
+                                                onSongSelectionToggle = onSongSelectionToggle,
+                                                getSelectionIndex = playerViewModel.multiSelectionStateHolder::getSelectionIndex,
+                                                onLocateCurrentSongVisibilityChanged = { foldersShowLocateButton = it },
+                                                onRegisterLocateCurrentSongAction = { foldersLocateAction = it }
+                                            )
+                                        } else {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(16.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                Text("All files access is required to browse folders.")
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Button(onClick = {
+                                                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                                                    intent.data = Uri.fromParts("package", context.packageName, null)
+                                                    launcher.launch(intent)
+                                                }) {
+                                                    Text("Grant Permission")
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                null -> Unit
+                                    null -> Unit
+                                }
                             }
-                            }
-                            
+
                             // Floating selection count pill overlay
                             SelectionCountPill(
                                 selectedCount = selectedSongs.size,
@@ -1267,12 +1270,12 @@ fun LibraryScreen(
     // Multi-Selection Bottom Sheet
     if (showMultiSelectionSheet && selectedSongs.isNotEmpty()) {
         val activity = context as? android.app.Activity
-        
+
         MultiSelectionBottomSheet(
             selectedSongs = selectedSongs,
             favoriteSongIds = favoriteIds,
             onDismiss = { showMultiSelectionSheet = false },
-            onPlayAll = { 
+            onPlayAll = {
                 playerViewModel.playSelectedSongs(selectedSongs)
                 showMultiSelectionSheet = false
             },
@@ -1578,9 +1581,9 @@ private fun LibraryTabSwitcherSheet(
                     span = { GridItemSpan(maxLineSpan) }
                 ) {
                     Box(
-                       modifier = Modifier
-                           .fillMaxWidth()
-                           .heightIn(min = 46.dp, max = 60.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 46.dp, max = 60.dp)
                     ) {
                         FilledTonalButton(
                             onClick = onEditClick,
@@ -1751,7 +1754,7 @@ fun LibraryFoldersTab(
         val coroutineScope = rememberCoroutineScope()
         val visibilityCallback by rememberUpdatedState(onLocateCurrentSongVisibilityChanged)
         val registerActionCallback by rememberUpdatedState(onRegisterLocateCurrentSongAction)
-        
+
         val flattenedFolders = remember(folders, currentSortOption) {
             sortMusicFoldersByOption(flattenFolders(folders), currentSortOption)
         }
@@ -1932,11 +1935,11 @@ fun LibraryFoldersTab(
                                     )
                                 }
                             }
-                            
+
                             // ScrollBar Overlay
-                            val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong()) 
-                                bottomBarHeight + MiniPlayerHeight + 16.dp 
-                            else 
+                            val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong())
+                                bottomBarHeight + MiniPlayerHeight + 16.dp
+                            else
                                 bottomBarHeight + 16.dp
 
                             ExpressiveScrollBar(
@@ -2064,7 +2067,7 @@ private fun MusicFolder.collectAllSongs(): List<Song> {
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun LibraryFavoritesTab(
-    favoriteSongs: List<Song>, // This is already StateFlow<ImmutableList<Song>> from ViewModel
+    favoriteSongs: androidx.paging.compose.LazyPagingItems<Song>,
     playerViewModel: PlayerViewModel,
     bottomBarHeight: Dp,
     onMoreOptionsClick: (Song) -> Unit,
@@ -2084,8 +2087,14 @@ fun LibraryFavoritesTab(
     val visibilityCallback by rememberUpdatedState(onLocateCurrentSongVisibilityChanged)
     val registerActionCallback by rememberUpdatedState(onRegisterLocateCurrentSongAction)
     val currentSongId = stablePlayerState.currentSong?.id
-    val currentSongListIndex = remember(favoriteSongs, currentSongId) {
-        currentSongId?.let { songId -> favoriteSongs.indexOfFirst { it.id == songId } } ?: -1
+
+    // For paging items, find current song index in loaded snapshot
+    val currentSongListIndex = remember(favoriteSongs.itemCount, currentSongId) {
+        if (currentSongId == null) -1
+        else {
+            val items = favoriteSongs.itemSnapshotList
+            items.indexOfFirst { it?.id == currentSongId }
+        }
     }
     val locateCurrentSongAction: (() -> Unit)? = remember(currentSongListIndex, listState) {
         if (currentSongListIndex < 0) {
@@ -2103,8 +2112,8 @@ fun LibraryFavoritesTab(
         registerActionCallback(locateCurrentSongAction)
     }
 
-    LaunchedEffect(currentSongListIndex, favoriteSongs, listState) {
-        if (currentSongListIndex < 0 || favoriteSongs.isEmpty()) {
+    LaunchedEffect(currentSongListIndex, favoriteSongs.itemCount, listState) {
+        if (currentSongListIndex < 0 || favoriteSongs.itemCount == 0) {
             visibilityCallback(false)
             return@LaunchedEffect
         }
@@ -2130,10 +2139,7 @@ fun LibraryFavoritesTab(
         }
     }
 
-    // No need to collect favoriteSongs again if it's passed directly as a list
-    // However, if you need to react to its changes, ensure it's collected or passed as StateFlow's value
-
-    if (favoriteSongs.isEmpty()) {
+    if (favoriteSongs.itemCount == 0 && favoriteSongs.loadState.refresh !is androidx.paging.LoadState.Loading) {
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(16.dp), contentAlignment = Alignment.Center) {
@@ -2183,37 +2189,54 @@ fun LibraryFavoritesTab(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(bottom = bottomBarHeight + MiniPlayerHeight + 30.dp)
                     ) {
-                        items(favoriteSongs, key = { it.id }) { song ->
-                            val isPlayingThisSong =
-                                song.id == stablePlayerState.currentSong?.id && stablePlayerState.isPlaying
-                            EnhancedSongListItem(
-                                song = song,
-                                isCurrentSong = stablePlayerState.currentSong?.id == song.id,
-                                isPlaying = isPlayingThisSong,
-                                onMoreOptionsClick = { onMoreOptionsClick(song) },
-                                isSelected = selectedSongIds.contains(song.id),
-                                selectionIndex = if (isSelectionMode) getSelectionIndex(song.id) else null,
-                                isSelectionMode = isSelectionMode,
-                                onLongPress = { onSongLongPress(song) },
-                                onClick = {
-                                    if (isSelectionMode) {
-                                        onSongSelectionToggle(song)
-                                    } else {
-                                        playerViewModel.showAndPlaySong(
-                                            song,
-                                            favoriteSongs,
-                                            "Liked Songs"
-                                        )
+                        items(
+                            count = favoriteSongs.itemCount,
+                            key = { index -> favoriteSongs.peek(index)?.id ?: index },
+                            contentType = { "song" }
+                        ) { index ->
+                            val song = favoriteSongs[index]
+                            if (song != null) {
+                                val isPlayingThisSong =
+                                    song.id == stablePlayerState.currentSong?.id && stablePlayerState.isPlaying
+                                EnhancedSongListItem(
+                                    song = song,
+                                    isCurrentSong = stablePlayerState.currentSong?.id == song.id,
+                                    isPlaying = isPlayingThisSong,
+                                    onMoreOptionsClick = { onMoreOptionsClick(song) },
+                                    isSelected = selectedSongIds.contains(song.id),
+                                    selectionIndex = if (isSelectionMode) getSelectionIndex(song.id) else null,
+                                    isSelectionMode = isSelectionMode,
+                                    onLongPress = { onSongLongPress(song) },
+                                    onClick = {
+                                        if (isSelectionMode) {
+                                            onSongSelectionToggle(song)
+                                        } else {
+                                            playerViewModel.showAndPlaySong(
+                                                song,
+                                                favoriteSongs.itemSnapshotList.items,
+                                                "Liked Songs"
+                                            )
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            } else {
+                                // Placeholder while loading
+                                EnhancedSongListItem(
+                                    song = Song.emptySong(),
+                                    isPlaying = false,
+                                    isLoading = true,
+                                    isCurrentSong = false,
+                                    onMoreOptionsClick = {},
+                                    onClick = {}
+                                )
+                            }
                         }
                     }
-                    
+
                     // ScrollBar Overlay
-                    val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong()) 
-                        bottomBarHeight + MiniPlayerHeight + 16.dp 
-                    else 
+                    val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong())
+                        bottomBarHeight + MiniPlayerHeight + 16.dp
+                    else
                         bottomBarHeight + 16.dp
 
                     ExpressiveScrollBar(
@@ -2246,7 +2269,7 @@ fun LibrarySongsTabPaginated(
 ) {
     val listState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
-    
+
     // Handle different loading states
     when {
         paginatedSongs.loadState.refresh is LoadState.Loading && paginatedSongs.itemCount == 0 -> {
@@ -2325,7 +2348,7 @@ fun LibrarySongsTabPaginated(
             }
         }
         else -> {
-                // Songs loaded - show paginated list
+            // Songs loaded - show paginated list
             Box(modifier = Modifier.fillMaxSize()) {
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
@@ -2360,7 +2383,7 @@ fun LibrarySongsTabPaginated(
                             contentPadding = PaddingValues(bottom = bottomBarHeight + MiniPlayerHeight + 30.dp)
                         ) {
                             item(key = "songs_top_spacer") { Spacer(Modifier.height(0.dp)) }
-                            
+
                             items(
                                 count = paginatedSongs.itemCount,
                                 contentType = paginatedSongs.itemContentType { "song" }
@@ -2368,14 +2391,14 @@ fun LibrarySongsTabPaginated(
                                 val song = paginatedSongs[index]
                                 if (song != null) {
                                     val isPlayingThisSong = song.id == stablePlayerState.currentSong?.id && stablePlayerState.isPlaying
-                                    
+
                                     val rememberedOnMoreOptionsClick: (Song) -> Unit = remember(onMoreOptionsClick) {
                                         { songFromListItem -> onMoreOptionsClick(songFromListItem) }
                                     }
                                     val rememberedOnClick: () -> Unit = remember(song) {
                                         { playerViewModel.showAndPlaySong(song) }
                                     }
-                                    
+
                                     EnhancedSongListItem(
                                         song = song,
                                         isPlaying = isPlayingThisSong,
@@ -2396,7 +2419,7 @@ fun LibrarySongsTabPaginated(
                                     )
                                 }
                             }
-                            
+
                             // Loading indicator for appending more items
                             if (paginatedSongs.loadState.append is LoadState.Loading) {
                                 item {
@@ -2409,12 +2432,12 @@ fun LibrarySongsTabPaginated(
                                 }
                             }
                         }
-                        
+
                         // ScrollBar Overlay
-                        val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong()) 
-                            bottomBarHeight + MiniPlayerHeight + 16.dp 
-                        else 
-                           bottomBarHeight + 16.dp
+                        val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong())
+                            bottomBarHeight + MiniPlayerHeight + 16.dp
+                        else
+                            bottomBarHeight + 16.dp
 
                         ExpressiveScrollBar(
                             modifier = Modifier
@@ -2457,7 +2480,7 @@ fun LibraryAlbumsTab(
     val listState = rememberLazyListState() // New state for list view
     val context = LocalContext.current
     val imageLoader = context.imageLoader
-    
+
     // Collect view mode preference
     val playerUiState by playerViewModel.playerUiState.collectAsState()
     val isListView = playerUiState.isAlbumsListView
@@ -2474,8 +2497,8 @@ fun LibraryAlbumsTab(
     // Prefetching logic for LibraryAlbumsTab
     LaunchedEffect(albums, gridState, listState, isListView) {
         if (isListView) {
-             // Prefetch logic for List View
-             snapshotFlow { listState.layoutInfo }
+            // Prefetch logic for List View
+            snapshotFlow { listState.layoutInfo }
                 .distinctUntilChanged()
                 .collect { layoutInfo ->
                     val visibleItemsInfo = layoutInfo.visibleItemsInfo
@@ -2483,7 +2506,7 @@ fun LibraryAlbumsTab(
                         val lastVisibleItemIndex = visibleItemsInfo.last().index
                         val totalItemsCount = albums.size
                         val prefetchThreshold = 5
-                        val prefetchCount = 10 
+                        val prefetchCount = 10
 
                         if (totalItemsCount > lastVisibleItemIndex + 1 && lastVisibleItemIndex + prefetchThreshold >= totalItemsCount - prefetchCount) {
                             val startIndexToPrefetch = lastVisibleItemIndex + 1
@@ -2494,7 +2517,7 @@ fun LibraryAlbumsTab(
                                 album?.albumArtUriString?.let { uri ->
                                     val request = ImageRequest.Builder(context)
                                         .data(uri)
-                                        .size(Size(256, 256)) 
+                                        .size(Size(256, 256))
                                         .build()
                                     imageLoader.enqueue(request)
                                 }
@@ -2511,8 +2534,8 @@ fun LibraryAlbumsTab(
                     if (visibleItemsInfo.isNotEmpty() && albums.isNotEmpty()) {
                         val lastVisibleItemIndex = visibleItemsInfo.last().index
                         val totalItemsCount = albums.size
-                        val prefetchThreshold = 5 
-                        val prefetchCount = 10 
+                        val prefetchThreshold = 5
+                        val prefetchCount = 10
 
                         if (totalItemsCount > lastVisibleItemIndex + 1 && lastVisibleItemIndex + prefetchThreshold >= totalItemsCount - prefetchCount) {
                             val startIndexToPrefetch = lastVisibleItemIndex + 1
@@ -2523,7 +2546,7 @@ fun LibraryAlbumsTab(
                                 album?.albumArtUriString?.let { uri ->
                                     val request = ImageRequest.Builder(context)
                                         .data(uri)
-                                        .size(Size(256, 256)) 
+                                        .size(Size(256, 256))
                                         .build()
                                     imageLoader.enqueue(request)
                                 }
@@ -2537,7 +2560,7 @@ fun LibraryAlbumsTab(
     if (isLoading && albums.isEmpty()) {
         // Show skeleton grid during loading
         if (isListView) {
-             LazyColumn(
+            LazyColumn(
                 modifier = Modifier
                     .padding(start = 14.dp, end = 14.dp, bottom = 6.dp)
                     .clip(
@@ -2553,7 +2576,7 @@ fun LibraryAlbumsTab(
                 contentPadding = PaddingValues(bottom = bottomBarHeight + MiniPlayerHeight + ListExtraBottomGap + 4.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                 items(8) { 
+                items(8) {
                     AlbumListItem(
                         album = Album.empty(),
                         albumColorSchemePairFlow = MutableStateFlow(null),
@@ -2619,9 +2642,9 @@ fun LibraryAlbumsTab(
             ) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     if (isListView) {
-                            
+
                         LazyColumn(
-                             modifier = Modifier
+                            modifier = Modifier
                                 .padding(start = 14.dp, end = if (listState.canScrollForward || listState.canScrollBackward) 24.dp else 14.dp, bottom = 6.dp)
                                 .clip(
                                     RoundedCornerShape(
@@ -2635,7 +2658,7 @@ fun LibraryAlbumsTab(
                             contentPadding = PaddingValues(bottom = bottomBarHeight + MiniPlayerHeight + ListExtraBottomGap + 4.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                             items(albums, key = { it.id }) { album ->
+                            items(albums, key = { it.id }) { album ->
                                 val albumSpecificColorSchemeFlow =
                                     playerViewModel.themeStateHolder.getAlbumColorSchemeFlow(album.albumArtUriString ?: "")
                                 val rememberedOnClick = remember(album.id) { { onAlbumClick(album.id) } }
@@ -2647,13 +2670,13 @@ fun LibraryAlbumsTab(
                                 )
                             }
                         }
-                         // ScrollBar Overlay for List
+                        // ScrollBar Overlay for List
                         val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
-                        val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong()) 
-                            bottomBarHeight + MiniPlayerHeight + 16.dp 
-                        else 
+                        val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong())
+                            bottomBarHeight + MiniPlayerHeight + 16.dp
+                        else
                             bottomBarHeight + 16.dp
-                        
+
                         ExpressiveScrollBar(
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
@@ -2678,7 +2701,7 @@ fun LibraryAlbumsTab(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-    
+
                             items(albums, key = { it.id }) { album ->
                                 val albumSpecificColorSchemeFlow =
                                     playerViewModel.themeStateHolder.getAlbumColorSchemeFlow(album.albumArtUriString ?: "")
@@ -2691,14 +2714,14 @@ fun LibraryAlbumsTab(
                                 )
                             }
                         }
-                        
+
                         // ScrollBar Overlay for Grid
                         val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
-                        val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong()) 
-                            bottomBarHeight + MiniPlayerHeight + 16.dp 
-                        else 
+                        val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong())
+                            bottomBarHeight + MiniPlayerHeight + 16.dp
+                        else
                             bottomBarHeight + 16.dp
-                        
+
                         ExpressiveScrollBar(
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
@@ -2801,9 +2824,9 @@ fun AlbumGridItemRedesigned(
                         model = album.albumArtUriString,
                         contentDescription = "Carátula de ${album.title}",
                         contentScale = ContentScale.Crop,
-                            // Reducido el tamaño para mejorar el rendimiento del scroll, como se sugiere en el informe.
-                            // ContentScale.Crop se encargará de ajustar la imagen al aspect ratio.
-                            targetSize = Size(256, 256),
+                        // Reducido el tamaño para mejorar el rendimiento del scroll, como se sugiere en el informe.
+                        // ContentScale.Crop se encargará de ajustar la imagen al aspect ratio.
+                        targetSize = Size(256, 256),
                         modifier = Modifier
                             .aspectRatio(3f / 2f)
                             .fillMaxSize(),
@@ -2867,7 +2890,7 @@ fun LibraryArtistsTab(
 ) {
     val listState = rememberLazyListState()
     val playerUiState by playerViewModel.playerUiState.collectAsState()
-    
+
     // Scroll to top when sort option changes
     LaunchedEffect(playerUiState.currentArtistSortOption) {
         listState.scrollToItem(0)
@@ -2950,12 +2973,12 @@ fun LibraryArtistsTab(
                         //         .padding(16.dp), Alignment.Center) { CircularProgressIndicator() } }
                         // }
                     }
-                    
+
                     // ScrollBar Overlay
                     val stablePlayerState by playerViewModel.stablePlayerState.collectAsState()
-                    val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong()) 
-                        bottomBarHeight + MiniPlayerHeight + 16.dp 
-                    else 
+                    val bottomPadding = if (stablePlayerState.currentSong != null && stablePlayerState.currentSong != Song.emptySong())
+                        bottomBarHeight + MiniPlayerHeight + 16.dp
+                    else
                         bottomBarHeight + 16.dp
 
                     ExpressiveScrollBar(
@@ -3074,7 +3097,7 @@ fun AlbumListItem(
     val itemDesignColorScheme = remember(albumColorSchemePair, systemIsDark, currentMaterialColorScheme) {
         albumColorSchemePair?.let { pair ->
             if (systemIsDark) pair.dark else pair.light
-        } ?: currentMaterialColorScheme 
+        } ?: currentMaterialColorScheme
     }
 
     val gradientBaseColor = itemDesignColorScheme.primaryContainer
@@ -3089,13 +3112,13 @@ fun AlbumListItem(
             shape = RoundedCornerShape(cardCornerRadius),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
         ) {
-             Row(modifier = Modifier.fillMaxSize()) {
-                  ShimmerBox(
+            Row(modifier = Modifier.fillMaxSize()) {
+                ShimmerBox(
                     modifier = Modifier
-                        .aspectRatio(1f) 
+                        .aspectRatio(1f)
                         .fillMaxHeight()
                 )
-                 Column(
+                Column(
                     modifier = Modifier
                         .weight(1f)
                         .padding(12.dp),
@@ -3107,15 +3130,15 @@ fun AlbumListItem(
                             .height(16.dp)
                             .clip(RoundedCornerShape(4.dp))
                     )
-                     Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     ShimmerBox(
                         modifier = Modifier
                             .fillMaxWidth(0.4f)
                             .height(14.dp)
                             .clip(RoundedCornerShape(4.dp))
                     )
-                 }
-             }
+                }
+            }
         }
     } else {
         Card(
@@ -3149,7 +3172,7 @@ fun AlbumListItem(
                     if (isLoadingImage) {
                         ShimmerBox(modifier = Modifier.fillMaxSize())
                     }
-                    
+
                     // Gradient Overlay
                     Box(
                         modifier = Modifier
@@ -3166,13 +3189,13 @@ fun AlbumListItem(
                 }
 
                 // MIDDLE: Solid Background
-                 Box(
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
                         .background(gradientBaseColor)
                 ) {
-                     // Text on top of the gradient/solid background
+                    // Text on top of the gradient/solid background
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -3182,7 +3205,7 @@ fun AlbumListItem(
                         val variableTextStyle = remember(album.id, album.title) {
                             GenreTypography.getGenreStyle(album.id.toString(), album.title)
                         }
-                        
+
                         Text(
                             album.title,
                             style = variableTextStyle.copy(fontSize = 22.sp),
@@ -3195,16 +3218,16 @@ fun AlbumListItem(
                         )
                         Text(
                             album.artist,
-                            style = MaterialTheme.typography.bodySmall, 
-                            color = onGradientColor.copy(alpha = 0.85f), 
-                            maxLines = 1, 
+                            style = MaterialTheme.typography.bodySmall,
+                            color = onGradientColor.copy(alpha = 0.85f),
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                         Text(
+                        Text(
                             "${album.songCount} Songs",
-                            style = MaterialTheme.typography.bodySmall, 
-                            color = onGradientColor.copy(alpha = 0.7f), 
-                            maxLines = 1, 
+                            style = MaterialTheme.typography.bodySmall,
+                            color = onGradientColor.copy(alpha = 0.7f),
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }

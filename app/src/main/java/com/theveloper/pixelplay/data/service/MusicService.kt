@@ -215,6 +215,7 @@ class MusicService : MediaSessionService() {
                             SessionError.ERROR_UNKNOWN))
                         Timber.tag("MusicService").d("Executing LIKE for songId: $songId")
                         val isCurrentlyFavorite = favoriteSongIds.contains(songId)
+                        val targetFavoriteState = !isCurrentlyFavorite
                         favoriteSongIds = if (isCurrentlyFavorite) {
                             favoriteSongIds - songId
                         } else {
@@ -225,7 +226,8 @@ class MusicService : MediaSessionService() {
 
                         serviceScope.launch {
                             Timber.tag("MusicService").d("Toggling favorite status for $songId")
-                            userPreferencesRepository.toggleFavoriteSong(songId)
+                            musicRepository.setFavoriteStatus(songId, targetFavoriteState)
+                            userPreferencesRepository.setFavoriteSong(songId, targetFavoriteState)
                             Timber.tag("MusicService")
                                 .d("Toggled favorite status. Updating notification.")
                             refreshMediaSessionUi(session)

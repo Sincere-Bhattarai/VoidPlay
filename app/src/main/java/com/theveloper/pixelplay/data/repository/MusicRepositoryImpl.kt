@@ -90,6 +90,11 @@ class MusicRepositoryImpl @Inject constructor(
     private val folderTreeBuilder: FolderTreeBuilder
 ) : MusicRepository {
 
+    companion object {
+        /** Maximum number of search results to load at once to avoid memory issues with large libraries. */
+        private const val SEARCH_RESULTS_LIMIT = 100
+    }
+
     private val directoryScanMutex = Mutex()
 
     private fun normalizePath(path: String): String =
@@ -106,8 +111,20 @@ class MusicRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getPaginatedSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption): Flow<PagingData<Song>> {
-        // Delegate to reactive repository for correct filtering and paging
         return songRepository.getPaginatedSongs(sortOption)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getPaginatedFavoriteSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption): Flow<PagingData<Song>> {
+        return songRepository.getPaginatedFavoriteSongs(sortOption)
+    }
+
+    override suspend fun getFavoriteSongsOnce(): List<Song> {
+        return songRepository.getFavoriteSongsOnce()
+    }
+
+    override fun getFavoriteSongCountFlow(): Flow<Int> {
+        return songRepository.getFavoriteSongCountFlow()
     }
 
     override fun getSongCountFlow(): Flow<Int> {
@@ -223,18 +240,18 @@ class MusicRepositoryImpl @Inject constructor(
 
     override fun searchSongs(query: String): Flow<List<Song>> {
         if (query.isBlank()) return flowOf(emptyList())
-        // Passing emptyList and false for directory filter as we trust SSOT (SyncWorker filtered)
-        return musicDao.searchSongs(query, emptyList(), false).map { entities ->
+        // Use limited search to avoid loading thousands of results into memory
+        return musicDao.searchSongsLimited(query, emptyList(), false, SEARCH_RESULTS_LIMIT).map { entities ->
             entities.map { it.toSong() }
         }.flowOn(Dispatchers.IO)
     }
 
 
     override fun searchAlbums(query: String): Flow<List<Album>> {
-       if (query.isBlank()) return flowOf(emptyList())
-       return musicDao.searchAlbums(query, emptyList(), false).map { entities ->
-           entities.map { it.toAlbum() }
-       }.flowOn(Dispatchers.IO)
+        if (query.isBlank()) return flowOf(emptyList())
+        return musicDao.searchAlbums(query, emptyList(), false).map { entities ->
+            entities.map { it.toAlbum() }
+        }.flowOn(Dispatchers.IO)
     }
 
     override fun searchArtists(query: String): Flow<List<Artist>> {
@@ -330,8 +347,8 @@ class MusicRepositoryImpl @Inject constructor(
     override fun getSongsByIds(songIds: List<String>): Flow<List<Song>> {
         if (songIds.isEmpty()) return flowOf(emptyList())
         return songRepository.getSongs().map { songs ->
-             val songsMap = songs.associateBy { it.id }
-             songIds.mapNotNull { songsMap[it] }
+            val songsMap = songs.associateBy { it.id }
+            songIds.mapNotNull { songsMap[it] }
         }.flowOn(Dispatchers.Default)
     }
 
@@ -363,15 +380,32 @@ class MusicRepositoryImpl @Inject constructor(
         musicDao.getAllArtistsListRaw().map { it.toArtist() }
     }
 
+    override suspend fun setFavoriteStatus(songId: String, isFavorite: Boolean) = withContext(Dispatchers.IO) {
+        val id = songId.toLongOrNull() ?: return@withContext
+        if (isFavorite) {
+            favoritesDao.setFavorite(
+                com.theveloper.pixelplay.data.database.FavoritesEntity(
+                    songId = id,
+                    isFavorite = true
+                )
+            )
+        } else {
+            favoritesDao.removeFavorite(id)
+        }
+        musicDao.setFavoriteStatus(id, isFavorite)
+    }
+
+    override suspend fun getFavoriteSongIdsOnce(): Set<String> = withContext(Dispatchers.IO) {
+        favoritesDao.getFavoriteSongIdsOnce()
+            .map { it.toString() }
+            .toSet()
+    }
+
     override suspend fun toggleFavoriteStatus(songId: String): Boolean = withContext(Dispatchers.IO) {
         val id = songId.toLongOrNull() ?: return@withContext false
         val isFav = favoritesDao.isFavorite(id) ?: false
         val newFav = !isFav
-        if (newFav) {
-            favoritesDao.setFavorite(com.theveloper.pixelplay.data.database.FavoritesEntity(id, true))
-        } else {
-            favoritesDao.removeFavorite(id)
-        }
+        setFavoriteStatus(songId, newFav)
         return@withContext newFav
     }
 

@@ -1027,6 +1027,17 @@ constructor(
         }
     }
 
+    suspend fun setFavoriteSong(songId: String, isFavorite: Boolean) {
+        dataStore.edit { preferences ->
+            val currentFavorites = preferences[PreferencesKeys.FAVORITE_SONG_IDS] ?: emptySet()
+            preferences[PreferencesKeys.FAVORITE_SONG_IDS] = if (isFavorite) {
+                currentFavorites + songId
+            } else {
+                currentFavorites - songId
+            }
+        }
+    }
+
     suspend fun setInitialSetupDone(isDone: Boolean) {
         dataStore.edit { preferences -> preferences[PreferencesKeys.INITIAL_SETUP_DONE] = isDone }
     }

@@ -78,10 +78,17 @@ class LibraryStateHolder @Inject constructor(
     private val _currentFolderSortOption = MutableStateFlow<SortOption>(SortOption.FolderNameAZ)
     val currentFolderSortOption = _currentFolderSortOption.asStateFlow()
 
-    private val _currentFavoriteSortOption = MutableStateFlow<SortOption>(SortOption.LikedSongTitleAZ)
+    private val _currentFavoriteSortOption = MutableStateFlow<SortOption>(SortOption.LikedSongDateLiked)
     val currentFavoriteSortOption = _currentFavoriteSortOption.asStateFlow()
 
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val favoritesPagingFlow: kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<Song>> = _currentFavoriteSortOption
+        .flatMapLatest { sortOption ->
+            musicRepository.getPaginatedFavoriteSongs(sortOption)
+        }
+        .flowOn(Dispatchers.IO)
 
+    val favoriteSongCountFlow: kotlinx.coroutines.flow.Flow<Int> = musicRepository.getFavoriteSongCountFlow()
 
     @OptIn(ExperimentalStdlibApi::class)
     val genres: kotlinx.coroutines.flow.Flow<ImmutableList<com.theveloper.pixelplay.data.model.Genre>> = _allSongs
@@ -107,7 +114,7 @@ class LibraryStateHolder @Inject constructor(
                     }
                     val lightThemeColor = com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = false)
                     val darkThemeColor = com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = true)
-                    
+
                     com.theveloper.pixelplay.data.model.Genre(
                         id = id,
                         name = genreName,
@@ -126,7 +133,7 @@ class LibraryStateHolder @Inject constructor(
         }
         .flowOn(Dispatchers.Default)
 
-    
+
     // Internal state
     private var scope: CoroutineScope? = null
 
@@ -141,14 +148,14 @@ class LibraryStateHolder @Inject constructor(
 
             val albumSortKey = userPreferencesRepository.albumsSortOptionFlow.first()
             _currentAlbumSortOption.value = SortOption.ALBUMS.find { it.storageKey == albumSortKey } ?: SortOption.AlbumTitleAZ
-            
+
             val artistSortKey = userPreferencesRepository.artistsSortOptionFlow.first()
             _currentArtistSortOption.value = SortOption.ARTISTS.find { it.storageKey == artistSortKey } ?: SortOption.ArtistNameAZ
-            
+
             val folderSortKey = userPreferencesRepository.foldersSortOptionFlow.first()
             _currentFolderSortOption.value = SortOption.FOLDERS.find { it.storageKey == folderSortKey } ?: SortOption.FolderNameAZ
-            
-            
+
+
             val likedSortKey = userPreferencesRepository.likedSongsSortOptionFlow.first()
             _currentFavoriteSortOption.value = SortOption.LIKED.find { it.storageKey == likedSortKey } ?: SortOption.LikedSongDateLiked
         }
@@ -159,34 +166,34 @@ class LibraryStateHolder @Inject constructor(
     }
 
     // --- Data Loading ---
-    
+
     // We observe the repository flows permanently in initialize(), or we start collecting here?
     // Better to start collecting in initialize() or have these functions just be "ensure active".
     // Actually, explicit "load" functions are legacy imperative style.
     // We should launch collectors in initialize() that update the state.
-    
+
     private var songsJob: Job? = null
     private var albumsJob: Job? = null
     private var artistsJob: Job? = null
     private var foldersJob: Job? = null
-    
+
     fun startObservingLibraryData() {
         if (songsJob?.isActive == true) return
-        
+
         Log.d("LibraryStateHolder", "startObservingLibraryData called.")
-        
+
         songsJob = scope?.launch {
             _isLoadingLibrary.value = true
             musicRepository.getAudioFiles().collect { songs ->
-                 // When the repository emits a new list (triggered by directory changes),
-                 // we update our state and re-apply current sorting.
-                 _allSongs.value = songs.toImmutableList()
-                 // Apply sort to the new data
-                 sortSongs(_currentSongSortOption.value, persist = false)
-                 _isLoadingLibrary.value = false
+                // When the repository emits a new list (triggered by directory changes),
+                // we update our state and re-apply current sorting.
+                _allSongs.value = songs.toImmutableList()
+                // Apply sort to the new data
+                sortSongs(_currentSongSortOption.value, persist = false)
+                _isLoadingLibrary.value = false
             }
         }
-        
+
         albumsJob = scope?.launch {
             _isLoadingCategories.value = true
             musicRepository.getAlbums().collect { albums ->
@@ -195,7 +202,7 @@ class LibraryStateHolder @Inject constructor(
                 _isLoadingCategories.value = false
             }
         }
-        
+
         artistsJob = scope?.launch {
             _isLoadingCategories.value = true
             musicRepository.getArtists().collect { artists ->
@@ -204,41 +211,41 @@ class LibraryStateHolder @Inject constructor(
                 _isLoadingCategories.value = false
             }
         }
-        
+
         foldersJob = scope?.launch {
             musicRepository.getMusicFolders().collect { folders ->
-                 _musicFolders.value = folders.toImmutableList()
-                 sortFolders(_currentFolderSortOption.value, persist = false)
+                _musicFolders.value = folders.toImmutableList()
+                sortFolders(_currentFolderSortOption.value, persist = false)
             }
         }
     }
 
     // Deprecated imperative loaders - redirected to observer start
     fun loadSongsFromRepository() {
-         startObservingLibraryData()
+        startObservingLibraryData()
     }
 
     fun loadAlbumsFromRepository() {
-         startObservingLibraryData()
+        startObservingLibraryData()
     }
 
     fun loadArtistsFromRepository() {
-         startObservingLibraryData()
+        startObservingLibraryData()
     }
-    
+
     fun loadFoldersFromRepository() {
         startObservingLibraryData()
     }
-    
+
     // --- Lazy Loading Checks ---
 
     // --- Lazy Loading Checks ---
     // We replace conditional "check if empty" with "ensure observing".
     // If we are already observing, startObservingLibraryData returns early.
     // If we are not (e.g. process death recovery?), it restarts.
-    
+
     fun loadSongsIfNeeded() {
-         startObservingLibraryData()
+        startObservingLibraryData()
     }
 
     fun loadAlbumsIfNeeded() {
@@ -256,18 +263,8 @@ class LibraryStateHolder @Inject constructor(
             if (persist) {
                 userPreferencesRepository.setSongsSortOption(sortOption.storageKey)
             }
+            // Updating the sort option triggers songsPagingFlow to reload with new sort at DB level
             _currentSongSortOption.value = sortOption
-
-            val sorted = when (sortOption) {
-                SortOption.SongTitleAZ -> _allSongs.value.sortedBy { it.title.lowercase() }
-                SortOption.SongTitleZA -> _allSongs.value.sortedByDescending { it.title.lowercase() }
-                SortOption.SongArtist -> _allSongs.value.sortedBy { it.artist.lowercase() }
-                SortOption.SongAlbum -> _allSongs.value.sortedBy { it.album.lowercase() }
-                SortOption.SongDateAdded -> _allSongs.value.sortedByDescending { it.dateAdded }
-                SortOption.SongDuration -> _allSongs.value.sortedBy { it.duration }
-                else -> _allSongs.value // Default or unhandled
-            }
-            _allSongs.value = sorted.toImmutableList()
         }
     }
 
@@ -285,12 +282,12 @@ class LibraryStateHolder @Inject constructor(
                 SortOption.AlbumReleaseYear -> _albums.value.sortedByDescending { it.year }
                 SortOption.AlbumSizeAsc -> _albums.value.sortedWith(compareBy<Album> { it.songCount }.thenBy { it.title.lowercase() })
                 SortOption.AlbumSizeDesc -> _albums.value.sortedWith(compareByDescending<Album> { it.songCount }.thenBy { it.title.lowercase() })
-                 else -> _albums.value
+                else -> _albums.value
             }
             _albums.value = sorted.toImmutableList()
         }
     }
-    
+
     fun sortArtists(sortOption: SortOption, persist: Boolean = true) {
         scope?.launch {
             if (persist) {
@@ -313,7 +310,7 @@ class LibraryStateHolder @Inject constructor(
                 userPreferencesRepository.setFoldersSortOption(sortOption.storageKey)
             }
             _currentFolderSortOption.value = sortOption
-            
+
             val sorted = when (sortOption) {
                 SortOption.FolderNameAZ -> _musicFolders.value.sortedBy { it.name.lowercase() }
                 SortOption.FolderNameZA -> _musicFolders.value.sortedByDescending { it.name.lowercase() }

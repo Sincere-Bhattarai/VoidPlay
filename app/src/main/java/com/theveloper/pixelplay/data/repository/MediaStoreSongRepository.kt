@@ -10,6 +10,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.theveloper.pixelplay.data.database.MusicDao
 import com.theveloper.pixelplay.data.database.FavoritesDao
+import com.theveloper.pixelplay.data.database.toSong
 import com.theveloper.pixelplay.data.model.Song
 import com.theveloper.pixelplay.data.observer.MediaStoreObserver
 import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
@@ -58,10 +59,10 @@ class MediaStoreSongRepository @Inject constructor(
     private fun normalizePath(path: String): String = File(path).absolutePath
 
     private fun getExcludedPaths(): Set<String> {
-        // This should come from a repository/store, not blocking flow preferably, 
+        // This should come from a repository/store, not blocking flow preferably,
         // but for query implementation we'll need to filter the cursor results.
         // For now, we will assume strict filtering logic inside mapCursorToSongs
-        return emptySet() 
+        return emptySet()
     }
 
     override fun getSongs(): Flow<List<Song>> = combine(
@@ -98,10 +99,10 @@ class MediaStoreSongRepository @Inject constructor(
             // Genre is difficult in MediaStore.Audio.Media, usually requires separate query.
             // keeping it simple for now, maybe null or fetch separately.
         )
-        
+
         // Handling API version differences for columns if necessary
         // Assuming minSdk is high enough or columns exist (ALBUM_ARTIST is API 30+, need check if app supports lower)
-        
+
         val selection = getBaseSelection()
 
         val songIdToGenreMap = getSongIdToGenreMap(context.contentResolver)
@@ -131,13 +132,13 @@ class MediaStoreSongRepository @Inject constructor(
 
                 val resolver = DirectoryRuleResolver(
                     allowedDirs.map(::normalizePath).toSet(),
-                    blockedDirs.map(::normalizePath).toSet() 
+                    blockedDirs.map(::normalizePath).toSet()
                 )
                 val isFilterActive = blockedDirs.isNotEmpty()
 
                 while (cursor.moveToNext()) {
                     val path = cursor.getString(pathCol)
-                    
+
                     // Directory Filtering
                     if (isFilterActive) {
                         val lastSlashIndex = path.lastIndexOf('/')
@@ -149,7 +150,7 @@ class MediaStoreSongRepository @Inject constructor(
 
                     val id = cursor.getLong(idCol)
                     val albumId = cursor.getLong(albumIdCol)
-                    
+
                     val song = Song(
                         id = id.toString(),
                         title = cursor.getString(titleCol).normalizeMetadataTextOrEmpty(),
@@ -194,19 +195,19 @@ class MediaStoreSongRepository @Inject constructor(
                 MediaStore.Audio.Genres._ID,
                 MediaStore.Audio.Genres.NAME
             )
-            
+
             contentResolver.query(genresUri, genresProjection, null, null, null)?.use { genreCursor ->
                 val genreIdCol = genreCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID)
                 val genreNameCol = genreCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME)
-                
+
                 while (genreCursor.moveToNext()) {
                     val genreId = genreCursor.getLong(genreIdCol)
                     val genreName = genreCursor.getString(genreNameCol).normalizeMetadataTextOrEmpty()
-                    
+
                     if (genreName.isNotBlank() && genreName != "<unknown>") {
                         val membersUri = MediaStore.Audio.Genres.Members.getContentUri("external", genreId)
                         val membersProjection = arrayOf(MediaStore.Audio.Genres.Members.AUDIO_ID)
-                        
+
                         try {
                             contentResolver.query(membersUri, membersProjection, null, null, null)?.use { membersCursor ->
                                 val audioIdCol = membersCursor.getColumnIndex(MediaStore.Audio.Genres.Members.AUDIO_ID)
@@ -215,12 +216,12 @@ class MediaStoreSongRepository @Inject constructor(
                                         val songId = membersCursor.getLong(audioIdCol)
                                         // If a song has multiple genres, this simple map keeps the last one found.
                                         // Could be improved to join them if needed.
-                                        genreMap[songId] = genreName 
+                                        genreMap[songId] = genreName
                                     }
                                 }
                             }
                         } catch (e: Exception) {
-                             Log.w("MediaStoreSongRepository", "Error querying members for genreId=$genreId", e)
+                            Log.w("MediaStoreSongRepository", "Error querying members for genreId=$genreId", e)
                         }
                     }
                 }
@@ -232,12 +233,12 @@ class MediaStoreSongRepository @Inject constructor(
     }
 
     override fun getSongsByAlbum(albumId: Long): Flow<List<Song>> {
-         // Reusing getSongs() and filtering might be inefficient for one album, 
-         // but consistent with the reactive source of truth.
-         // Optimization: Create specific query flow if needed.
-         return getSongs().flowOn(Dispatchers.IO).combine(kotlinx.coroutines.flow.flowOf(albumId)) { songs, id ->
-             songs.filter { it.albumId == id }
-         }
+        // Reusing getSongs() and filtering might be inefficient for one album,
+        // but consistent with the reactive source of truth.
+        // Optimization: Create specific query flow if needed.
+        return getSongs().flowOn(Dispatchers.IO).combine(kotlinx.coroutines.flow.flowOf(albumId)) { songs, id ->
+            songs.filter { it.albumId == id }
+        }
     }
 
     override fun getSongsByArtist(artistId: Long): Flow<List<Song>> {
@@ -248,8 +249,8 @@ class MediaStoreSongRepository @Inject constructor(
 
     override suspend fun searchSongs(query: String): List<Song> {
         val allSongs = getSongs().first() // Snapshot
-        return allSongs.filter { 
-            it.title.contains(query, true) || it.artist.contains(query, true) 
+        return allSongs.filter {
+            it.title.contains(query, true) || it.artist.contains(query, true)
         }
     }
 
@@ -268,19 +269,19 @@ class MediaStoreSongRepository @Inject constructor(
         ) { _, allowedDirs, blockedDirs ->
             Triple(allowedDirs, blockedDirs, Unit)
         }.flatMapLatest { (allowedDirs, blockedDirs, _) ->
-             val musicIds = getFilteredSongIds(allowedDirs.toList(), blockedDirs.toList())
-             val genreMap = getSongIdToGenreMap(context.contentResolver) // Potentially expensive, optimize if needed
-             
-             androidx.paging.Pager(
-                 config = androidx.paging.PagingConfig(
-                     pageSize = 50,
-                     enablePlaceholders = true,
-                     initialLoadSize = 50
-                 ),
-                 pagingSourceFactory = {
-                     com.theveloper.pixelplay.data.paging.MediaStorePagingSource(context, musicIds, genreMap)
-                 }
-             ).flow
+            val musicIds = getFilteredSongIds(allowedDirs.toList(), blockedDirs.toList())
+            val genreMap = getSongIdToGenreMap(context.contentResolver) // Potentially expensive, optimize if needed
+
+            androidx.paging.Pager(
+                config = androidx.paging.PagingConfig(
+                    pageSize = 50,
+                    enablePlaceholders = true,
+                    initialLoadSize = 50
+                ),
+                pagingSourceFactory = {
+                    com.theveloper.pixelplay.data.paging.MediaStorePagingSource(context, musicIds, genreMap)
+                }
+            ).flow
         }.flowOn(Dispatchers.IO)
     }
 
@@ -288,7 +289,7 @@ class MediaStoreSongRepository @Inject constructor(
         val ids = mutableListOf<Long>()
         val projection = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DATA)
         val selection = getBaseSelection()
-        
+
         try {
             context.contentResolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -299,7 +300,7 @@ class MediaStoreSongRepository @Inject constructor(
             )?.use { cursor ->
                 val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
                 val pathCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-                
+
                 val resolver = DirectoryRuleResolver(
                     allowedDirs.map(::normalizePath).toSet(),
                     blockedDirs.map(::normalizePath).toSet()
@@ -309,13 +310,13 @@ class MediaStoreSongRepository @Inject constructor(
                 while (cursor.moveToNext()) {
                     val path = cursor.getString(pathCol)
                     if (isFilterActive) {
-                    if (isFilterActive) {
-                        val lastSlashIndex = path.lastIndexOf('/')
-                        val parentPath = if (lastSlashIndex != -1) path.substring(0, lastSlashIndex) else ""
-                        if (resolver.isBlocked(parentPath)) {
-                            continue
+                        if (isFilterActive) {
+                            val lastSlashIndex = path.lastIndexOf('/')
+                            val parentPath = if (lastSlashIndex != -1) path.substring(0, lastSlashIndex) else ""
+                            if (resolver.isBlocked(parentPath)) {
+                                continue
+                            }
                         }
-                    }
                     }
                     ids.add(cursor.getLong(idCol))
                 }
@@ -325,35 +326,37 @@ class MediaStoreSongRepository @Inject constructor(
         }
         ids
     }
+    /**
+     * Computes allowed parent directories by filtering out blocked directories.
+     * Returns Pair(allowedDirs, applyFilter).
+     */
+    private suspend fun computeAllowedDirs(blockedDirs: Set<String>): Pair<List<String>, Boolean> {
+        if (blockedDirs.isEmpty()) return Pair(emptyList(), false)
+        val allParentDirs = musicDao.getDistinctParentDirectories()
+        val normalizedBlocked = blockedDirs.map { it.trimEnd('/') }
+        val allowedParentDirs = allParentDirs.filter { parentDir ->
+            val normalizedParent = parentDir.trimEnd('/')
+            normalizedBlocked.none { blocked ->
+                normalizedParent == blocked || normalizedParent.startsWith("$blocked/")
+            }
+        }
+        return Pair(allowedParentDirs, true)
+    }
+
+    private val defaultPagingConfig = androidx.paging.PagingConfig(
+        pageSize = 50,
+        enablePlaceholders = true,
+        maxSize = 250
+    )
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getPaginatedSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption): Flow<PagingData<Song>> {
         return userPreferencesRepository.blockedDirectoriesFlow.flatMapLatest { blockedDirs ->
-            // Compute allowed directories for Room's allow-list filtering
-            // Room doesn't support "NOT IN" efficiently or at all with list parameters in some versions,
-            // so we calculate the allowed list (All - Blocked).
-            // However, getDistinctParentDirectories() is a suspend function, so we need flow builder or just do it here.
-            
             kotlinx.coroutines.flow.flow {
-                val allParentDirs = musicDao.getDistinctParentDirectories()
-                val normalizedBlocked = blockedDirs.map { it.trimEnd('/') }
-                
-                val allowedParentDirs = allParentDirs.filter { parentDir ->
-                    val normalizedParent = parentDir.trimEnd('/')
-                    // Check if parentDir is inside any blocked dir
-                    normalizedBlocked.none { blocked -> 
-                        normalizedParent == blocked || normalizedParent.startsWith("$blocked/")
-                    }
-                }
-                
-                val applyDirectoryFilter = blockedDirs.isNotEmpty()
-
+                val (allowedParentDirs, applyDirectoryFilter) = computeAllowedDirs(blockedDirs)
                 emit(
                     androidx.paging.Pager(
-                        config = androidx.paging.PagingConfig(
-                            pageSize = 50,
-                            enablePlaceholders = true,
-                            maxSize = 250
-                        ),
+                        config = defaultPagingConfig,
                         pagingSourceFactory = {
                             musicDao.getSongsPaginated(
                                 allowedParentDirs = allowedParentDirs,
@@ -365,27 +368,48 @@ class MediaStoreSongRepository @Inject constructor(
                 )
             }.flatMapLatest { it }
         }.map { pagingData ->
-            pagingData.map { entity ->
-                Song(
-                     id = entity.id.toString(),
-                     title = entity.title,
-                     artist = entity.artistName,
-                     artistId = entity.artistId,
-                     album = entity.albumName,
-                     albumId = entity.albumId,
-                     path = entity.filePath,
-                     contentUriString = entity.contentUriString,
-                     albumArtUriString = entity.albumArtUriString,
-                     duration = entity.duration,
-                     lyrics = entity.lyrics,
-                     dateAdded = entity.dateAdded,
-                     trackNumber = entity.trackNumber,
-                     year = entity.year,
-                     mimeType = entity.mimeType,
-                     bitrate = entity.bitrate,
-                     sampleRate = entity.sampleRate,
-                     isFavorite = false // TODO: Join with favorites if needed
+            pagingData.map { entity -> entity.toSong() }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getPaginatedFavoriteSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption): Flow<PagingData<Song>> {
+        return userPreferencesRepository.blockedDirectoriesFlow.flatMapLatest { blockedDirs ->
+            kotlinx.coroutines.flow.flow {
+                val (allowedParentDirs, applyDirectoryFilter) = computeAllowedDirs(blockedDirs)
+                emit(
+                    androidx.paging.Pager(
+                        config = defaultPagingConfig,
+                        pagingSourceFactory = {
+                            musicDao.getFavoriteSongsPaginated(
+                                allowedParentDirs = allowedParentDirs,
+                                applyDirectoryFilter = applyDirectoryFilter,
+                                sortOrder = sortOption.storageKey
+                            )
+                        }
+                    ).flow
                 )
+            }.flatMapLatest { it }
+        }.map { pagingData ->
+            pagingData.map { entity -> entity.toSong().copy(isFavorite = true) }
+        }
+    }
+
+    override suspend fun getFavoriteSongsOnce(): List<Song> = withContext(Dispatchers.IO) {
+        val blockedDirs = userPreferencesRepository.blockedDirectoriesFlow.first()
+        val (allowedParentDirs, applyDirectoryFilter) = computeAllowedDirs(blockedDirs)
+        musicDao.getFavoriteSongsList(allowedParentDirs, applyDirectoryFilter)
+            .map { entity -> entity.toSong().copy(isFavorite = true) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun getFavoriteSongCountFlow(): Flow<Int> {
+        return userPreferencesRepository.blockedDirectoriesFlow.flatMapLatest { blockedDirs ->
+            kotlinx.coroutines.flow.flow {
+                val (allowedParentDirs, applyDirectoryFilter) = computeAllowedDirs(blockedDirs)
+                emit(Pair(allowedParentDirs, applyDirectoryFilter))
+            }.flatMapLatest { (allowedDirs, applyFilter) ->
+                musicDao.getFavoriteSongCount(allowedDirs, applyFilter)
             }
         }
     }
