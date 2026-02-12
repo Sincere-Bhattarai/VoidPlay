@@ -4,10 +4,14 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.backup.AppDataBackupManager
-import com.theveloper.pixelplay.data.backup.BackupSection
-import com.theveloper.pixelplay.data.backup.BackupOperationType
-import com.theveloper.pixelplay.data.backup.BackupTransferProgressUpdate
+import com.theveloper.pixelplay.data.backup.BackupManager
+import com.theveloper.pixelplay.data.backup.model.BackupSection
+import com.theveloper.pixelplay.data.backup.model.BackupOperationType
+import com.theveloper.pixelplay.data.backup.model.BackupTransferProgressUpdate
+import com.theveloper.pixelplay.data.backup.model.BackupHistoryEntry
+import com.theveloper.pixelplay.data.backup.model.RestorePlan
+import com.theveloper.pixelplay.data.backup.model.RestoreResult
+import com.theveloper.pixelplay.data.backup.model.ValidationError
 import com.theveloper.pixelplay.data.preferences.AppThemeMode
 import com.theveloper.pixelplay.data.preferences.CarouselStyle
 import com.theveloper.pixelplay.data.preferences.LibraryNavigationMode
@@ -70,7 +74,11 @@ data class SettingsUiState(
     val immersiveLyricsEnabled: Boolean = false,
     val immersiveLyricsTimeout: Long = 4000L,
     val backupInfoDismissed: Boolean = false,
-    val isDataTransferInProgress: Boolean = false
+    val isDataTransferInProgress: Boolean = false,
+    val restorePlan: RestorePlan? = null,
+    val backupHistory: List<BackupHistoryEntry> = emptyList(),
+    val backupValidationErrors: List<ValidationError> = emptyList(),
+    val isInspectingBackup: Boolean = false
 )
 
 data class FailedSongInfo(
@@ -133,7 +141,7 @@ class SettingsViewModel @Inject constructor(
     private val geminiModelService: GeminiModelService,
     private val lyricsRepository: LyricsRepository,
     private val musicRepository: MusicRepository,
-    private val appDataBackupManager: AppDataBackupManager,
+    private val backupManager: BackupManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -176,6 +184,14 @@ class SettingsViewModel @Inject constructor(
 
     private val _dataTransferEvents = MutableSharedFlow<String>()
     val dataTransferEvents: SharedFlow<String> = _dataTransferEvents.asSharedFlow()
+
+    init {
+        viewModelScope.launch {
+            backupManager.getBackupHistory().collect { history ->
+                _uiState.update { it.copy(backupHistory = history) }
+            }
+        }
+    }
 
     private val _dataTransferProgress = MutableStateFlow<BackupTransferProgressUpdate?>(null)
     val dataTransferProgress: StateFlow<BackupTransferProgressUpdate?> = _dataTransferProgress.asStateFlow()
@@ -724,21 +740,47 @@ class SettingsViewModel @Inject constructor(
                 title = "Preparing backup",
                 detail = "Starting backup task."
             )
-            val result = appDataBackupManager.exportToUri(uri, sections) { progress ->
+            val result = backupManager.export(uri, sections) { progress ->
                 _dataTransferProgress.value = progress
             }
             result.fold(
                 onSuccess = { _dataTransferEvents.emit("Data exported successfully") },
                 onFailure = { _dataTransferEvents.emit("Export failed: ${it.localizedMessage ?: "Unknown error"}") }
             )
-            delay(450)
+            delay(300)
             _uiState.update { it.copy(isDataTransferInProgress = false) }
             _dataTransferProgress.value = null
         }
     }
 
-    fun importAppData(uri: Uri, sections: Set<BackupSection>) {
-        if (sections.isEmpty() || _uiState.value.isDataTransferInProgress) return
+    fun inspectBackupFile(uri: Uri) {
+        if (_uiState.value.isInspectingBackup) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isInspectingBackup = true, backupValidationErrors = emptyList(), restorePlan = null) }
+            val result = backupManager.inspectBackup(uri)
+            result.fold(
+                onSuccess = { plan ->
+                    _uiState.update { it.copy(restorePlan = plan, isInspectingBackup = false) }
+                },
+                onFailure = { error ->
+                    _dataTransferEvents.emit("Invalid backup: ${error.localizedMessage ?: "Unknown error"}")
+                    _uiState.update { it.copy(isInspectingBackup = false) }
+                }
+            )
+        }
+    }
+
+    fun updateRestorePlanSelection(selectedModules: Set<BackupSection>) {
+        _uiState.update { state ->
+            state.restorePlan?.let { plan ->
+                state.copy(restorePlan = plan.copy(selectedModules = selectedModules))
+            } ?: state
+        }
+    }
+
+    fun restoreFromPlan(uri: Uri) {
+        val plan = _uiState.value.restorePlan ?: return
+        if (plan.selectedModules.isEmpty() || _uiState.value.isDataTransferInProgress) return
         viewModelScope.launch {
             _uiState.update { it.copy(isDataTransferInProgress = true) }
             _dataTransferProgress.value = BackupTransferProgressUpdate(
@@ -748,19 +790,36 @@ class SettingsViewModel @Inject constructor(
                 title = "Preparing restore",
                 detail = "Starting restore task."
             )
-            val result = appDataBackupManager.importFromUri(uri, sections) { progress ->
+            val result = backupManager.restore(uri, plan) { progress ->
                 _dataTransferProgress.value = progress
             }
-            result.fold(
-                onSuccess = {
-                    _dataTransferEvents.emit("Data imported successfully")
+            when (result) {
+                is RestoreResult.Success -> {
+                    _dataTransferEvents.emit("Data restored successfully")
                     syncManager.sync()
-                },
-                onFailure = { _dataTransferEvents.emit("Import failed: ${it.localizedMessage ?: "Unknown error"}") }
-            )
-            delay(450)
-            _uiState.update { it.copy(isDataTransferInProgress = false) }
+                }
+                is RestoreResult.PartialFailure -> {
+                    val failedNames = result.failed.entries.joinToString { "${it.key.label}: ${it.value}" }
+                    _dataTransferEvents.emit("Partial restore. Failed: $failedNames")
+                    if (result.succeeded.isNotEmpty()) syncManager.sync()
+                }
+                is RestoreResult.TotalFailure -> {
+                    _dataTransferEvents.emit("Restore failed: ${result.error}")
+                }
+            }
+            delay(300)
+            _uiState.update { it.copy(isDataTransferInProgress = false, restorePlan = null) }
             _dataTransferProgress.value = null
+        }
+    }
+
+    fun clearRestorePlan() {
+        _uiState.update { it.copy(restorePlan = null, backupValidationErrors = emptyList()) }
+    }
+
+    fun removeBackupHistoryEntry(entry: BackupHistoryEntry) {
+        viewModelScope.launch {
+            backupManager.removeBackupHistoryEntry(entry.uri)
         }
     }
 }

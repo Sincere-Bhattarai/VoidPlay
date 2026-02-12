@@ -1784,11 +1784,17 @@ constructor(
                         preferences[stringPreferencesKey(entry.key)] = value
                     }
                     "int" -> {
-                        val value = entry.intValue ?: return@forEach
+                        val value = entry.intValue
+                            ?: entry.doubleValue?.toInt()
+                            ?: entry.longValue?.toInt()
+                            ?: return@forEach
                         preferences[intPreferencesKey(entry.key)] = value
                     }
                     "long" -> {
-                        val value = entry.longValue ?: return@forEach
+                        val value = entry.longValue
+                            ?: entry.doubleValue?.toLong()
+                            ?: entry.intValue?.toLong()
+                            ?: return@forEach
                         preferences[longPreferencesKey(entry.key)] = value
                     }
                     "boolean" -> {
@@ -1796,11 +1802,15 @@ constructor(
                         preferences[booleanPreferencesKey(entry.key)] = value
                     }
                     "float" -> {
-                        val value = entry.floatValue ?: return@forEach
+                        val value = entry.floatValue
+                            ?: entry.doubleValue?.toFloat()
+                            ?: return@forEach
                         preferences[androidx.datastore.preferences.core.floatPreferencesKey(entry.key)] = value
                     }
                     "double" -> {
-                        val value = entry.doubleValue ?: return@forEach
+                        val value = entry.doubleValue
+                            ?: entry.floatValue?.toDouble()
+                            ?: return@forEach
                         preferences[androidx.datastore.preferences.core.doublePreferencesKey(entry.key)] = value
                     }
                     "string_set" -> {

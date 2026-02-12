@@ -119,6 +119,7 @@ data class AppDataBackupPayload(
     val playbackHistory: List<PlaybackHistoryBackupEntry>? = null
 )
 
+@Deprecated("Use BackupManager instead. This class is retained for legacy format reference only.")
 @Singleton
 class AppDataBackupManager @Inject constructor(
     @ApplicationContext private val context: Context,

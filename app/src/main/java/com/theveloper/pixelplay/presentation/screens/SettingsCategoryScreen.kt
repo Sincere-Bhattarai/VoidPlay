@@ -1,22 +1,29 @@
 package com.theveloper.pixelplay.presentation.screens
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
+import android.text.format.Formatter
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,8 +58,10 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Style
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Science
@@ -120,9 +129,12 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.backup.BackupOperationType
-import com.theveloper.pixelplay.data.backup.BackupSection
-import com.theveloper.pixelplay.data.backup.BackupTransferProgressUpdate
+import com.theveloper.pixelplay.data.backup.model.BackupHistoryEntry
+import com.theveloper.pixelplay.data.backup.model.BackupOperationType
+import com.theveloper.pixelplay.data.backup.model.BackupSection
+import com.theveloper.pixelplay.data.backup.model.BackupTransferProgressUpdate
+import com.theveloper.pixelplay.data.backup.model.ModuleRestoreDetail
+import com.theveloper.pixelplay.data.backup.model.RestorePlan
 import com.theveloper.pixelplay.data.preferences.AppThemeMode
 import com.theveloper.pixelplay.data.preferences.CarouselStyle
 import com.theveloper.pixelplay.data.preferences.LaunchTab
@@ -183,9 +195,9 @@ fun SettingsCategoryScreen(
     var showRegenerateDailyMixDialog by remember { mutableStateOf(false) }
     var showRegenerateStatsDialog by remember { mutableStateOf(false) }
     var showExportDataDialog by remember { mutableStateOf(false) }
-    var showImportDataDialog by remember { mutableStateOf(false) }
+    var showImportFlow by remember { mutableStateOf(false) }
     var exportSections by remember { mutableStateOf(BackupSection.defaultSelection) }
-    var importSections by remember { mutableStateOf(BackupSection.defaultSelection) }
+    var importFileUri by remember { mutableStateOf<Uri?>(null) }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/octet-stream")
@@ -195,11 +207,12 @@ fun SettingsCategoryScreen(
         }
     }
 
-    val importLauncher = rememberLauncherForActivityResult(
+    val importFilePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
-            settingsViewModel.importAppData(uri, importSections)
+            importFileUri = uri
+            settingsViewModel.inspectBackupFile(uri)
         }
     }
 
@@ -808,7 +821,7 @@ fun SettingsCategoryScreen(
                             ) {
                                 ActionSettingsItem(
                                     title = "Import Backup",
-                                    subtitle = "${buildBackupSelectionSummary(importSections)} Selected data will replace current data.",
+                                    subtitle = "Browse or pick from recent backups. Selected data will replace current data.",
                                     icon = {
                                         Icon(
                                             imageVector = Icons.Rounded.Restore,
@@ -817,7 +830,7 @@ fun SettingsCategoryScreen(
                                         )
                                     },
                                     primaryActionLabel = "Select & Restore",
-                                    onPrimaryAction = { showImportDataDialog = true },
+                                    onPrimaryAction = { showImportFlow = true },
                                     enabled = !uiState.isDataTransferInProgress
                                 )
                             }
@@ -1107,21 +1120,48 @@ fun SettingsCategoryScreen(
         )
     }
 
-    if (showImportDataDialog) {
-        BackupSectionSelectionDialog(
-            operation = BackupOperationType.IMPORT,
-            title = "Import Backup",
-            supportingText = "Selected sections will replace your current app data.",
-            selectedSections = importSections,
-            confirmLabel = "Import Backup",
-            inProgress = uiState.isDataTransferInProgress,
-            onDismiss = { showImportDataDialog = false },
-            onSelectionChanged = { importSections = it },
-            onConfirm = {
-                showImportDataDialog = false
-                importLauncher.launch("*/*")
-            }
-        )
+    if (showImportFlow) {
+        val restorePlan = uiState.restorePlan
+        if (restorePlan != null && importFileUri != null) {
+            // Step 2: Module selection from inspected backup
+            ImportModuleSelectionDialog(
+                plan = restorePlan,
+                inProgress = uiState.isDataTransferInProgress,
+                onDismiss = {
+                    showImportFlow = false
+                    importFileUri = null
+                    settingsViewModel.clearRestorePlan()
+                },
+                onBack = {
+                    importFileUri = null
+                    settingsViewModel.clearRestorePlan()
+                },
+                onSelectionChanged = { settingsViewModel.updateRestorePlanSelection(it) },
+                onConfirm = {
+                    settingsViewModel.restoreFromPlan(importFileUri!!)
+                    showImportFlow = false
+                    importFileUri = null
+                }
+            )
+        } else {
+            // Step 1: File selection with backup history
+            ImportFileSelectionDialog(
+                backupHistory = uiState.backupHistory,
+                isInspecting = uiState.isInspectingBackup,
+                onDismiss = {
+                    showImportFlow = false
+                    importFileUri = null
+                    settingsViewModel.clearRestorePlan()
+                },
+                onBrowseFile = { importFilePicker.launch("*/*") },
+                onHistoryItemSelected = { entry ->
+                    val uri = entry.uri.toUri()
+                    importFileUri = uri
+                    settingsViewModel.inspectBackupFile(uri)
+                },
+                onRemoveHistoryEntry = { settingsViewModel.removeBackupHistoryEntry(it) }
+            )
+        }
     }
 }
 
@@ -1136,16 +1176,7 @@ private fun buildBackupSelectionSummary(selected: Set<BackupSection>): String {
 }
 
 private fun backupSectionIconRes(section: BackupSection): Int {
-    return when (section) {
-        BackupSection.PLAYLISTS -> R.drawable.rounded_playlist_play_24
-        BackupSection.GLOBAL_SETTINGS -> R.drawable.rounded_settings_24
-        BackupSection.FAVORITES -> R.drawable.rounded_favorite_24
-        BackupSection.LYRICS -> R.drawable.rounded_lyrics_24
-        BackupSection.SEARCH_HISTORY -> R.drawable.rounded_search_24
-        BackupSection.TRANSITIONS -> R.drawable.rounded_align_justify_space_even_24
-        BackupSection.ENGAGEMENT_STATS -> R.drawable.rounded_monitoring_24
-        BackupSection.PLAYBACK_HISTORY -> R.drawable.rounded_schedule_24
-    }
+    return section.iconRes
 }
 
 @Composable
@@ -1205,6 +1236,7 @@ private fun BackupInfoNoticeCard(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BackupSectionSelectionDialog(
@@ -1221,217 +1253,246 @@ private fun BackupSectionSelectionDialog(
     val listState = rememberLazyListState()
     val selectedCount = selectedSections.size
     val totalCount = BackupSection.entries.size
+    val transitionState = remember { MutableTransitionState(false) }
+    var shouldShowDialog by remember { mutableStateOf(true) }
+    var onDialogHiddenAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
-        )
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.surfaceContainerLowest
+    transitionState.targetState = shouldShowDialog
+
+    fun closeDialog(afterClose: () -> Unit) {
+        if (!shouldShowDialog) return
+        onDialogHiddenAction = afterClose
+        shouldShowDialog = false
+    }
+
+    LaunchedEffect(transitionState.currentState, transitionState.targetState) {
+        if (!transitionState.currentState && !transitionState.targetState) {
+            onDialogHiddenAction?.let { action ->
+                onDialogHiddenAction = null
+                action()
+            }
+        }
+    }
+
+    if (transitionState.currentState || transitionState.targetState) {
+        Dialog(
+            onDismissRequest = { closeDialog(onDismiss) },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
         ) {
-            Scaffold(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                contentWindowInsets = WindowInsets.systemBars,
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        title = {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontSize = 24.sp,
-                                    textGeometricTransform = TextGeometricTransform(scaleX = 1.2f),
-                                ),
-                                fontFamily = GoogleSansRounded,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                        navigationIcon = {
-                            FilledIconButton(
-                                modifier = Modifier.padding(start = 6.dp),
-                                onClick = onDismiss,
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                                    contentColor = MaterialTheme.colorScheme.onSurface
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Close,
-                                    contentDescription = "Close"
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    )
-                },
-                bottomBar = {
-                    BottomAppBar(
-                        windowInsets = WindowInsets.navigationBars,
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(start = 10.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                FilledIconButton(
-                                    onClick = { onSelectionChanged(BackupSection.entries.toSet()) },
-                                    enabled = !inProgress,
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.round_select_all_24),
-                                        contentDescription = "Select all"
-                                    )
-                                }
-                                FilledIconButton(
-                                    onClick = { onSelectionChanged(emptySet()) },
-                                    enabled = !inProgress,
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                        contentColor = MaterialTheme.colorScheme.onSurface
-                                    )
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.baseline_deselect_24),
-                                        contentDescription = "Clear selection"
-                                    )
-                                }
-                            }
-
-                            ExtendedFloatingActionButton(
-                                onClick = onConfirm,
-                                modifier = Modifier
-                                    .padding(end = 6.dp)
-                                    .height(48.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                containerColor = if (operation == BackupOperationType.EXPORT) {
-                                    MaterialTheme.colorScheme.tertiaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.primaryContainer
-                                },
-                                contentColor = if (operation == BackupOperationType.EXPORT) {
-                                    MaterialTheme.colorScheme.onTertiaryContainer
-                                } else {
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                }
-                            ) {
-                                if (inProgress) {
-                                    LoadingIndicator(modifier = Modifier.height(20.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
+            AnimatedVisibility(
+                visibleState = transitionState,
+                enter = slideInVertically(initialOffsetY = { it / 6 }) + fadeIn(animationSpec = tween(220)),
+                exit = slideOutVertically(targetOffsetY = { it / 6 }) + fadeOut(animationSpec = tween(200)),
+                label = "backup_section_dialog"
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest
+                ) {
+                    Scaffold(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        contentWindowInsets = WindowInsets.systemBars,
+                        topBar = {
+                            CenterAlignedTopAppBar(
+                                title = {
                                     Text(
-                                        text = if (operation == BackupOperationType.EXPORT) "Exporting" else "Importing",
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = FontWeight.SemiBold
+                                        text = title,
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontSize = 24.sp,
+                                            textGeometricTransform = TextGeometricTransform(scaleX = 1.2f),
+                                        ),
+                                        fontFamily = GoogleSansRounded,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
-                                } else {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                },
+                                navigationIcon = {
+                                    FilledIconButton(
+                                        modifier = Modifier.padding(start = 6.dp),
+                                        onClick = { closeDialog(onDismiss) },
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                                            contentColor = MaterialTheme.colorScheme.onSurface
+                                        )
                                     ) {
                                         Icon(
-                                            painter = painterResource(
-                                                if (operation == BackupOperationType.EXPORT) {
-                                                    R.drawable.outline_save_24
-                                                } else {
-                                                    R.drawable.rounded_upload_file_24
-                                                }
-                                            ),
-                                            contentDescription = confirmLabel
+                                            imageVector = Icons.Rounded.Close,
+                                            contentDescription = "Close"
                                         )
+                                    }
+                                },
+                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                )
+                            )
+                        },
+                        bottomBar = {
+                            BottomAppBar(
+                                windowInsets = WindowInsets.navigationBars,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(start = 10.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        FilledIconButton(
+                                            onClick = { onSelectionChanged(BackupSection.entries.toSet()) },
+                                            enabled = !inProgress,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                            )
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.round_select_all_24),
+                                                contentDescription = "Select all"
+                                            )
+                                        }
+                                        FilledIconButton(
+                                            onClick = { onSelectionChanged(emptySet()) },
+                                            enabled = !inProgress,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                                contentColor = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.baseline_deselect_24),
+                                                contentDescription = "Clear selection"
+                                            )
+                                        }
+                                    }
 
-                                        Text(
-                                            text = if (operation == BackupOperationType.EXPORT) {
-                                                "Export Backup"
-                                            } else {
-                                                "Import Backup"
+                                    ExtendedFloatingActionButton(
+                                        onClick = { closeDialog(onConfirm) },
+                                        modifier = Modifier
+                                            .padding(end = 6.dp)
+                                            .height(48.dp),
+                                        shape = RoundedCornerShape(16.dp),
+                                        containerColor = if (operation == BackupOperationType.EXPORT) {
+                                            MaterialTheme.colorScheme.tertiaryContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.primaryContainer
+                                        },
+                                        contentColor = if (operation == BackupOperationType.EXPORT) {
+                                            MaterialTheme.colorScheme.onTertiaryContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                        }
+                                    ) {
+                                        if (inProgress) {
+                                            LoadingIndicator(modifier = Modifier.height(20.dp))
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = if (operation == BackupOperationType.EXPORT) "Exporting" else "Importing",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        } else {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(
+                                                        if (operation == BackupOperationType.EXPORT) {
+                                                            R.drawable.outline_save_24
+                                                        } else {
+                                                            R.drawable.rounded_upload_file_24
+                                                        }
+                                                    ),
+                                                    contentDescription = confirmLabel
+                                                )
+
+                                                Text(
+                                                    text = if (operation == BackupOperationType.EXPORT) {
+                                                        "Export Backup"
+                                                    } else {
+                                                        "Import Backup"
+                                                    }
+                                                )
                                             }
-                                        )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                }
-            ) { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize()
-                        .padding(horizontal = 18.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.62f),
-                        shape = RoundedCornerShape(18.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp)
-                    ) {
+                    ) { innerPadding ->
                         Column(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .padding(horizontal = 18.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text(
-                                text = supportingText,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = "$selectedCount of $totalCount sections selected",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            if (inProgress) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.62f),
+                                shape = RoundedCornerShape(18.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    LoadingIndicator(modifier = Modifier.height(24.dp))
                                     Text(
-                                        text = "Transfer in progress...",
-                                        style = MaterialTheme.typography.bodySmall,
+                                        text = supportingText,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = "$selectedCount of $totalCount sections selected",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    if (inProgress) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            LoadingIndicator(modifier = Modifier.height(24.dp))
+                                            Text(
+                                                text = "Transfer in progress...",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 18.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(BackupSection.entries, key = { it.key }) { section ->
+                                    val isSelected = section in selectedSections
+                                    BackupSectionSelectableCard(
+                                        section = section,
+                                        selected = isSelected,
+                                        enabled = !inProgress,
+                                        onToggle = {
+                                            onSelectionChanged(
+                                                if (isSelected) selectedSections - section else selectedSections + section
+                                            )
+                                        }
                                     )
                                 }
                             }
-                        }
-                    }
-
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 18.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(BackupSection.entries, key = { it.key }) { section ->
-                            val isSelected = section in selectedSections
-                            BackupSectionSelectableCard(
-                                section = section,
-                                selected = isSelected,
-                                enabled = !inProgress,
-                                onToggle = {
-                                    onSelectionChanged(
-                                        if (isSelected) selectedSections - section else selectedSections + section
-                                    )
-                                }
-                            )
                         }
                     }
                 }
@@ -1439,12 +1500,12 @@ private fun BackupSectionSelectionDialog(
         }
     }
 }
-
 @Composable
 private fun BackupSectionSelectableCard(
     section: BackupSection,
     selected: Boolean,
     enabled: Boolean,
+    detail: ModuleRestoreDetail? = null,
     onToggle: () -> Unit
 ) {
     val borderColor by animateColorAsState(
@@ -1528,6 +1589,13 @@ private fun BackupSectionSelectableCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (detail != null && detail.entryCount > 0) {
+                        Text(
+                            text = "${detail.entryCount} entries · Will replace current data",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.tertiary
+                        )
+                    }
                 }
 
                 Switch(
@@ -1627,6 +1695,676 @@ private fun BackupTransferProgressDialog(progress: BackupTransferProgressUpdate)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ImportFileSelectionDialog(
+    backupHistory: List<BackupHistoryEntry>,
+    isInspecting: Boolean,
+    onDismiss: () -> Unit,
+    onBrowseFile: () -> Unit,
+    onHistoryItemSelected: (BackupHistoryEntry) -> Unit,
+    onRemoveHistoryEntry: (BackupHistoryEntry) -> Unit
+) {
+    val context = LocalContext.current
+    val transitionState = remember { MutableTransitionState(false) }
+    var shouldShowDialog by remember { mutableStateOf(true) }
+    var onDialogHiddenAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    transitionState.targetState = shouldShowDialog
+
+    fun closeDialog(afterClose: () -> Unit) {
+        if (!shouldShowDialog) return
+        onDialogHiddenAction = afterClose
+        shouldShowDialog = false
+    }
+
+    LaunchedEffect(transitionState.currentState, transitionState.targetState) {
+        if (!transitionState.currentState && !transitionState.targetState) {
+            onDialogHiddenAction?.let { action ->
+                onDialogHiddenAction = null
+                action()
+            }
+        }
+    }
+
+    if (transitionState.currentState || transitionState.targetState) {
+        Dialog(
+            onDismissRequest = { closeDialog(onDismiss) },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
+        ) {
+            AnimatedVisibility(
+                visibleState = transitionState,
+                enter = slideInVertically(initialOffsetY = { it / 6 }) + fadeIn(animationSpec = tween(220)),
+                exit = slideOutVertically(targetOffsetY = { it / 6 }) + fadeOut(animationSpec = tween(200)),
+                label = "import_file_selection_dialog"
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest
+                ) {
+                    Scaffold(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        contentWindowInsets = WindowInsets.systemBars,
+                        topBar = {
+                            CenterAlignedTopAppBar(
+                                title = {
+                                    Text(
+                                        text = "Import Backup",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontSize = 24.sp,
+                                            textGeometricTransform = TextGeometricTransform(scaleX = 1.2f),
+                                        ),
+                                        fontFamily = GoogleSansRounded,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                },
+                                navigationIcon = {
+                                    FilledIconButton(
+                                        modifier = Modifier.padding(start = 6.dp),
+                                        onClick = { closeDialog(onDismiss) },
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                                            contentColor = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Close,
+                                            contentDescription = "Close"
+                                        )
+                                    }
+                                },
+                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                )
+                            )
+                        },
+                        bottomBar = {
+                            BottomAppBar(
+                                windowInsets = WindowInsets.navigationBars,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    ExtendedFloatingActionButton(
+                                        onClick = onBrowseFile,
+                                        modifier = Modifier.height(48.dp),
+                                        shape = RoundedCornerShape(16.dp),
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ) {
+                                        if (isInspecting) {
+                                            LoadingIndicator(modifier = Modifier.height(20.dp))
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Inspecting...",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        } else {
+                                            Icon(
+                                                painter = painterResource(R.drawable.rounded_upload_file_24),
+                                                contentDescription = null
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Browse for file",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ) { innerPadding ->
+                        Column(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .padding(horizontal = 18.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.62f),
+                                shape = RoundedCornerShape(18.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        text = "Select a .pxpl backup file to inspect. You'll choose which sections to restore in the next step.",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            if (backupHistory.isNotEmpty()) {
+                                Text(
+                                    text = "Recent Backups",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                                )
+                            }
+
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 18.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                if (backupHistory.isEmpty()) {
+                                    item {
+                                        Surface(
+                                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                            shape = RoundedCornerShape(18.dp),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(24.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Restore,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(36.dp),
+                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                                )
+                                                Text(
+                                                    text = "No recent backups",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                                Text(
+                                                    text = "Previously imported backups will appear here.",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                                )
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    items(backupHistory, key = { it.uri }) { entry ->
+                                        BackupHistoryCard(
+                                            entry = entry,
+                                            context = context,
+                                            onSelect = { onHistoryItemSelected(entry) },
+                                            onRemove = { onRemoveHistoryEntry(entry) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BackupHistoryCard(
+    entry: BackupHistoryEntry,
+    context: android.content.Context,
+    onSelect: () -> Unit,
+    onRemove: () -> Unit
+) {
+    val dateText = remember(entry.createdAt) {
+        val sdf = java.text.SimpleDateFormat("MMM d, yyyy 'at' h:mm a", java.util.Locale.getDefault())
+        sdf.format(java.util.Date(entry.createdAt))
+    }
+    val sizeText = remember(entry.sizeBytes) {
+        if (entry.sizeBytes > 0) Formatter.formatShortFileSize(context, entry.sizeBytes) else ""
+    }
+    val moduleCount = entry.modules.size
+
+    Surface(
+        onClick = onSelect,
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.size(44.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.rounded_upload_file_24),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = entry.displayName,
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontFamily = GoogleSansRounded
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = buildString {
+                            append(dateText)
+                            if (sizeText.isNotEmpty()) append(" · $sizeText")
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
+                }
+
+                IconButton(
+                    onClick = onRemove,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "Remove from history",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "$moduleCount modules · v${entry.appVersion.ifEmpty { "?" }} · schema v${entry.schemaVersion}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ImportModuleSelectionDialog(
+    plan: RestorePlan,
+    inProgress: Boolean,
+    onDismiss: () -> Unit,
+    onBack: () -> Unit,
+    onSelectionChanged: (Set<BackupSection>) -> Unit,
+    onConfirm: () -> Unit
+) {
+    val listState = rememberLazyListState()
+    val selectedCount = plan.selectedModules.size
+    val availableCount = plan.availableModules.size
+    val dateText = remember(plan.manifest.createdAt) {
+        val sdf = java.text.SimpleDateFormat("MMM d, yyyy 'at' h:mm a", java.util.Locale.getDefault())
+        sdf.format(java.util.Date(plan.manifest.createdAt))
+    }
+    val transitionState = remember { MutableTransitionState(false) }
+    var shouldShowDialog by remember { mutableStateOf(true) }
+    var onDialogHiddenAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    transitionState.targetState = shouldShowDialog
+
+    fun closeDialog(afterClose: () -> Unit) {
+        if (!shouldShowDialog) return
+        onDialogHiddenAction = afterClose
+        shouldShowDialog = false
+    }
+
+    LaunchedEffect(transitionState.currentState, transitionState.targetState) {
+        if (!transitionState.currentState && !transitionState.targetState) {
+            onDialogHiddenAction?.let { action ->
+                onDialogHiddenAction = null
+                action()
+            }
+        }
+    }
+
+    if (transitionState.currentState || transitionState.targetState) {
+        Dialog(
+            onDismissRequest = { closeDialog(onDismiss) },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
+        ) {
+            AnimatedVisibility(
+                visibleState = transitionState,
+                enter = slideInVertically(initialOffsetY = { it / 6 }) + fadeIn(animationSpec = tween(220)),
+                exit = slideOutVertically(targetOffsetY = { it / 6 }) + fadeOut(animationSpec = tween(200)),
+                label = "import_module_selection_dialog"
+            ) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest
+                ) {
+                    Scaffold(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        contentWindowInsets = WindowInsets.systemBars,
+                        topBar = {
+                            CenterAlignedTopAppBar(
+                                title = {
+                                    Text(
+                                        text = "Restore Modules",
+                                        style = MaterialTheme.typography.titleMedium.copy(
+                                            fontSize = 24.sp,
+                                            textGeometricTransform = TextGeometricTransform(scaleX = 1.2f),
+                                        ),
+                                        fontFamily = GoogleSansRounded,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                },
+                                navigationIcon = {
+                                    FilledIconButton(
+                                        modifier = Modifier.padding(start = 6.dp),
+                                        onClick = { closeDialog(onBack) },
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                                            contentColor = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.ArrowBack,
+                                            contentDescription = "Back"
+                                        )
+                                    }
+                                },
+                                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                )
+                            )
+                        },
+                        bottomBar = {
+                            BottomAppBar(
+                                windowInsets = WindowInsets.navigationBars,
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(start = 10.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        FilledIconButton(
+                                            onClick = { onSelectionChanged(plan.availableModules) },
+                                            enabled = !inProgress,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                            )
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.round_select_all_24),
+                                                contentDescription = "Select all"
+                                            )
+                                        }
+                                        FilledIconButton(
+                                            onClick = { onSelectionChanged(emptySet()) },
+                                            enabled = !inProgress,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                                contentColor = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.baseline_deselect_24),
+                                                contentDescription = "Clear selection"
+                                            )
+                                        }
+                                    }
+
+                                    ExtendedFloatingActionButton(
+                                        onClick = { closeDialog(onConfirm) },
+                                        modifier = Modifier
+                                            .padding(end = 6.dp)
+                                            .height(48.dp),
+                                        shape = RoundedCornerShape(16.dp),
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ) {
+                                        if (inProgress) {
+                                            LoadingIndicator(modifier = Modifier.height(20.dp))
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Restoring",
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        } else {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Restore,
+                                                    contentDescription = null
+                                                )
+                                                Text(
+                                                    text = "Restore Selected",
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ) { innerPadding ->
+                        Column(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                                .padding(horizontal = 18.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // Backup metadata header
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.62f),
+                                shape = RoundedCornerShape(18.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Text(
+                                        text = "Backup Details",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                            Text(
+                                                text = "Created",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Text(
+                                                text = dateText,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                            Text(
+                                                text = "App Version",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Text(
+                                                text = plan.manifest.appVersion.ifEmpty { "Unknown" },
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
+                                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                            Text(
+                                                text = "Schema",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Text(
+                                                text = "v${plan.manifest.schemaVersion}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        }
+                                        if (plan.manifest.deviceInfo.model.isNotBlank()) {
+                                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                                Text(
+                                                    text = "Device",
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                                Text(
+                                                    text = "${plan.manifest.deviceInfo.manufacturer} ${plan.manifest.deviceInfo.model}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Text(
+                                        text = "$selectedCount of $availableCount modules selected",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+
+                                    if (inProgress) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            LoadingIndicator(modifier = Modifier.height(24.dp))
+                                            Text(
+                                                text = "Transfer in progress...",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Warnings
+                            if (plan.warnings.isNotEmpty()) {
+                                plan.warnings.forEach { warning ->
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                                        shape = RoundedCornerShape(14.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.Warning,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.error,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                            Text(
+                                                text = warning,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onErrorContainer
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Module list
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 18.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(plan.availableModules.toList(), key = { it.key }) { section ->
+                                    val isSelected = section in plan.selectedModules
+                                    val detail = plan.moduleDetails[section]
+                                    BackupSectionSelectableCard(
+                                        section = section,
+                                        selected = isSelected,
+                                        enabled = !inProgress,
+                                        detail = detail,
+                                        onToggle = {
+                                            onSelectionChanged(
+                                                if (isSelected) plan.selectedModules - section else plan.selectedModules + section
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 @Composable
 private fun PaletteRegenerateSongSheetContent(
     songs: List<Song>,

@@ -1,0 +1,53 @@
+package com.theveloper.pixelplay.data.backup.module
+
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.theveloper.pixelplay.data.backup.model.BackupSection
+import com.theveloper.pixelplay.data.preferences.PreferenceBackupEntry
+import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.pixelplay.di.BackupGson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class PlaylistsModuleHandler @Inject constructor(
+    private val userPreferencesRepository: UserPreferencesRepository,
+    @BackupGson private val gson: Gson
+) : BackupModuleHandler {
+
+    override val section = BackupSection.PLAYLISTS
+
+    override suspend fun export(): String = withContext(Dispatchers.IO) {
+        val entries = userPreferencesRepository.exportPreferencesForBackup()
+            .filter { it.key in PLAYLIST_KEYS }
+        gson.toJson(entries)
+    }
+
+    override suspend fun countEntries(): Int = withContext(Dispatchers.IO) {
+        userPreferencesRepository.exportPreferencesForBackup()
+            .count { it.key in PLAYLIST_KEYS }
+    }
+
+    override suspend fun snapshot(): String = export()
+
+    override suspend fun restore(payload: String) = withContext(Dispatchers.IO) {
+        val type = object : TypeToken<List<PreferenceBackupEntry>>() {}.type
+        val entries: List<PreferenceBackupEntry> = gson.fromJson(payload, type)
+        userPreferencesRepository.clearPreferencesByKeys(PLAYLIST_KEYS)
+        if (entries.isNotEmpty()) {
+            userPreferencesRepository.importPreferencesFromBackup(entries, clearExisting = false)
+        }
+    }
+
+    override suspend fun rollback(snapshot: String) = restore(snapshot)
+
+    companion object {
+        val PLAYLIST_KEYS = setOf(
+            "user_playlists_json_v1",
+            "playlist_song_order_modes",
+            "playlists_sort_option"
+        )
+    }
+}

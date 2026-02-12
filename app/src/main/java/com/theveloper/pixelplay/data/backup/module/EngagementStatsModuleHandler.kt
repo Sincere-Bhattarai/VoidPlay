@@ -1,0 +1,42 @@
+package com.theveloper.pixelplay.data.backup.module
+
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.theveloper.pixelplay.data.backup.model.BackupSection
+import com.theveloper.pixelplay.data.database.EngagementDao
+import com.theveloper.pixelplay.data.database.SongEngagementEntity
+import com.theveloper.pixelplay.di.BackupGson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class EngagementStatsModuleHandler @Inject constructor(
+    private val engagementDao: EngagementDao,
+    @BackupGson private val gson: Gson
+) : BackupModuleHandler {
+
+    override val section = BackupSection.ENGAGEMENT_STATS
+
+    override suspend fun export(): String = withContext(Dispatchers.IO) {
+        gson.toJson(engagementDao.getAllEngagements())
+    }
+
+    override suspend fun countEntries(): Int = withContext(Dispatchers.IO) {
+        engagementDao.getAllEngagements().size
+    }
+
+    override suspend fun snapshot(): String = export()
+
+    override suspend fun restore(payload: String) = withContext(Dispatchers.IO) {
+        val type = object : TypeToken<List<SongEngagementEntity>>() {}.type
+        val stats: List<SongEngagementEntity> = gson.fromJson(payload, type)
+        engagementDao.clearAllEngagements()
+        if (stats.isNotEmpty()) {
+            engagementDao.upsertEngagements(stats)
+        }
+    }
+
+    override suspend fun rollback(snapshot: String) = restore(snapshot)
+}

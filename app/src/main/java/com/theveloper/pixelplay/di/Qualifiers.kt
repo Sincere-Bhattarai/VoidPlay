@@ -15,3 +15,10 @@ annotation class DeezerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class FastOkHttpClient
+
+/**
+ * Qualifier for Gson instance configured for backup serialization.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class BackupGson
