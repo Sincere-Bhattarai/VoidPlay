@@ -31,6 +31,9 @@ class EqualizerManager @Inject constructor() {
     private var bassBoost: BassBoost? = null
     private var virtualizer: Virtualizer? = null
     private var currentAudioSessionId: Int = 0
+
+    val isAttached: Boolean
+        get() = equalizer != null && currentAudioSessionId != 0
     
     // Normalized band levels (-15 to +15 for UI)
     private val _bandLevels = MutableStateFlow(List(NUM_BANDS) { 0 })
@@ -456,12 +459,14 @@ class EqualizerManager @Inject constructor() {
             equalizer?.release()
             bassBoost?.release()
             virtualizer?.release()
+            loudnessEnhancer?.release()
         } catch (e: Exception) {
             Timber.tag(TAG).e(e, "Error releasing audio effects")
         }
         equalizer = null
         bassBoost = null
         virtualizer = null
+        loudnessEnhancer = null
         currentAudioSessionId = 0
         Timber.tag(TAG).d("Audio effects released")
     }

@@ -1661,6 +1661,44 @@ constructor(
         }
     }
     
+    suspend fun renameCustomPreset(oldName: String, newName: String) {
+        val current = customPresetsFlow.first().toMutableList()
+        val index = current.indexOfFirst { it.name == oldName }
+        if (index == -1) return
+        
+        current[index] = current[index].copy(name = newName, displayName = newName)
+        
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CUSTOM_PRESETS] = json.encodeToString(current)
+        }
+        
+        val pinned = pinnedPresetsFlow.first().toMutableList()
+        val pinnedIndex = pinned.indexOf(oldName)
+        if (pinnedIndex != -1) {
+            pinned[pinnedIndex] = newName
+            setPinnedPresets(pinned)
+        }
+        
+        val activePreset = dataStore.data.first()[PreferencesKeys.EQUALIZER_PRESET]
+        if (activePreset == oldName) {
+            dataStore.edit { preferences ->
+                preferences[PreferencesKeys.EQUALIZER_PRESET] = newName
+            }
+        }
+    }
+    
+    suspend fun updateCustomPresetBands(presetName: String, bandLevels: List<Int>) {
+        val current = customPresetsFlow.first().toMutableList()
+        val index = current.indexOfFirst { it.name == presetName }
+        if (index == -1) return
+        
+        current[index] = current[index].copy(bandLevels = bandLevels)
+        
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.CUSTOM_PRESETS] = json.encodeToString(current)
+        }
+    }
+    
     // ===== Pinned Presets Persistence =====
     
     val pinnedPresetsFlow: Flow<List<String>> =

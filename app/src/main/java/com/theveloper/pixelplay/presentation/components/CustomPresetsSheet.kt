@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,6 +45,7 @@ fun CustomPresetsSheet(
     pinnedPresetsNames: List<String>,
     onPresetSelected: (EqualizerPreset) -> Unit,
     onPinToggled: (EqualizerPreset) -> Unit,
+    onRename: (EqualizerPreset) -> Unit,
     onDelete: (EqualizerPreset) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -91,6 +93,7 @@ fun CustomPresetsSheet(
                                 onDismiss()
                             },
                             onPinClick = { onPinToggled(preset) },
+                            onRenameClick = { onRename(preset) },
                             onDeleteClick = { onDelete(preset) }
                         )
                         HorizontalDivider(
@@ -111,6 +114,7 @@ private fun CustomPresetItem(
     isPinned: Boolean,
     onClick: () -> Unit,
     onPinClick: () -> Unit,
+    onRenameClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Row(
@@ -155,6 +159,13 @@ private fun CustomPresetItem(
                     imageVector = if (isPinned) Icons.Default.Star else Icons.Default.StarBorder,
                     contentDescription = if (isPinned) "Unpin" else "Pin",
                     tint = if (isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            IconButton(onClick = onRenameClick) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "Rename",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             IconButton(onClick = onDeleteClick) {
