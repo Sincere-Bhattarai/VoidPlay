@@ -986,7 +986,7 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             castStateHolder.selectedRoute.collect { route ->
                 if (route != null && !route.isDefault && route.supportsControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)) {
-                    castTransferStateHolder.ensureHttpServerRunning()
+                    castTransferStateHolder.primeHttpServerStart()
                 } else if (route?.isDefault == true) {
                     val hasActiveRemoteSession = castStateHolder.castSession.value?.remoteMediaClient != null ||
                             castStateHolder.isRemotePlaybackActive.value ||
@@ -1145,6 +1145,9 @@ class PlayerViewModel @Inject constructor(
             onTransferBackComplete = { startProgressUpdates() },
             onSheetVisible = { _isSheetVisible.value = true },
             onDisconnect = { disconnect() },
+            onCastError = { message ->
+                viewModelScope.launch { _toastEvents.emit(message) }
+            },
             onSongChanged = { uriString ->
                 castSongUiSyncJob?.cancel()
                 castSongUiSyncJob = viewModelScope.launch {
@@ -1242,11 +1245,13 @@ class PlayerViewModel @Inject constructor(
         queueName: String = "Current Context",
         isVoluntaryPlay: Boolean = true
     ) {
+        val playbackContext =
+            if (contextSongs.any { it.id == song.id }) contextSongs else listOf(song)
         val castSession = castStateHolder.castSession.value
         if (castSession != null && castSession.remoteMediaClient != null) {
             val remoteMediaClient = castSession.remoteMediaClient!!
             val mediaStatus = remoteMediaClient.mediaStatus
-            val desiredQueue = if (contextSongs.any { it.id == song.id }) contextSongs else listOf(song)
+            val desiredQueue = playbackContext
             val lastRemoteQueue = castTransferStateHolder.lastRemoteQueue
             val contextMatchesRemoteSnapshot = lastRemoteQueue.matchesSongOrder(desiredQueue)
             val targetIndexInDesiredQueue = desiredQueue.indexOfFirst { it.id == song.id }
@@ -1306,7 +1311,7 @@ class PlayerViewModel @Inject constructor(
         mediaController?.let { controller ->
             val currentQueue = _playerUiState.value.currentPlaybackQueue
             val songIndexInQueue = currentQueue.indexOfFirst { it.id == song.id }
-            val queueMatchesContext = currentQueue.matchesSongOrder(contextSongs)
+            val queueMatchesContext = currentQueue.matchesSongOrder(playbackContext)
 
             if (songIndexInQueue != -1 && queueMatchesContext) {
                 if (controller.currentMediaItemIndex == songIndexInQueue) {
@@ -1318,7 +1323,7 @@ class PlayerViewModel @Inject constructor(
                 if (isVoluntaryPlay) incrementSongScore(song)
             } else {
                 if (isVoluntaryPlay) incrementSongScore(song)
-                playSongs(contextSongs, song, queueName, null)
+                playSongs(playbackContext, song, queueName, null)
             }
         }
         _predictiveBackCollapseFraction.value = 0f
@@ -1919,7 +1924,8 @@ class PlayerViewModel @Inject constructor(
             }
 
             // Adjust startSong if it was filtered out
-            val validStartSong = if (validSongs.contains(startSong)) startSong else validSongs.first()
+            val validStartSong =
+                validSongs.firstOrNull { it.id == startSong.id } ?: validSongs.first()
 
             // Store the original order so we can "unshuffle" later if the user turns shuffle off
             queueStateHolder.setOriginalQueueOrder(validSongs)
@@ -1941,7 +1947,7 @@ class PlayerViewModel @Inject constructor(
                 withContext(Dispatchers.Default) {
                     QueueUtils.buildAnchoredShuffleQueueSuspending(
                         validSongs,
-                        validSongs.indexOf(validStartSong).coerceAtLeast(0)
+                        validSongs.indexOfFirst { it.id == validStartSong.id }.coerceAtLeast(0)
                     )
                 }
             } else {
@@ -2061,6 +2067,12 @@ class PlayerViewModel @Inject constructor(
 
 
     private suspend fun internalPlaySongs(songsToPlay: List<Song>, startSong: Song, queueName: String = "None", playlistId: String? = null) {
+        if (songsToPlay.isEmpty()) {
+            clearPreparingSongIfMatching()
+            return
+        }
+        val effectiveStartSong = songsToPlay.firstOrNull { it.id == startSong.id } ?: songsToPlay.first()
+
         // Update dynamic shortcut for last played playlist
         if (playlistId != null && queueName != "None") {
             appShortcutManager.updateLastPlaylistShortcut(playlistId, queueName)
@@ -2071,14 +2083,14 @@ class PlayerViewModel @Inject constructor(
             clearPreparingSongIfMatching()
             val remoteLoaded = castTransferStateHolder.playRemoteQueue(
                 songsToPlay = songsToPlay,
-                startSong = startSong,
+                startSong = effectiveStartSong,
                 isShuffleEnabled = playbackStateHolder.stablePlayerState.value.isShuffleEnabled
             )
 
             if (!remoteLoaded) {
                 Timber.tag(CAST_LOG_TAG).w(
                     "Remote queue load failed in internalPlaySongs (songId=%s queueSize=%d).",
-                    startSong.id,
+                    effectiveStartSong.id,
                     songsToPlay.size
                 )
                 castSession.remoteMediaClient?.requestStatus()
@@ -2088,14 +2100,14 @@ class PlayerViewModel @Inject constructor(
             _playerUiState.update { it.copy(currentPlaybackQueue = songsToPlay.toImmutableList(), currentQueueSourceName = queueName) }
             playbackStateHolder.updateStablePlayerState {
                 it.copy(
-                    currentSong = startSong,
+                    currentSong = effectiveStartSong,
                     isPlaying = true,
                     playWhenReady = true,
-                    totalDuration = startSong.duration.coerceAtLeast(0L)
+                    totalDuration = effectiveStartSong.duration.coerceAtLeast(0L)
                 )
             }
         } else {
-            beginPreparingSong(startSong)
+            beginPreparingSong(effectiveStartSong)
             _playerUiState.update {
                 it.copy(
                     currentPlaybackQueue = songsToPlay.toImmutableList(),
@@ -2104,10 +2116,10 @@ class PlayerViewModel @Inject constructor(
             }
             playbackStateHolder.updateStablePlayerState {
                 it.copy(
-                    currentSong = startSong,
+                    currentSong = effectiveStartSong,
                     isPlaying = true,
                     playWhenReady = true,
-                    totalDuration = startSong.duration.coerceAtLeast(0L)
+                    totalDuration = effectiveStartSong.duration.coerceAtLeast(0L)
                 )
             }
             _isSheetVisible.value = true
@@ -2135,7 +2147,7 @@ class PlayerViewModel @Inject constructor(
                         .setMediaMetadata(metadata)
                         .build()
                 }
-                val startIndex = songsToPlay.indexOf(startSong).coerceAtLeast(0)
+                val startIndex = songsToPlay.indexOfFirst { it.id == effectiveStartSong.id }.coerceAtLeast(0)
 
                 if (mediaItems.isNotEmpty()) {
                     // Direct access: No IPC limit involved
@@ -2143,7 +2155,7 @@ class PlayerViewModel @Inject constructor(
                     enginePlayer.prepare()
                     enginePlayer.play()
                 } else {
-                    clearPreparingSongIfMatching(startSong.id)
+                    clearPreparingSongIfMatching(effectiveStartSong.id)
                 }
                 _playerUiState.update { it.copy(isLoadingInitialSongs = false) }
             }
@@ -2949,6 +2961,15 @@ class PlayerViewModel @Inject constructor(
     fun selectRoute(route: MediaRouter.RouteInfo) {
         val selectedRouteId = castStateHolder.selectedRoute.value?.id
         val isCastRoute = route.isCastRoute() && !route.isDefault
+        if (isCastRoute && sessionManager == null) {
+            castStateHolder.setPendingCastRouteId(null)
+            castStateHolder.setCastConnecting(false)
+            viewModelScope.launch {
+                _toastEvents.emit("Cast is unavailable right now. Restart the app and try again.")
+            }
+            Timber.tag(CAST_LOG_TAG).e("Cannot select Cast route: SessionManager is null")
+            return
+        }
         // Use castStateHolder.isRemotePlaybackActive directly
         val isSwitchingBetweenRemotes = isCastRoute &&
                 (castStateHolder.isRemotePlaybackActive.value || castStateHolder.isCastConnecting.value) &&
@@ -2972,6 +2993,12 @@ class PlayerViewModel @Inject constructor(
             }
         } else {
             castStateHolder.setPendingCastRouteId(null)
+        }
+
+        if (isCastRoute) {
+            // Start the HTTP cast server while app is certainly foreground to avoid
+            // foreground-service start restrictions when session callbacks arrive.
+            castTransferStateHolder.primeHttpServerStart()
         }
 
         castStateHolder.selectRoute(route)

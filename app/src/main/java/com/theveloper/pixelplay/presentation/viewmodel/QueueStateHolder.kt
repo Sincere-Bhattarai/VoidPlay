@@ -87,7 +87,7 @@ class QueueStateHolder @Inject constructor() {
         val startSong = songs.random()
         saveOriginalQueueState(songs, queueName)
 
-        val startIndex = songs.indexOf(startSong).coerceAtLeast(0)
+        val startIndex = songs.indexOfFirst { it.id == startSong.id }.coerceAtLeast(0)
         val shuffledQueue = QueueUtils.buildAnchoredShuffleQueue(songs, startIndex)
 
         return Pair(shuffledQueue, startSong)
@@ -98,7 +98,7 @@ class QueueStateHolder @Inject constructor() {
      */
     fun prepareShuffledQueueWithStart(songs: List<Song>, startSong: Song, queueName: String): List<Song> {
         saveOriginalQueueState(songs, queueName)
-        val startIndex = songs.indexOf(startSong).coerceAtLeast(0)
+        val startIndex = songs.indexOfFirst { it.id == startSong.id }.coerceAtLeast(0)
         return QueueUtils.buildAnchoredShuffleQueue(songs, startIndex)
     }
 
@@ -112,7 +112,7 @@ class QueueStateHolder @Inject constructor() {
         val startSong = songs.random()
         saveOriginalQueueState(songs, queueName)
 
-        val startIndex = songs.indexOf(startSong).coerceAtLeast(0)
+        val startIndex = songs.indexOfFirst { it.id == startSong.id }.coerceAtLeast(0)
         val shuffledQueue = withContext(Dispatchers.Default) {
             QueueUtils.buildAnchoredShuffleQueueSuspending(songs, startIndex)
         }
