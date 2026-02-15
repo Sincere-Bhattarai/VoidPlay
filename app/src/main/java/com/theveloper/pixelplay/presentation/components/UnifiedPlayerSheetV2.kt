@@ -1,6 +1,7 @@
 package com.theveloper.pixelplay.presentation.components
 
 import android.widget.Toast
+import com.theveloper.pixelplay.presentation.components.ExpressiveOfflineDialog
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -106,6 +107,23 @@ fun UnifiedPlayerSheetV2(
         playerViewModel.toastEvents.collect { message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    var showNoInternetDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        playerViewModel.showNoInternetDialog.collect {
+            showNoInternetDialog = true
+        }
+    }
+
+    if (showNoInternetDialog) {
+        ExpressiveOfflineDialog(
+            onDismiss = { showNoInternetDialog = false },
+            onRetry = {
+                 playerViewModel.refreshLocalConnectionInfo()
+                 showNoInternetDialog = false
+            }
+        )
     }
 
     val infrequentPlayerStateReference = playerViewModel.stablePlayerStateInfrequent.collectAsState()

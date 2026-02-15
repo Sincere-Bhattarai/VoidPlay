@@ -480,8 +480,14 @@ interface MusicDao {
     suspend fun getAllArtistsListRaw(): List<ArtistEntity>
 
     @Query("""
-        SELECT DISTINCT artists.* FROM artists
-        INNER JOIN songs ON artists.id = songs.artist_id
+        SELECT DISTINCT artists.id, artists.name, artists.image_url,
+               (SELECT COUNT(*) FROM song_artist_cross_ref 
+                INNER JOIN songs ON song_artist_cross_ref.song_id = songs.id
+                WHERE song_artist_cross_ref.artist_id = artists.id
+                AND (:applyDirectoryFilter = 0 OR songs.id < 0 OR songs.parent_directory_path IN (:allowedParentDirs))) AS track_count
+        FROM artists
+        INNER JOIN song_artist_cross_ref ON artists.id = song_artist_cross_ref.artist_id
+        INNER JOIN songs ON song_artist_cross_ref.song_id = songs.id
         WHERE (:applyDirectoryFilter = 0 OR songs.id < 0 OR songs.parent_directory_path IN (:allowedParentDirs))
         AND artists.name LIKE '%' || :query || '%'
         ORDER BY artists.name ASC

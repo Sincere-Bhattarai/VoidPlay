@@ -22,6 +22,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,6 +51,9 @@ class ConnectivityStateHolder @Inject constructor(
     private val _wifiName = MutableStateFlow<String?>(null)
     val wifiName: StateFlow<String?> = _wifiName.asStateFlow()
 
+    private val _isOnline = MutableStateFlow(false)
+    val isOnline: StateFlow<Boolean> = _isOnline.asStateFlow()
+
     // Bluetooth State
     private val _isBluetoothEnabled = MutableStateFlow(false)
     val isBluetoothEnabled: StateFlow<Boolean> = _isBluetoothEnabled.asStateFlow()
@@ -57,6 +63,24 @@ class ConnectivityStateHolder @Inject constructor(
 
     private val _bluetoothAudioDevices = MutableStateFlow<List<String>>(emptyList())
     val bluetoothAudioDevices: StateFlow<List<String>> = _bluetoothAudioDevices.asStateFlow()
+    
+    // Offline Barrier Event
+    // Event to signal that playback was blocked due to offline status
+    // Using extraBufferCapacity to ensure the event isn't lost if no collectors are immediately suspended
+    private val _offlinePlaybackBlocked = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST)
+    val offlinePlaybackBlocked: SharedFlow<Unit> = _offlinePlaybackBlocked.asSharedFlow()
+    
+    fun triggerOfflineBlockedEvent() {
+        _offlinePlaybackBlocked.tryEmit(Unit)
+    }
+
+    /**
+     * Manually refresh local connection info (e.g. WiFi SSID).
+     */
+    fun refreshLocalConnectionInfo() {
+        val activeNetwork = connectivityManager.activeNetwork
+        updateWifiInfo(activeNetwork)
+    }
 
     // System services
     private val connectivityManager: ConnectivityManager =
@@ -92,21 +116,34 @@ class ConnectivityStateHolder @Inject constructor(
         if (_isWifiEnabled.value) {
             updateWifiInfo(activeNetwork)
         }
+        
+        _isOnline.value = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
 
         _isBluetoothEnabled.value = bluetoothAdapter?.isEnabled ?: false
         updateBluetoothName()
 
         // Register WiFi network callback
         networkCallback = object : ConnectivityManager.NetworkCallback() {
+            // Track all valid networks to handle rapid switching
+            private val availableNetworks = mutableSetOf<Network>()
+
             override fun onAvailable(network: Network) {
-                val caps = connectivityManager.getNetworkCapabilities(network)
-                if (caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-                    _isWifiEnabled.value = true
-                    updateWifiInfo(network)
-                }
+                // Network is available, but waiting for capability check
             }
 
             override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+                val hasInternet = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                val isValidated = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+                
+                if (hasInternet && isValidated) {
+                    availableNetworks.add(network)
+                } else {
+                    availableNetworks.remove(network)
+                }
+                
+                checkConnectivity()
+                
                 if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                     _isWifiEnabled.value = true
                     updateWifiInfo(network)
@@ -114,193 +151,127 @@ class ConnectivityStateHolder @Inject constructor(
             }
 
             override fun onLost(network: Network) {
+                availableNetworks.remove(network)
+                checkConnectivity()
+                
                 val currentNetwork = connectivityManager.activeNetwork
                 val caps = connectivityManager.getNetworkCapabilities(currentNetwork)
                 _isWifiEnabled.value = caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
                 if (!_isWifiEnabled.value) _wifiName.value = null
             }
+            
+            private fun checkConnectivity() {
+                _isOnline.value = availableNetworks.isNotEmpty()
+            }
         }
-        val networkRequest = NetworkRequest.Builder()
-            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
-        connectivityManager.registerNetworkCallback(networkRequest, networkCallback!!)
+        connectivityManager.registerNetworkCallback(request, networkCallback!!)
 
-        // Register WiFi state receiver
+        // Register receivers
         wifiStateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == WifiManager.WIFI_STATE_CHANGED_ACTION) {
-                    updateWifiRadioState()
+                     updateWifiRadioState()
                 }
             }
         }
         context.registerReceiver(wifiStateReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
 
-        // Register Bluetooth state receiver
         bluetoothStateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 when (intent?.action) {
                     BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                        val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                        _isBluetoothEnabled.value = state == BluetoothAdapter.STATE_ON
-                        if (state == BluetoothAdapter.STATE_OFF) {
-                            _bluetoothName.value = null
-                            _bluetoothAudioDevices.value = emptyList()
-                        } else updateBluetoothName(forceClear = false)
-                    }
-                    BluetoothDevice.ACTION_ACL_CONNECTED,
-                    BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                        updateBluetoothName(forceClear = intent.action == BluetoothDevice.ACTION_ACL_DISCONNECTED)
+                        _isBluetoothEnabled.value = bluetoothAdapter?.isEnabled ?: false
+                        updateBluetoothName()
                     }
                 }
             }
         }
-        val btFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED).apply {
-            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        }
-        context.registerReceiver(bluetoothStateReceiver, btFilter)
+        context.registerReceiver(bluetoothStateReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
 
-        // Register audio device callback
+        // Audio Device Callback
         audioDeviceCallback = object : android.media.AudioDeviceCallback() {
             override fun onAudioDevicesAdded(addedDevices: Array<out android.media.AudioDeviceInfo>?) {
-                updateBluetoothName()
+                updateAudioDevices()
             }
+
             override fun onAudioDevicesRemoved(removedDevices: Array<out android.media.AudioDeviceInfo>?) {
-                updateBluetoothName(forceClear = removedDevices?.any {
-                    it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                        it.type == android.media.AudioDeviceInfo.TYPE_BLE_HEADSET ||
-                        it.type == android.media.AudioDeviceInfo.TYPE_BLE_SPEAKER ||
-                        it.type == android.media.AudioDeviceInfo.TYPE_HEARING_AID
-                } == true)
+                updateAudioDevices()
             }
         }
         audioManager.registerAudioDeviceCallback(audioDeviceCallback, null)
-    }
-
-    /**
-     * Refresh all connectivity information. Call when returning to Cast UI.
-     */
-    fun refreshLocalConnectionInfo() {
-        val currentNetwork = connectivityManager.activeNetwork
-        val currentCaps = connectivityManager.getNetworkCapabilities(currentNetwork)
-        updateWifiRadioState()
-        _isWifiEnabled.value = currentCaps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-        if (_isWifiEnabled.value) updateWifiInfo(currentNetwork)
-
-        _isBluetoothEnabled.value = bluetoothAdapter?.isEnabled ?: false
-        updateBluetoothName()
-        updateBluetoothAudioDevices()
-    }
-
-    fun hasBluetoothPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
-        } else true
-    }
-
-    fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun updateWifiInfo(network: Network?) {
-        if (!hasLocationPermission()) {
-            _wifiName.value = null
-            return
-        }
-        if (network == null) {
-            _wifiName.value = null
-            return
-        }
-        val caps = connectivityManager.getNetworkCapabilities(network)
-        if (caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true) {
-            val wifiInfo = caps.transportInfo as? android.net.wifi.WifiInfo
-            val rawSsid = wifiInfo?.ssid
-            if (rawSsid != null && rawSsid != "<unknown ssid>") {
-                _wifiName.value = rawSsid.trim('"')
-            } else {
-                // Fallback to WifiManager for older APIs
-                val info = wifiManager?.connectionInfo
-                val fallbackSsid = info?.ssid
-                if (fallbackSsid != null && fallbackSsid != "<unknown ssid>") {
-                    _wifiName.value = fallbackSsid.trim('"')
-                } else {
-                    _wifiName.value = null
-                }
-            }
-        }
+        updateAudioDevices()
     }
 
     private fun updateWifiRadioState() {
-        val state = wifiManager?.wifiState
-        _isWifiRadioOn.value = when (state) {
-            WifiManager.WIFI_STATE_ENABLED, WifiManager.WIFI_STATE_ENABLING -> true
-            WifiManager.WIFI_STATE_DISABLED, WifiManager.WIFI_STATE_DISABLING -> false
-            else -> wifiManager?.isWifiEnabled == true
-        }
+        _isWifiRadioOn.value = wifiManager?.isWifiEnabled == true
     }
 
     @SuppressLint("MissingPermission")
-    private fun updateBluetoothName(forceClear: Boolean = false) {
-        if (!hasBluetoothPermission()) {
-            if (forceClear) _bluetoothName.value = null
-            _bluetoothAudioDevices.value = emptyList()
-            return
-        }
-
-        val connectedDevice = safeGetConnectedDevices(BluetoothProfile.A2DP).firstOrNull()
-            ?: safeGetConnectedDevices(BluetoothProfile.HEADSET).firstOrNull()
-            ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                safeGetConnectedDevices(BluetoothProfile.LE_AUDIO).firstOrNull()
-            } else {
-                null
-            }
-
-        val audioDevices = audioManager.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
-        val activeBluetoothAudioName = audioDevices.firstOrNull {
-            it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                it.type == android.media.AudioDeviceInfo.TYPE_BLE_HEADSET ||
-                it.type == android.media.AudioDeviceInfo.TYPE_BLE_SPEAKER ||
-                it.type == android.media.AudioDeviceInfo.TYPE_HEARING_AID
-        }?.productName?.toString()
-
-        val resolvedName = connectedDevice?.name ?: activeBluetoothAudioName
-
-        when {
-            resolvedName != null -> _bluetoothName.value = resolvedName
-            forceClear || !(bluetoothAdapter?.isEnabled ?: false) -> _bluetoothName.value = null
-        }
-
-        updateBluetoothAudioDevices()
+    private fun updateWifiInfo(network: Network?) {
+         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+             val info = wifiManager?.connectionInfo
+             if (info != null && info.supplicantState == android.net.wifi.SupplicantState.COMPLETED) {
+                 var ssid = info.ssid
+                 if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
+                     ssid = ssid.substring(1, ssid.length - 1)
+                 }
+                 _wifiName.value = ssid
+             } else {
+                 _wifiName.value = null
+             }
+         } else {
+             // Basic fallback purely on network capabilities if we don't have permission (unlikely for system app but good practice)
+             _wifiName.value = "WiFi Connected" 
+         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun updateBluetoothAudioDevices() {
-        if (!hasBluetoothPermission()) {
-            _bluetoothAudioDevices.value = emptyList()
-            return
-        }
-
-        val connectedDevices = buildSet {
-            safeGetConnectedDevices(BluetoothProfile.A2DP).mapNotNullTo(this) { it.name }
-            safeGetConnectedDevices(BluetoothProfile.HEADSET).mapNotNullTo(this) { it.name }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                safeGetConnectedDevices(BluetoothProfile.LE_AUDIO).mapNotNullTo(this) { it.name }
+    private fun updateBluetoothName() {
+        if (_isBluetoothEnabled.value) {
+            try {
+                _bluetoothName.value = bluetoothAdapter?.name
+            } catch (e: SecurityException) {
+                _bluetoothName.value = null
             }
-
-            audioManager.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
-                .filter {
-                    it.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
-                        it.type == android.media.AudioDeviceInfo.TYPE_BLE_HEADSET ||
-                        it.type == android.media.AudioDeviceInfo.TYPE_BLE_SPEAKER ||
-                        it.type == android.media.AudioDeviceInfo.TYPE_HEARING_AID
-                }
-                .mapNotNull { it.productName?.toString() }
-                .forEach { add(it) }
+        } else {
+            _bluetoothName.value = null
         }
-
-        _bluetoothAudioDevices.value = connectedDevices.toList().sorted()
     }
 
+    private fun updateAudioDevices() {
+        val devices = audioManager.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
+        val connectedDevices = mutableListOf<String>()
+        
+        for (device in devices) {
+            if (device.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || 
+                device.type == android.media.AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                device.productName?.let { connectedDevices.add(it.toString()) }
+            }
+        }
+        
+        // Also check via BluetoothManager for completeness if permissions allow
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+            bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+                .mapNotNull { it.name }
+                .forEach { if (!connectedDevices.contains(it)) connectedDevices.add(it) }
+                
+            safeGetConnectedDevices(BluetoothProfile.A2DP)
+                .mapNotNull { it.name }
+                .forEach { if (!connectedDevices.contains(it)) connectedDevices.add(it) }
+                
+            safeGetConnectedDevices(BluetoothProfile.HEADSET)
+                .mapNotNull { it.name }
+                .forEach { if (!connectedDevices.contains(it)) connectedDevices.add(it) }
+        }
+
+        _bluetoothAudioDevices.value = connectedDevices.distinct().sorted()
+    }
+
+    @SuppressLint("MissingPermission")
     private fun safeGetConnectedDevices(profile: Int): List<BluetoothDevice> {
         return runCatching { bluetoothManager.getConnectedDevices(profile) }.getOrElse { emptyList() }
     }

@@ -7,6 +7,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.text.format.Formatter
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -148,6 +149,7 @@ import com.theveloper.pixelplay.presentation.components.FileExplorerDialog
 import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
 import com.theveloper.pixelplay.presentation.model.SettingsCategory
 import com.theveloper.pixelplay.presentation.navigation.Screen
+import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
 import com.theveloper.pixelplay.presentation.viewmodel.LyricsRefreshProgress
 import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
 import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
@@ -166,6 +168,11 @@ fun SettingsCategoryScreen(
 ) {
     val category = SettingsCategory.fromId(categoryId) ?: return
     val context = LocalContext.current
+    val playerSheetState by playerViewModel.sheetState.collectAsState()
+
+    BackHandler(enabled = playerSheetState == PlayerSheetState.EXPANDED) {
+        playerViewModel.collapsePlayerSheet()
+    }
     
     // State Collection (Duplicated from SettingsScreen for now to ensure functionality)
     val uiState by settingsViewModel.uiState.collectAsState()

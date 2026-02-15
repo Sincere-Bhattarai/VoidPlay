@@ -58,7 +58,8 @@ class DualPlayerEngine @Inject constructor(
     @ApplicationContext private val context: Context,
     private val telegramRepository: TelegramRepository,
     private val telegramStreamProxy: com.theveloper.pixelplay.data.telegram.TelegramStreamProxy,
-    private val telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager
+    private val telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager,
+    private val connectivityStateHolder: com.theveloper.pixelplay.presentation.viewmodel.ConnectivityStateHolder
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var transitionJob: Job? = null
@@ -337,6 +338,15 @@ class DualPlayerEngine @Inject constructor(
                          if (fileInfo?.local?.isDownloadingCompleted == true && fileInfo.local.path.isNotEmpty()) {
                               Timber.tag("DualPlayerEngine").d("File $fileId is downloaded. Using direct file playback.")
                               return dataSpec.buildUpon().setUri(android.net.Uri.fromFile(java.io.File(fileInfo.local.path))).build()
+                         }
+
+                         // Not cached locally. Check connectivity.
+                         val isOnline = connectivityStateHolder.isOnline.value
+                         if (!isOnline) {
+                             Timber.tag("DualPlayerEngine").w("Blocked playback: Offline and not cached (fileId=$fileId). Triggering UI event.")
+                             connectivityStateHolder.triggerOfflineBlockedEvent()
+                             // Return original to let it fail or handled by error propagation.
+                             return dataSpec
                          }
 
                          Timber.tag("DualPlayerEngine").d("File $fileId not downloaded or Check failed. Using StreamProxy.")

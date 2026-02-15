@@ -2,6 +2,8 @@
 
 package com.theveloper.pixelplay.presentation.telegram.channel
 
+import com.theveloper.pixelplay.presentation.components.ExpressiveOfflineState
+
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -65,6 +68,7 @@ fun TelegramChannelSearchSheet(
     val songs by viewModel.songs.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val inputShape = AbsoluteSmoothCornerShape(
@@ -90,13 +94,26 @@ fun TelegramChannelSearchSheet(
             )
         }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(bottom = 32.dp)
-                .heightIn(min = 450.dp)
-        ) {
+        if (!isOnline) {
+             Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(450.dp)
+            ) {
+                ExpressiveOfflineState(
+                    onRetry = {},
+                    isDialog = false,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 32.dp)
+                    .heightIn(min = 450.dp)
+            ) {
             // Header with expressive typography
             Text(
                 text = "Add Channel",
@@ -340,4 +357,5 @@ fun TelegramChannelSearchSheet(
             }
         }
     }
+}
 }

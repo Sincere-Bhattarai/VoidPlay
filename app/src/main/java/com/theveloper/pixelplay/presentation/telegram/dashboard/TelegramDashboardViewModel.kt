@@ -12,12 +12,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import com.theveloper.pixelplay.presentation.viewmodel.ConnectivityStateHolder
 
 @HiltViewModel
 class TelegramDashboardViewModel @Inject constructor(
     private val telegramRepository: TelegramRepository,
-    private val musicRepository: MusicRepository
+    private val musicRepository: MusicRepository,
+    private val connectivityStateHolder: ConnectivityStateHolder
 ) : ViewModel() {
+
+    val isOnline = connectivityStateHolder.isOnline
 
     // Expose channels flow directly
     val channels = musicRepository.getAllTelegramChannels()
@@ -71,5 +75,10 @@ class TelegramDashboardViewModel @Inject constructor(
     
     fun clearStatus() {
         _statusMessage.value = null
+    }
+
+    fun refreshChannels() {
+        // Trigger a connectivity check
+        connectivityStateHolder.refreshLocalConnectionInfo()
     }
 }

@@ -90,6 +90,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -164,6 +165,9 @@ class PlayerViewModel @Inject constructor(
 
     private val _playerUiState = MutableStateFlow(PlayerUiState())
     val playerUiState: StateFlow<PlayerUiState> = _playerUiState.asStateFlow()
+    
+    private val _showNoInternetDialog = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST)
+    val showNoInternetDialog: SharedFlow<Unit> = _showNoInternetDialog.asSharedFlow()
 
     val stablePlayerState: StateFlow<StablePlayerState> = playbackStateHolder.stablePlayerState
     /**
@@ -220,6 +224,13 @@ class PlayerViewModel @Inject constructor(
             telegramCacheManager.embeddedArtUpdated.collect { updatedArtUri ->
                 refreshArtwork(updatedArtUri)
             }
+        }
+        
+        launch {
+             connectivityStateHolder.offlinePlaybackBlocked.collect {
+                 Timber.w("Received offline blocked event. Showing dialog.")
+                 _showNoInternetDialog.emit(Unit)
+             }
         }
         
         launch {
@@ -1858,10 +1869,9 @@ class PlayerViewModel @Inject constructor(
                 }
                 _playerUiState.update { it.copy(currentPosition = initialPosition) }
                 viewModelScope.launch {
-                    song.albumArtUriString?.toUri()?.let { uri ->
-                        val currentUri = playbackStateHolder.stablePlayerState.value.currentSong?.albumArtUriString
-                        themeStateHolder.extractAndGenerateColorScheme(uri, currentUri)
-                    }
+                    val uri = song.albumArtUriString?.toUri()
+                    val currentUri = playbackStateHolder.stablePlayerState.value.currentSong?.albumArtUriString
+                    themeStateHolder.extractAndGenerateColorScheme(uri, currentUri)
                 }
                 listeningStatsTracker.onSongChanged(
                     song = song,
@@ -1948,6 +1958,22 @@ class PlayerViewModel @Inject constructor(
                     mediaItem?.let { transitionedItem ->
                         listeningStatsTracker.finalizeCurrentSession()
                         val song = resolveSongFromMediaItem(transitionedItem)
+                        
+                        // Offline check for Telegram songs
+                        if (song?.contentUriString?.startsWith("telegram:") == true) {
+                            val isOnline = connectivityStateHolder.isOnline.value
+                            if (!isOnline) {
+                                val fileId = song.telegramFileId
+                                if (fileId != null) {
+                                    val isCached = musicRepository.telegramRepository.isFileCached(fileId)
+                                    if (!isCached) {
+                                        playerCtrl.pause()
+                                        _showNoInternetDialog.emit(Unit)
+                                    }
+                                }
+                            }
+                        }
+
                         val resolvedDuration = if (song != null) {
                             playbackStateHolder.resolveDurationForPlaybackState(
                                 reportedDurationMs = playerCtrl.duration,
@@ -1977,10 +2003,9 @@ class PlayerViewModel @Inject constructor(
                                 isPlaying = playerCtrl.isPlaying
                             )
                             viewModelScope.launch {
-                                currentSongValue.albumArtUriString?.toUri()?.let { uri ->
-                                    val currentUri = playbackStateHolder.stablePlayerState.value.currentSong?.albumArtUriString
-                                    themeStateHolder.extractAndGenerateColorScheme(uri, currentUri)
-                                }
+                                val uri = currentSongValue.albumArtUriString?.toUri()
+                                val currentUri = playbackStateHolder.stablePlayerState.value.currentSong?.albumArtUriString
+                                themeStateHolder.extractAndGenerateColorScheme(uri, currentUri)
                             }
                             loadLyricsForCurrentSong()
                         }
@@ -2089,6 +2114,26 @@ class PlayerViewModel @Inject constructor(
             // Adjust startSong if it was filtered out
             val validStartSong =
                 validSongs.firstOrNull { it.id == startSong.id } ?: validSongs.first()
+
+            // Offline check for the starting song if it is a Telegram song
+            if (validStartSong.contentUriString.startsWith("telegram:")) {
+                val isOnline = connectivityStateHolder.isOnline.value
+                val fileId = validStartSong.telegramFileId
+                
+                Timber.d("Offline Check: fileId=$fileId, contentUri=${validStartSong.contentUriString}, isOnline=$isOnline")
+
+                if (!isOnline) {
+                     if (fileId != null) {
+                         val isCached = musicRepository.telegramRepository.isFileCached(fileId)
+                         Timber.d("Offline Check: isCached=$isCached")
+                         if (!isCached) {
+                             Timber.w("Blocked playback: Offline and not cached.")
+                             _showNoInternetDialog.tryEmit(Unit)
+                             return@launch
+                         }
+                     }
+                }
+            }
 
             // Store the original order so we can "unshuffle" later if the user turns shuffle off
             queueStateHolder.setOriginalQueueOrder(validSongs)

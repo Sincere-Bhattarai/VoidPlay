@@ -2,6 +2,9 @@
 
 package com.theveloper.pixelplay.presentation.telegram.dashboard
 
+import com.theveloper.pixelplay.presentation.components.ExpressiveOfflineState
+import com.theveloper.pixelplay.presentation.components.NoInternetScreen
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -62,6 +65,7 @@ fun TelegramDashboardScreen(
     val channels by viewModel.channels.collectAsState()
     val isRefreshingId by viewModel.isRefreshing.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
     
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -79,7 +83,10 @@ fun TelegramDashboardScreen(
         }
     }
 
-    Scaffold(
+    if (!isOnline) {
+        NoInternetScreen(onRetry = {})
+    } else {
+        Scaffold(
         topBar = {
             LargeTopAppBar(
                 title = { 
@@ -158,10 +165,17 @@ fun TelegramDashboardScreen(
         ) {
             Crossfade(targetState = channels.isEmpty(), label = "ContentFade") { isEmpty ->
                 if (isEmpty) {
-                    ExpressiveEmptyState(
-                        modifier = Modifier.fillMaxSize(),
-                        onAdd = onAddChannel
-                    )
+                    if (!isOnline) {
+                        ExpressiveOfflineState(
+                            modifier = Modifier.fillMaxSize(),
+                            onRetry = viewModel::refreshChannels
+                        )
+                    } else {
+                        ExpressiveEmptyState(
+                            modifier = Modifier.fillMaxSize(),
+                            onAdd = onAddChannel
+                        )
+                    }
                 } else {
                     LazyColumn(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -196,12 +210,13 @@ fun TelegramDashboardScreen(
                         item {
                             Spacer(modifier = Modifier.height(80.dp))
                         }
+}
                     }
                 }
             }
         }
     }
-}
+    }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

@@ -13,11 +13,16 @@ import kotlinx.coroutines.launch
 import org.drinkless.tdlib.TdApi
 import javax.inject.Inject
 
+import com.theveloper.pixelplay.presentation.viewmodel.ConnectivityStateHolder
+
 @HiltViewModel
 class TelegramChannelSearchViewModel @Inject constructor(
     private val telegramRepository: TelegramRepository,
-    private val musicRepository: MusicRepository
+    private val musicRepository: MusicRepository,
+    connectivityStateHolder: ConnectivityStateHolder
 ) : ViewModel() {
+
+    val isOnline = connectivityStateHolder.isOnline
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()

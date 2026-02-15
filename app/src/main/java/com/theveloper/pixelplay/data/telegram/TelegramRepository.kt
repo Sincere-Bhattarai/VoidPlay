@@ -255,6 +255,20 @@ class TelegramRepository @Inject constructor(
         }
     }
 
+    suspend fun isFileCached(fileId: Int): Boolean {
+        // 1. Check memory cache
+        resolvedPathCache[fileId]?.let { path ->
+            if (java.io.File(path).exists()) return true
+            resolvedPathCache.remove(fileId)
+        }
+
+        // 2. Check TDLib
+        val file = getFile(fileId)
+        return file?.local?.isDownloadingCompleted == true && 
+               file.local.path.isNotEmpty() && 
+               java.io.File(file.local.path).exists()
+    }
+
     suspend fun resolveTelegramUri(uriString: String): Pair<Int, Long>? {
         // 1. Check Memory Cache
         uriResolutionCache[uriString]?.let {
