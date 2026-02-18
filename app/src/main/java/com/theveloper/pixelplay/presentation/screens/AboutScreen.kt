@@ -486,8 +486,8 @@ fun AboutScreen(
             collapseFraction = collapseFraction,
             headerHeight = currentTopBarHeightDp,
             onBackClick = onNavigationIconClick,
-            expandedTitleStartPadding = 32.dp,
-            collapsedTitleStartPadding = 58.dp
+            expandedTitleStartPadding = 20.dp,
+            collapsedTitleStartPadding = 68.dp
         )
 
         if (showBrickBreaker) {

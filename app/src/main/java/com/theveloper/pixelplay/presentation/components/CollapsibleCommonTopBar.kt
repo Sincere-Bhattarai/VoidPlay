@@ -40,7 +40,7 @@ fun CollapsibleCommonTopBar(
     // Actually GenreDetailScreen uses: (collapseFraction * 2f).coerceIn(0f, 1f)
     val solidAlpha = (collapseFraction * 2f).coerceIn(0f, 1f)
     
-    val backgroundColor = containerColor ?: MaterialTheme.colorScheme.surfaceContainer.copy(alpha = solidAlpha)
+    val backgroundColor = containerColor ?: MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = solidAlpha)
     // We can also fade the content color if we want, but usually onSurface is fine.
     // GenreDetail interpolates content color, but for standard screens onSurface is usually correct for both states 
     // (transparent surface vs surfaceContainer).

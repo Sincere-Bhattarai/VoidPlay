@@ -219,7 +219,7 @@ fun StatsScreen(
                 modifier = Modifier
                     .fillMaxSize(),
                 contentPadding = PaddingValues(
-                    top = currentTopBarHeightDp + tabsHeight + tabIndicatorExtraSpacing + tabContentSpacing + 20.dp,
+                    top = currentTopBarHeightDp + tabsHeight + tabIndicatorExtraSpacing + tabContentSpacing + 0.dp,
                     bottom = MiniPlayerHeight + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 16.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
@@ -287,16 +287,17 @@ fun StatsScreen(
                 .zIndex(5f)
         ) {
             val solidAlpha = (collapseFraction * 2f).coerceIn(0f, 1f)
-            val backgroundColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = solidAlpha)
+            val backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = solidAlpha)
             
             Column(
                 modifier = Modifier
                     .background(backgroundColor)
+                    .padding(bottom = 8.dp) // Reduced padding below tabs
             ) {
                 CollapsibleCommonTopBar(
                     title = "Listening Stats",
                     collapseFraction = collapseFraction,
-                    headerHeight = currentTopBarHeightDp, // Removed + 8.dp to reduce padding
+                    headerHeight = currentTopBarHeightDp,
                     onBackClick = { navController.popBackStack() },
                     containerColor = Color.Transparent
                 )
@@ -307,14 +308,6 @@ fun StatsScreen(
                     onRangeSelected = statsViewModel::onRangeSelected,
                     indicatorSpacing = tabIndicatorExtraSpacing,
                     showIndicator = showRangeTabIndicator,
-                    //modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(tabContentSpacing)
-                        .background(MaterialTheme.colorScheme.surface)
                 )
             }
         }
@@ -579,13 +572,13 @@ private fun RangeTabsHeader(
         modifier = modifier
             .fillMaxWidth()
             .zIndex(1f),
-        color = MaterialTheme.colorScheme.surface,
+        color = Color.Transparent,
         //shadowElevation = 6.dp
     ) {
         ScrollableTabRow(
             modifier = if (indicatorSpacing > 0.dp) Modifier.padding(bottom = indicatorSpacing) else Modifier,
             selectedTabIndex = selectedIndex,
-            edgePadding = 20.dp,
+            edgePadding = 12.dp,
             divider = {},
             containerColor = Color.Transparent,
             indicator = { positions ->

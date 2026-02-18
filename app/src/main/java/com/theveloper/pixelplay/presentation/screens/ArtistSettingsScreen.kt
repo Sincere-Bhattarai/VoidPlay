@@ -278,7 +278,7 @@ fun ArtistSettingsScreen(
             collapseFraction = collapseFraction,
             headerHeight = currentTopBarHeightDp,
             onBackClick = { navController.popBackStack() },
-            expandedTitleStartPadding = 0.dp
+            expandedTitleStartPadding = 20.dp
         )
     }
 }
