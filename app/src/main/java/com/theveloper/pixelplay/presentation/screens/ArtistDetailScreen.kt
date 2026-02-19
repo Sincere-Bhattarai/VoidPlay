@@ -383,7 +383,8 @@ fun ArtistDetailScreen(
             }
         }
     } // End Surface
-    } // End MaterialTheme
+
+    // Bottom sheets inherit the artist's dynamic color palette — same approach as AlbumDetailScreen
     if (showSongInfoBottomSheet && selectedSongForInfo != null) {
         val currentSong = selectedSongForInfo
         val isFavorite = remember(currentSong?.id, favoriteIds) {
@@ -448,6 +449,7 @@ fun ArtistDetailScreen(
             }
         }
     }
+    } // End MaterialTheme
 }
 
 private fun ArtistAlbumSection.collapseKey(): String = "artist_album_${albumId}_${title}"
