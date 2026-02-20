@@ -1970,21 +1970,6 @@ fun QueuePlaylistSongItem(
                 }
                 .padding(horizontal = 12.dp)
                 .clip(itemShape)
-                .then(
-                    if (dismissEnabled && dismissHandler != null) {
-                        Modifier.pointerInput(swipeStateIdentity, dismissHandler) {
-                            detectHorizontalDragGestures(
-                                onDragStart = { dismissHandler.onDragStart() },
-                                onHorizontalDrag = { change, dragAmount ->
-                                    change.consume()
-                                    dismissHandler.onHorizontalDrag(dragAmount)
-                                },
-                                onDragEnd = { dismissHandler.onDragEnd() },
-                                onDragCancel = { dismissHandler.onDragCancel() }
-                            )
-                        }
-                    } else Modifier
-                )
                 .clickable(
                     enabled = currentOffsetPx == 0f
                 ) {
@@ -1999,96 +1984,123 @@ fun QueuePlaylistSongItem(
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Drag handle is a DIRECT child of the Row, NOT inside the dismiss
+                // gesture area. This prevents detectHorizontalDragGestures from
+                // interfering with the reorderable library's drag detection.
                 AnimatedVisibility(visible = isDragHandleVisible) {
                     dragHandle()
                 }
 
-                val albumArtPadding by animateDpAsState(
-                    targetValue = if (isDragHandleVisible) 6.dp else 12.dp,
-                    label = "albumArtPadding"
-                )
-                Spacer(Modifier.width(albumArtPadding))
-
-                SmartImage(
-                    model = song.albumArtUriString,
-                    shape = albumShape,
-                    contentDescription = "Carátula",
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(albumShape),
-                    contentScale = ContentScale.Crop
-                )
-
-                Spacer(Modifier.width(16.dp))
-
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        song.title, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                        color = if (isCurrentSong) colors.primary else colors.onSurface,
-                        fontWeight = if (isCurrentSong) FontWeight.Bold else FontWeight.Normal,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        song.displayArtist, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (isCurrentSong) colors.primary.copy(alpha = 0.8f) else colors.onSurfaceVariant
-                    )
-                }
-
-                if (isCurrentSong) {
-                    if (isPlaying != null) {
-                        PlayingEqIcon(
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .size(width = 18.dp, height = 16.dp),
-                            color = colors.secondary,
-                            isPlaying = isPlaying
+                // All remaining content is wrapped in a Row that carries the dismiss
+                // gesture. Because it is a SIBLING of the drag handle (not an ancestor),
+                // pointer events on the drag handle never reach this gesture detector.
+                val dismissGestureModifier = if (dismissEnabled && dismissHandler != null) {
+                    Modifier.pointerInput(swipeStateIdentity, dismissHandler) {
+                        detectHorizontalDragGestures(
+                            onDragStart = { dismissHandler.onDragStart() },
+                            onHorizontalDrag = { change, dragAmount ->
+                                change.consume()
+                                dismissHandler.onHorizontalDrag(dragAmount)
+                            },
+                            onDragEnd = { dismissHandler.onDragEnd() },
+                            onDragCancel = { dismissHandler.onDragCancel() }
                         )
-                        Spacer(Modifier.width(4.dp))
-                        if (!isRemoveButtonVisible) {
-                            Spacer(Modifier.width(8.dp))
+                    }
+                } else Modifier
+
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(dismissGestureModifier),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val albumArtPadding by animateDpAsState(
+                        targetValue = if (isDragHandleVisible) 6.dp else 12.dp,
+                        label = "albumArtPadding"
+                    )
+                    Spacer(Modifier.width(albumArtPadding))
+
+                    SmartImage(
+                        model = song.albumArtUriString,
+                        shape = albumShape,
+                        contentDescription = "Carátula",
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(albumShape),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(Modifier.width(16.dp))
+
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            song.title, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            color = if (isCurrentSong) colors.primary else colors.onSurface,
+                            fontWeight = if (isCurrentSong) FontWeight.Bold else FontWeight.Normal,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            song.displayArtist, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (isCurrentSong) colors.primary.copy(alpha = 0.8f) else colors.onSurfaceVariant
+                        )
+                    }
+
+                    if (isCurrentSong) {
+                        if (isPlaying != null) {
+                            PlayingEqIcon(
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .size(width = 18.dp, height = 16.dp),
+                                color = colors.secondary,
+                                isPlaying = isPlaying
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            if (!isRemoveButtonVisible) {
+                                Spacer(Modifier.width(8.dp))
+                            }
+                        }
+                    } else {
+                        Spacer(Modifier.width(8.dp))
+                    }
+
+                    if (isFromPlaylist) {
+                        FilledIconButton(
+                            onClick = { onMoreOptionsClick(song) },
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = mvContainerColor,
+                                contentColor = mvContentColor
+                            ),
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(end = 14.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.MoreVert,
+                                contentDescription = "More options for ${song.title}",
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     }
-                } else {
-                    Spacer(Modifier.width(8.dp))
-                }
 
-                if (isFromPlaylist) {
-                    FilledIconButton(
-                        onClick = { onMoreOptionsClick(song) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = mvContainerColor,
-                            contentColor = mvContentColor
-                        ),
-                        modifier = Modifier
-                            .size(36.dp)
-                            .padding(end = 14.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.MoreVert,
-                            contentDescription = "More options for ${song.title}",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-
-                AnimatedVisibility(visible = isRemoveButtonVisible && !enableSwipeToDismiss) {
-                    FilledIconButton(
-                        onClick = onRemoveClick,
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = colors.surfaceContainer,
-                            contentColor = colors.onSurface
-                        ),
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(40.dp)
-                            .padding(start = 4.dp, end = 8.dp)
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(18.dp),
-                            painter = painterResource(R.drawable.rounded_close_24),
-                            contentDescription = "Remove from playlist",
-                        )
+                    AnimatedVisibility(visible = isRemoveButtonVisible && !enableSwipeToDismiss) {
+                        FilledIconButton(
+                            onClick = onRemoveClick,
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = colors.surfaceContainer,
+                                contentColor = colors.onSurface
+                            ),
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(40.dp)
+                                .padding(start = 4.dp, end = 8.dp)
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                painter = painterResource(R.drawable.rounded_close_24),
+                                contentDescription = "Remove from playlist",
+                            )
+                        }
                     }
                 }
             }
