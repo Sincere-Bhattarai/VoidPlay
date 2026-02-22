@@ -55,6 +55,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -85,7 +86,6 @@ import androidx.compose.material.icons.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
-// import androidx.compose.runtime.derivedStateOf // Already imported
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.ime
@@ -106,12 +106,14 @@ import com.theveloper.pixelplay.data.repository.MusicRepository
 import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
 import com.theveloper.pixelplay.presentation.components.NavBarContentHeight
 import com.theveloper.pixelplay.presentation.components.PlaylistBottomSheet
-import com.theveloper.pixelplay.presentation.navigation.Screen // Required for Screen.GenreDetail.createRoute
+import com.theveloper.pixelplay.presentation.components.PlaylistCover
+import com.theveloper.pixelplay.presentation.navigation.Screen
 import com.theveloper.pixelplay.presentation.screens.search.components.GenreCategoriesGrid
 import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import timber.log.Timber
@@ -148,7 +150,6 @@ fun SearchScreen(
 
     LaunchedEffect(playerViewModel, keyboardController) {
         playerViewModel.searchNavDoubleTapEvents.collect {
-            // Wait a frame for route transition/layout to settle when the second tap also navigates.
             delay(40L)
             searchInputFocusRequester.requestFocus()
             keyboardController?.show()
@@ -577,7 +578,7 @@ fun EmptySearchResults(searchQuery: String, colorScheme: ColorScheme) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Rounded.Search, // More generic icon
+            imageVector = Icons.Rounded.Search,
             contentDescription = "No results",
             modifier = Modifier
                 .size(80.dp)
@@ -617,6 +618,7 @@ fun SearchResultsList(
 ) {
     val localDensity = LocalDensity.current
     val playerStableState by playerViewModel.stablePlayerState.collectAsStateWithLifecycle()
+    val allSongs by playerViewModel.allSongsFlow.collectAsStateWithLifecycle()
 
     if (results.isEmpty()) {
         Box(
@@ -754,25 +756,23 @@ fun SearchResultsList(
                             }
 
                             is SearchResultItem.PlaylistItem -> {
-                                var songsInPlaylist by remember { mutableStateOf<List<Song>>(emptyList()) }
-                                var fetchSongs by remember { mutableStateOf(false) }
-                                LaunchedEffect(fetchSongs, item.playlist.id) {
-                                    if (!fetchSongs) return@LaunchedEffect
-                                    songsInPlaylist = playerViewModel.getSongs(item.playlist.songIds)
-                                    fetchSongs = false
+                                val playlistSongs = remember(item.playlist.songIds, allSongs) {
+                                    allSongs.filter { it.id in item.playlist.songIds }
                                 }
-                                val onPlayClick = remember(item.playlist, playerViewModel, onItemSelected) {
-                                    {
-                                        fetchSongs = true
-                                        if (songsInPlaylist.isNotEmpty()) {
+                                val coroutineScope = rememberCoroutineScope()
+                                val onPlayClick: () -> Unit = {
+                                    coroutineScope.launch {
+                                        val songs = playerViewModel.getSongs(item.playlist.songIds)
+                                        if (songs.isNotEmpty()) {
                                             playerViewModel.playSongs(
-                                                songsInPlaylist,
-                                                songsInPlaylist.first(),
+                                                songs,
+                                                songs.first(),
                                                 item.playlist.name
                                             )
                                             if (playerStableState.isShuffleEnabled) playerViewModel.toggleShuffle()
-                                        } else
+                                        } else {
                                             playerViewModel.sendToast("Empty playlist")
+                                        }
                                         onItemSelected()
                                     }
                                 }
@@ -787,6 +787,7 @@ fun SearchResultsList(
                                 }
                                 SearchResultPlaylistItem(
                                     playlist = item.playlist,
+                                    playlistSongs = playlistSongs,
                                     onPlayClick = onPlayClick,
                                     onOpenClick = onOpenClick
                                 )
@@ -909,7 +910,6 @@ fun SearchResultArtistItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Show artist image if available, fall back to icon
             if (!artist.effectiveImageUrl.isNullOrBlank()) {
                 SmartImage(
                     model = artist.effectiveImageUrl,
@@ -963,6 +963,7 @@ fun SearchResultArtistItem(
 @Composable
 fun SearchResultPlaylistItem(
     playlist: Playlist,
+    playlistSongs: List<Song>,
     onOpenClick: () -> Unit,
     onPlayClick: () -> Unit
 ) {
@@ -993,23 +994,24 @@ fun SearchResultPlaylistItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.PlaylistPlay,
-                contentDescription = "Playlist",
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(itemShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                    .padding(8.dp),
-                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+            PlaylistCover(
+                playlist = playlist,
+                playlistSongs = playlistSongs,
+                size = 56.dp
             )
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = playlist.name,
                     style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "${playlist.songIds.size} songs",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             FilledIconButton(
@@ -1031,27 +1033,25 @@ fun SearchResultPlaylistItem(
 @Composable
 fun SearchFilterChip(
     filterType: SearchFilterType,
-    currentFilter: SearchFilterType, // Este valor debería provenir del estado de tu PlayerViewModel
+    currentFilter: SearchFilterType,
     playerViewModel: PlayerViewModel,
     modifier: Modifier = Modifier
 ) {
     val selected = filterType == currentFilter
 
     FilterChip(
-        selected = selected, // FilterChip tiene un parámetro 'selected'
+        selected = selected,
         onClick = { playerViewModel.updateSearchFilter(filterType) },
         label = { Text(filterType.name.lowercase().replaceFirstChar { it.titlecase() }) },
         modifier = modifier,
-        shape = CircleShape, // Expressive shape
+        shape = CircleShape,
         border = BorderStroke(
             width = 0.dp,
             color = Color.Transparent
         ),
         colors = FilterChipDefaults.filterChipColors(
-            // Expressive colors for unselected state
             containerColor =  MaterialTheme.colorScheme.secondaryContainer,
             labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            // Expressive colors for selected state
             selectedContainerColor = MaterialTheme.colorScheme.primary,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
             selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
