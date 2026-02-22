@@ -12,11 +12,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,6 +38,15 @@ import javax.inject.Singleton
 class SearchStateHolder @Inject constructor(
     private val musicRepository: MusicRepository
 ) {
+    private companion object {
+        const val SEARCH_DEBOUNCE_MS = 300L
+    }
+
+    private data class SearchRequest(
+        val query: String,
+        val requestId: Long
+    )
+
     // Search State
     private val _searchResults = MutableStateFlow<ImmutableList<SearchResultItem>>(persistentListOf())
     val searchResults = _searchResults.asStateFlow()
@@ -43,6 +57,12 @@ class SearchStateHolder @Inject constructor(
     private val _searchHistory = MutableStateFlow<ImmutableList<SearchHistoryItem>>(persistentListOf())
     val searchHistory = _searchHistory.asStateFlow()
 
+    private val searchRequests = MutableSharedFlow<SearchRequest>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    private val latestSearchRequestId = AtomicLong(0L)
+
     private var scope: CoroutineScope? = null
     private var searchJob: Job? = null
 
@@ -51,6 +71,48 @@ class SearchStateHolder @Inject constructor(
      */
     fun initialize(scope: CoroutineScope) {
         this.scope = scope
+        observeSearchRequests()
+    }
+
+    private fun observeSearchRequests() {
+        searchJob?.cancel()
+        searchJob = scope?.launch {
+            searchRequests
+                .debounce(SEARCH_DEBOUNCE_MS)
+                .collectLatest { request ->
+                    val normalizedQuery = request.query
+
+                    if (normalizedQuery.isBlank()) {
+                        if (_searchResults.value.isNotEmpty()) {
+                            _searchResults.value = persistentListOf()
+                        }
+                        return@collectLatest
+                    }
+
+                    try {
+                        val currentFilter = _selectedSearchFilter.value
+                        val resultsList = withContext(Dispatchers.IO) {
+                            musicRepository.searchAll(normalizedQuery, currentFilter).first()
+                        }
+
+                        if (request.requestId != latestSearchRequestId.get()) {
+                            return@collectLatest
+                        }
+
+                        val immutableResults = resultsList.toImmutableList()
+                        if (_searchResults.value != immutableResults) {
+                            _searchResults.value = immutableResults
+                        }
+                    } catch (_: CancellationException) {
+                        // Superseded by a newer query; ignore.
+                    } catch (e: Exception) {
+                        if (request.requestId == latestSearchRequestId.get()) {
+                            Log.e("SearchStateHolder", "Error performing search for query: $normalizedQuery", e)
+                            _searchResults.value = persistentListOf()
+                        }
+                    }
+                }
+        }
     }
 
     fun updateSearchFilter(filterType: SearchFilterType) {
@@ -88,34 +150,15 @@ class SearchStateHolder @Inject constructor(
     fun performSearch(query: String) {
         val normalizedQuery = query.trim()
 
+        val requestId = latestSearchRequestId.incrementAndGet()
+
         if (normalizedQuery.isBlank()) {
-            searchJob?.cancel()
             if (_searchResults.value.isNotEmpty()) {
                 _searchResults.value = persistentListOf()
             }
-            return
         }
 
-        searchJob?.cancel()
-        searchJob = scope?.launch {
-            try {
-                val currentFilter = _selectedSearchFilter.value
-                val resultsList = withContext(Dispatchers.IO) {
-                    musicRepository.searchAll(normalizedQuery, currentFilter).first()
-                }
-
-                val immutableResults = resultsList.toImmutableList()
-                if (_searchResults.value != immutableResults) {
-                    _searchResults.value = immutableResults
-                }
-
-            } catch (_: CancellationException) {
-                // Superseded by a newer query; ignore.
-            } catch (e: Exception) {
-                Log.e("SearchStateHolder", "Error performing search for query: $normalizedQuery", e)
-                _searchResults.value = persistentListOf()
-            }
-        }
+        searchRequests.tryEmit(SearchRequest(normalizedQuery, requestId))
     }
 
     fun deleteSearchHistoryItem(query: String) {

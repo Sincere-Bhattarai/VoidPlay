@@ -155,16 +155,9 @@ fun SearchScreen(
         }
     }
 
-    // Debounce typing and avoid re-running search on focus-only changes.
+    // Search debouncing is centralized in SearchStateHolder.
     LaunchedEffect(searchQuery, currentFilter) {
-        val normalizedQuery = searchQuery.trim()
-        if (normalizedQuery.isBlank()) {
-            playerViewModel.performSearch("")
-            return@LaunchedEffect
-        }
-
-        delay(180L)
-        playerViewModel.performSearch(normalizedQuery)
+        playerViewModel.performSearch(searchQuery)
     }
     val searchResults = uiState.searchResults
     val handleSongMoreOptionsClick: (Song) -> Unit = { song ->
