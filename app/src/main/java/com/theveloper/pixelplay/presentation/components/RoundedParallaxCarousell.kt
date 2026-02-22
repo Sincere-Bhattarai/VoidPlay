@@ -1,6 +1,5 @@
 package com.theveloper.pixelplay.presentation.components
 
-import androidx.compose.ui.composed
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -34,7 +33,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.addOutline
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
@@ -48,6 +50,9 @@ import androidx.compose.ui.util.fastMapIndexed
 import kotlin.math.*
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.invalidateMeasurement
 import com.theveloper.pixelplay.data.preferences.CarouselStyle
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -319,15 +324,22 @@ private fun RoundedCarousel(
 
         //val clipShape = rememberRoundedClipShape(carouselItemInfo, itemCornerRadius)
 
+        val animatedAlpha by animateFloatAsState(
+            targetValue = if (carouselStyle == CarouselStyle.ONE_PEEK && page > state.pagerState.currentPage + 1) 0f else 1f,
+            animationSpec = tween(durationMillis = 200),
+            label = "CarouselItemAlpha"
+        )
+
         Box(
-            modifier = Modifier.carouselItem(
-                index = page,
-                state = state,
-                strategy = { pageSize.strategy },
-                carouselItemDrawInfo = carouselItemInfo,
-                clipShape = clipShape,
-                carouselStyle = carouselStyle
-            )
+            modifier = Modifier
+                .graphicsLayer { alpha = animatedAlpha }
+                .carouselItem(
+                    index = page,
+                    state = state,
+                    strategy = { pageSize.strategy },
+                    carouselItemDrawInfo = carouselItemInfo,
+                    clipShape = clipShape
+                )
         ) {
             scope.content(page)
         }
@@ -443,16 +455,53 @@ private fun Modifier.carouselItem(
     strategy: () -> Strategy,
     carouselItemDrawInfo: CarouselItemDrawInfoImpl,
     clipShape: Shape,
-    carouselStyle: String,
-): Modifier = composed {
-    val animatedAlpha by animateFloatAsState(
-        targetValue = if (carouselStyle == CarouselStyle.ONE_PEEK && index > state.pagerState.currentPage + 1) 0f else 1f,
-        animationSpec = tween(durationMillis = 200)
-    )
+): Modifier = this then CarouselItemModifierNodeElement(
+    index = index,
+    state = state,
+    strategy = strategy,
+    carouselItemDrawInfo = carouselItemDrawInfo,
+    clipShape = clipShape
+)
 
-    layout { measurable, constraints ->
+@OptIn(ExperimentalMaterial3Api::class)
+private data class CarouselItemModifierNodeElement(
+    val index: Int,
+    val state: CarouselState,
+    val strategy: () -> Strategy,
+    val carouselItemDrawInfo: CarouselItemDrawInfoImpl,
+    val clipShape: Shape,
+) : ModifierNodeElement<CarouselItemModifierNode>() {
+    override fun create(): CarouselItemModifierNode {
+        return CarouselItemModifierNode(
+            index = index,
+            state = state,
+            strategy = strategy,
+            carouselItemDrawInfo = carouselItemDrawInfo,
+            clipShape = clipShape
+        )
+    }
+
+    override fun update(node: CarouselItemModifierNode) {
+        node.index = index
+        node.state = state
+        node.strategy = strategy
+        node.carouselItemDrawInfo = carouselItemDrawInfo
+        node.clipShape = clipShape
+        node.invalidateMeasurement()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+private class CarouselItemModifierNode(
+    var index: Int,
+    var state: CarouselState,
+    var strategy: () -> Strategy,
+    var carouselItemDrawInfo: CarouselItemDrawInfoImpl,
+    var clipShape: Shape,
+) : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
         val strategyResult = strategy()
-        if (!strategyResult.isValid) return@layout layout(0, 0) {}
+        if (!strategyResult.isValid) return layout(0, 0) {}
 
         val isVertical = state.pagerState.layoutInfo.orientation == Orientation.Vertical
         val isRtl = layoutDirection == LayoutDirection.Rtl
@@ -477,7 +526,7 @@ private fun Modifier.carouselItem(
             else if (index == 0) 0f
             else 1f / index.toFloat()
 
-        layout(placeable.width, placeable.height) {
+        return layout(placeable.width, placeable.height) {
             placeable.placeWithLayer(0, 0, zIndex = itemZIndex) {
                 // --- keylines e interpolación
                 val scrollOffset = calculateCurrentScrollOffset(state, strategyResult)
@@ -547,9 +596,6 @@ private fun Modifier.carouselItem(
                 // --- CLIP: siempre activado con la forma redondeada
                 clip = true
                 shape = clipShape
-
-                // --- ALPHA: oculta items extra en modo ONE_PEEK
-                alpha = animatedAlpha
 
                 // --- traslación final (pegado de bordes)
                 var translation = ik.offset - unadjustedCenter
