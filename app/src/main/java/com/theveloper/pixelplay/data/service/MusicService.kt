@@ -2,6 +2,7 @@ package com.theveloper.pixelplay.data.service
 
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -662,22 +663,53 @@ class MusicService : MediaSessionService() {
     }
 
     override fun onUpdateNotification(session: MediaSession, startInForegroundRequired: Boolean) {
-        try {
-            super.onUpdateNotification(session, startInForegroundRequired)
-        } catch (e: ForegroundServiceStartNotAllowedException) {
-            Timber.tag(TAG).w(e, "onUpdateNotification suppressed: foreground service start not allowed")
-        } catch (e: IllegalStateException) {
-            // On Android 12+, Media3's notification pipeline can asynchronously call
-            // startForegroundService() after the bitmap loads, at which point the app
-            // may no longer be in the foreground. Catching this prevents the crash.
-            Timber.tag(TAG).w(e, "onUpdateNotification suppressed: cannot start foreground from background")
+        val playWhenReady = session.player.playWhenReady
+        val playbackState = session.player.playbackState
+
+        // Android 12+ (API 31+): Only request foreground when actively playing.
+        // This prevents requesting foreground start when player is idle/ended.
+        val shouldStartInForeground = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            startInForegroundRequired && playWhenReady
+                    && playbackState != Player.STATE_IDLE
+                    && playbackState != Player.STATE_ENDED
+        } else {
+            startInForegroundRequired
         }
+
+        try {
+            super.onUpdateNotification(session, shouldStartInForeground)
+        } catch (e: Exception) {
+            Timber.tag(TAG).w(e, "onUpdateNotification suppressed: ${e.message}")
+        }
+    }
+
+    override fun startForegroundService(serviceIntent: Intent?): ComponentName? {
+        // Android 12+ (API 31+): Media3 calls startForegroundService asynchronously
+        // (e.g. after bitmap loading or Cast SDK callbacks). By that time the app may
+        // already be in the background, causing ForegroundServiceStartNotAllowedException.
+        // Catch the exception and fall back to startService — if the service is already
+        // foreground, the subsequent Service.startForeground() call will just update
+        // the notification without throwing.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return try {
+                super.startForegroundService(serviceIntent)
+            } catch (e: ForegroundServiceStartNotAllowedException) {
+                Timber.tag(TAG).w(e, "startForegroundService not allowed, falling back to startService")
+                startService(serviceIntent)
+            }
+        }
+        return super.startForegroundService(serviceIntent)
     }
 
     private fun refreshMediaSessionUi(session: MediaSession) {
         val buttons = buildMediaButtonPreferences(session)
+        // setMediaButtonPreferences triggers a notification update internally via
+        // MediaControllerListener.onMediaButtonPreferencesChanged → onUpdateNotificationInternal,
+        // which correctly determines if the service should run in foreground.
+        // Do NOT manually call onUpdateNotification(session, false) here — that bypasses
+        // Media3's shouldRunInForeground logic and can remove foreground status, leading to
+        // ForegroundServiceStartNotAllowedException when async callbacks fire later.
         session.setMediaButtonPreferences(buttons)
-        onUpdateNotification(session, false)
     }
 
     private fun updateManualShuffleState(
