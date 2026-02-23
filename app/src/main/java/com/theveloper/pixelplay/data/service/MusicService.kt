@@ -323,7 +323,7 @@ class MusicService : MediaLibraryService() {
                         LibraryResult.ofItemList(children, params)
                     } catch (e: Exception) {
                         Timber.tag(TAG).e(e, "onGetChildren failed for parentId=$parentId")
-                        LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN)
+                        LibraryResult.ofError(SessionError.ERROR_UNKNOWN)
                     }
                 }
             }
@@ -339,11 +339,11 @@ class MusicService : MediaLibraryService() {
                         if (item != null) {
                             LibraryResult.ofItem(item, null)
                         } else {
-                            LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE)
+                            LibraryResult.ofError(SessionError.ERROR_BAD_VALUE)
                         }
                     } catch (e: Exception) {
                         Timber.tag(TAG).e(e, "onGetItem failed for mediaId=$mediaId")
-                        LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN)
+                        LibraryResult.ofError(SessionError.ERROR_UNKNOWN)
                     }
                 }
             }
@@ -368,11 +368,20 @@ class MusicService : MediaLibraryService() {
             ): ListenableFuture<LibraryResult<com.google.common.collect.ImmutableList<MediaItem>>> {
                 return serviceScope.future {
                     try {
-                        val results = autoMediaBrowseTree.search(query)
-                        LibraryResult.ofItemList(results, params)
+                        val allResults = autoMediaBrowseTree.search(query)
+                        val effectivePage = page.coerceAtLeast(0)
+                        val effectivePageSize = if (pageSize > 0) pageSize else Int.MAX_VALUE
+                        val offset = (effectivePage.toLong() * effectivePageSize.toLong())
+                            .coerceAtMost(Int.MAX_VALUE.toLong())
+                            .toInt()
+                        val pagedResults = allResults
+                            .drop(offset)
+                            .take(effectivePageSize)
+
+                        LibraryResult.ofItemList(pagedResults, params)
                     } catch (e: Exception) {
                         Timber.tag(TAG).e(e, "onGetSearchResult failed for query=$query")
-                        LibraryResult.ofError(LibraryResult.RESULT_ERROR_UNKNOWN)
+                        LibraryResult.ofError(SessionError.ERROR_UNKNOWN)
                     }
                 }
             }
