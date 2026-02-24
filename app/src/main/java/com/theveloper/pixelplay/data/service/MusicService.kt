@@ -101,6 +101,8 @@ class MusicService : MediaLibraryService() {
     private var keepPlayingInBackground = true
     private var isManualShuffleEnabled = false
     private var persistentShuffleEnabled = false
+    // Holds the previous main-thread UncaughtExceptionHandler so we can restore it in onDestroy.
+    private var previousMainThreadExceptionHandler: Thread.UncaughtExceptionHandler? = null
     // --- Counted Play State ---
     private var countedPlayActive = false
     private var countedPlayTarget = 0
@@ -115,6 +117,24 @@ class MusicService : MediaLibraryService() {
     }
 
     override fun onCreate() {
+        // Media3's Cast SDK callback path (MediaSessionImpl$$ExternalSyntheticLambda →
+        // Util.postOrRun → MediaNotificationManager.updateNotificationInternal) calls
+        // Service.startForeground() directly, bypassing onUpdateNotification() entirely.
+        // Since startForeground() is final we cannot override it. Instead we intercept
+        // ForegroundServiceStartNotAllowedException on the main thread before it reaches
+        // ActivityThread and crashes the process.
+        val existingHandler = Thread.currentThread().uncaughtExceptionHandler
+        previousMainThreadExceptionHandler = existingHandler
+        Thread.currentThread().setUncaughtExceptionHandler { thread, throwable ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                throwable is ForegroundServiceStartNotAllowedException
+            ) {
+                Timber.tag(TAG).w(throwable, "Suppressed ForegroundServiceStartNotAllowedException from Media3/Cast internal path")
+            } else {
+                existingHandler?.uncaughtException(thread, throwable)
+            }
+        }
+
         super.onCreate()
         
         // Ensure engine is ready (re-initialize if service was restarted)
@@ -404,7 +424,7 @@ class MusicService : MediaLibraryService() {
 
         mediaSession = MediaLibrarySession.Builder(this, engine.masterPlayer, callback)
             .setSessionActivity(getOpenAppPendingIntent())
-            .setBitmapLoader(CoilBitmapLoader(this))
+            .setBitmapLoader(CoilBitmapLoader(this, serviceScope))
             .build()
 
         setMediaNotificationProvider(
@@ -555,6 +575,8 @@ class MusicService : MediaLibraryService() {
         engine.release()
         controller.release()
         serviceScope.cancel()
+        Thread.currentThread().setUncaughtExceptionHandler(previousMainThreadExceptionHandler)
+        previousMainThreadExceptionHandler = null
         super.onDestroy()
     }
 
@@ -592,12 +614,24 @@ class MusicService : MediaLibraryService() {
 
     private suspend fun buildPlayerInfo(): PlayerInfo {
         val player = engine.masterPlayer
-        val currentItem = withContext(Dispatchers.Main) { player.currentMediaItem }
-        val isPlaying = withContext(Dispatchers.Main) { player.isPlaying }
+        // Batch all main-thread reads into a single context switch (was 7 separate hops → 1)
+        var currentItem: MediaItem? = null
+        var isPlaying = false
+        var repeatMode = Player.REPEAT_MODE_OFF
+        var currentPosition = 0L
+        var totalDuration = 0L
+        var snapshotWindowIndex = 0
+        var snapshotTimeline: androidx.media3.common.Timeline = androidx.media3.common.Timeline.EMPTY
+        withContext(Dispatchers.Main) {
+            currentItem = player.currentMediaItem
+            isPlaying = player.isPlaying
+            repeatMode = player.repeatMode
+            currentPosition = player.currentPosition
+            totalDuration = player.duration.coerceAtLeast(0)
+            snapshotWindowIndex = player.currentMediaItemIndex
+            snapshotTimeline = player.currentTimeline
+        }
         val shuffleEnabled = isManualShuffleEnabled // Manual shuffle for sync with PlayerViewModel
-        val repeatMode = withContext(Dispatchers.Main) { player.repeatMode }
-        val currentPosition = withContext(Dispatchers.Main) { player.currentPosition }
-        val totalDuration = withContext(Dispatchers.Main) { player.duration.coerceAtLeast(0) }
 
         val title = currentItem?.mediaMetadata?.title?.toString().orEmpty()
         val artist = currentItem?.mediaMetadata?.artist?.toString().orEmpty()
@@ -607,22 +641,33 @@ class MusicService : MediaLibraryService() {
 
         val (artBytes, artUriString) = getAlbumArtForWidget(artworkData, artworkUri)
 
-        val playerTheme = withContext(Dispatchers.IO) {
-            userPreferencesRepository.playerThemePreferenceFlow.first()
+        // Merge two IO preference reads into a single context switch
+        val (playerTheme, paletteStyle) = withContext(Dispatchers.IO) {
+            Pair(
+                userPreferencesRepository.playerThemePreferenceFlow.first(),
+                AlbumArtPaletteStyle.fromStorageKey(userPreferencesRepository.albumArtPaletteStyleFlow.first().storageKey)
+            )
         }
 
-        val paletteStyle = withContext(Dispatchers.IO) {
-            AlbumArtPaletteStyle.fromStorageKey(userPreferencesRepository.albumArtPaletteStyleFlow.first().storageKey)
+        val schemePair: ColorSchemePair? = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && playerTheme == ThemePreference.DYNAMIC ->
+                ColorSchemePair(
+                    light = dynamicLightColorScheme(applicationContext),
+                    dark = dynamicDarkColorScheme(applicationContext)
+                )
+            artUriString != null ->
+                // Skip heavy palette recomputation when art + style haven't changed
+                if (artUriString == cachedSchemeArtUri && paletteStyle == cachedSchemePaletteStyle) {
+                    cachedColorSchemePair
+                } else {
+                    colorSchemeProcessor.getOrGenerateColorScheme(artUriString, paletteStyle).also {
+                        cachedSchemeArtUri = artUriString
+                        cachedSchemePaletteStyle = paletteStyle
+                        cachedColorSchemePair = it
+                    }
+                }
+            else -> null
         }
-
-        val schemePair: ColorSchemePair? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && playerTheme == ThemePreference.DYNAMIC) {
-             ColorSchemePair(
-                 light = dynamicLightColorScheme(applicationContext),
-                 dark = dynamicDarkColorScheme(applicationContext)
-             )
-        } else if (artUriString != null) {
-            colorSchemeProcessor.getOrGenerateColorScheme(artUriString, paletteStyle)
-        } else null
 
         val widgetColors = schemePair?.let {
             WidgetThemeColors(
@@ -649,19 +694,18 @@ class MusicService : MediaLibraryService() {
 //            //musicRepository.getFavoriteSongs().firstOrNull()?.any { song -> song.id.toString() == it }
 //        } ?: false
 
-        val queueItems = mutableListOf<com.theveloper.voidplay.data.model.QueueItem>()
-        val timeline = withContext(Dispatchers.Main) { player.currentTimeline }
-        if (!timeline.isEmpty) {
+        val queueItems = mutableListOf<com.theveloper.pixelplay.data.model.QueueItem>()
+        // Reuse snapshotTimeline / snapshotWindowIndex captured at the top — no extra main-thread hop
+        if (!snapshotTimeline.isEmpty) {
             val window = androidx.media3.common.Timeline.Window()
-            val currentWindowIndex = withContext(Dispatchers.Main) { player.currentMediaItemIndex }
 
             // Empezar desde la siguiente canción en la cola
-            val startIndex = if (currentWindowIndex + 1 < timeline.windowCount) currentWindowIndex + 1 else 0
+            val startIndex = if (snapshotWindowIndex + 1 < snapshotTimeline.windowCount) snapshotWindowIndex + 1 else 0
 
             // Limitar el número de elementos de la cola a 4
-            val endIndex = (startIndex + 4).coerceAtMost(timeline.windowCount)
+            val endIndex = (startIndex + 4).coerceAtMost(snapshotTimeline.windowCount)
             for (i in startIndex until endIndex) {
-                timeline.getWindow(i, window)
+                snapshotTimeline.getWindow(i, window)
                 val mediaItem = window.mediaItem
                 val songId = mediaItem.mediaId.toLongOrNull()
                 if (songId != null) {
@@ -695,7 +739,14 @@ class MusicService : MediaLibraryService() {
         )
     }
 
-    private val widgetArtByteArrayCache = LruCache<String, ByteArray>(5)
+    private val widgetArtByteArrayCache = object : LruCache<String, ByteArray>(5 * 256 * 1024) {
+        override fun sizeOf(key: String, value: ByteArray): Int = value.size
+    }
+
+    // Color scheme cache: skip recomputation when art URI and palette style haven't changed
+    private var cachedSchemeArtUri: String? = null
+    private var cachedSchemePaletteStyle: AlbumArtPaletteStyle? = null
+    private var cachedColorSchemePair: ColorSchemePair? = null
 
     private suspend fun getAlbumArtForWidget(embeddedArt: ByteArray?, artUri: Uri?): Pair<ByteArray?, String?> = withContext(Dispatchers.IO) {
         if (embeddedArt != null && embeddedArt.isNotEmpty()) {
@@ -759,6 +810,10 @@ class MusicService : MediaLibraryService() {
             drawable?.let {
                 val bitmap = it.toBitmap(256, 256)
                 val stream = ByteArrayOutputStream()
+                // Do NOT recycle bitmap here: toBitmap() may return Coil's cached Bitmap
+                // object directly. Recycling it would invalidate any copy already handed
+                // to Media3, causing "Can't copy a recycled bitmap" on setMetadata().
+                // Coil manages the lifecycle of its own cached bitmaps.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 80, stream)
                 } else {
