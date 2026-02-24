@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,8 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Lyrics
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Lyrics
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme

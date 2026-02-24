@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.MusicDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

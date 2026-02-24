@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -85,10 +85,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.theveloper.pixelplay.presentation.screens.TabAnimation
-import com.theveloper.pixelplay.presentation.viewmodel.DirectoryEntry
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.utils.StorageInfo
+import com.theveloper.voidplay.presentation.screens.TabAnimation
+import com.theveloper.voidplay.presentation.viewmodel.DirectoryEntry
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.utils.StorageInfo
 import java.io.File
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

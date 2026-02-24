@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.gdrive.dashboard
+package com.theveloper.voidplay.presentation.gdrive.dashboard
 
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
@@ -33,9 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.theveloper.pixelplay.data.database.GDriveFolderEntity
-import com.theveloper.pixelplay.presentation.gdrive.auth.GDriveLoginActivity
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.database.GDriveFolderEntity
+import com.theveloper.voidplay.presentation.gdrive.auth.GDriveLoginActivity
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 

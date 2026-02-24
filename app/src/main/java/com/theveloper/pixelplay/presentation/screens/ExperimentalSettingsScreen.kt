@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
@@ -70,10 +70,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -655,7 +655,7 @@ fun ExperimentalSettingsScreen(
                            // For simplicity and quick access as requested ("selector or slider"), let's use a segmented style or a simple list of options.
                            
                            // Using a loop to create selectable items for each enum value
-                           com.theveloper.pixelplay.data.preferences.AlbumArtQuality.entries.forEach { quality ->
+                           com.theveloper.voidplay.data.preferences.AlbumArtQuality.entries.forEach { quality ->
                                val isSelected = quality == albumArtQuality
                                
                                Surface(

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.netease.dashboard
+package com.theveloper.voidplay.presentation.netease.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -30,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.theveloper.pixelplay.data.database.NeteasePlaylistEntity
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.database.NeteasePlaylistEntity
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 

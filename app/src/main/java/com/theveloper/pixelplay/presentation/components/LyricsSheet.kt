@@ -1,16 +1,16 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.widget.Toast
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.R
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.ui.zIndex
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.layout.ContentScale
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.AutoScrollingText
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.AutoScrollingText
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.animateFloat
@@ -96,29 +96,29 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-import com.theveloper.pixelplay.data.model.SyncedLine
-import com.theveloper.pixelplay.data.model.SyncedWord
-import com.theveloper.pixelplay.data.repository.LyricsSearchResult
-import com.theveloper.pixelplay.presentation.screens.TabAnimation
-import com.theveloper.pixelplay.presentation.components.subcomps.FetchLyricsDialog
-import com.theveloper.pixelplay.presentation.components.subcomps.PlayerSeekBar
-import com.theveloper.pixelplay.presentation.viewmodel.LyricsSearchUiState
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.utils.BubblesLine
-import com.theveloper.pixelplay.utils.ProviderText
-import com.theveloper.pixelplay.presentation.components.snapping.ExperimentalSnapperApi
-import com.theveloper.pixelplay.presentation.components.snapping.SnapperLayoutInfo
-import com.theveloper.pixelplay.presentation.components.snapping.rememberLazyListSnapperLayoutInfo
-import com.theveloper.pixelplay.presentation.components.snapping.rememberSnapperFlingBehavior
-import com.theveloper.pixelplay.utils.LyricsUtils
-import com.theveloper.pixelplay.presentation.components.subcomps.LyricsMoreBottomSheet
+import com.theveloper.voidplay.data.model.SyncedLine
+import com.theveloper.voidplay.data.model.SyncedWord
+import com.theveloper.voidplay.data.repository.LyricsSearchResult
+import com.theveloper.voidplay.presentation.screens.TabAnimation
+import com.theveloper.voidplay.presentation.components.subcomps.FetchLyricsDialog
+import com.theveloper.voidplay.presentation.components.subcomps.PlayerSeekBar
+import com.theveloper.voidplay.presentation.viewmodel.LyricsSearchUiState
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.utils.BubblesLine
+import com.theveloper.voidplay.utils.ProviderText
+import com.theveloper.voidplay.presentation.components.snapping.ExperimentalSnapperApi
+import com.theveloper.voidplay.presentation.components.snapping.SnapperLayoutInfo
+import com.theveloper.voidplay.presentation.components.snapping.rememberLazyListSnapperLayoutInfo
+import com.theveloper.voidplay.presentation.components.snapping.rememberSnapperFlingBehavior
+import com.theveloper.voidplay.utils.LyricsUtils
+import com.theveloper.voidplay.presentation.components.subcomps.LyricsMoreBottomSheet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import com.theveloper.pixelplay.data.preferences.dataStore
+import com.theveloper.voidplay.data.preferences.dataStore
 import androidx.compose.ui.graphics.TransformOrigin
 
 import java.io.File
@@ -130,7 +130,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextOverflow
-import com.theveloper.pixelplay.presentation.components.subcomps.PlayingEqIcon
+import com.theveloper.voidplay.presentation.components.subcomps.PlayingEqIcon
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

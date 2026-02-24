@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
-import com.theveloper.pixelplay.data.DailyMixManager
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.DailyMixManager
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

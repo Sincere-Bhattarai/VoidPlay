@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import android.os.Trace
 import androidx.compose.foundation.BorderStroke
@@ -73,19 +73,19 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.stats.StatsTimeRange
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.PlaylistBottomSheet
-import com.theveloper.pixelplay.presentation.components.SongInfoBottomSheet
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.subcomps.EnhancedSongListItem
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.model.RecentlyPlayedSongUiModel
-import com.theveloper.pixelplay.presentation.model.mapRecentlyPlayedSongs
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.stats.StatsTimeRange
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.PlaylistBottomSheet
+import com.theveloper.voidplay.presentation.components.SongInfoBottomSheet
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.subcomps.EnhancedSongListItem
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.model.RecentlyPlayedSongUiModel
+import com.theveloper.voidplay.presentation.model.mapRecentlyPlayedSongs
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

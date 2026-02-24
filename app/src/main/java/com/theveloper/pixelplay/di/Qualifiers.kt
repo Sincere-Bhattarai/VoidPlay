@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.di
+package com.theveloper.voidplay.di
 
 import javax.inject.Qualifier
 

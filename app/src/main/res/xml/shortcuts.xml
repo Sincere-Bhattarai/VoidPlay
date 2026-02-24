@@ -8,9 +8,9 @@
         android:shortcutShortLabel="@string/shortcut_shuffle_short"
         android:shortcutLongLabel="@string/shortcut_shuffle_long">
         <intent
-            android:action="com.theveloper.pixelplay.ACTION_SHUFFLE_ALL"
-            android:targetPackage="com.theveloper.pixelplay"
-            android:targetClass="com.theveloper.pixelplay.MainActivity" />
+            android:action="com.theveloper.voidplay.ACTION_SHUFFLE_ALL"
+            android:targetPackage="com.theveloper.voidplay"
+            android:targetClass="com.theveloper.voidplay.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 </shortcuts>

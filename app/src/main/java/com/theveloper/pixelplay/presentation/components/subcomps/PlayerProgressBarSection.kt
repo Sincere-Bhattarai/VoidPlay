@@ -1,2 +1,2 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 

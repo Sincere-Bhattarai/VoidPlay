@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -83,7 +83,7 @@ class QueueUtilsTest {
             album = "Album",
             albumId = 1L,
             path = "/tmp/song-$index.mp3",
-            contentUriString = "content://pixelplay/song/$index",
+            contentUriString = "content://voidplay/song/$index",
             albumArtUriString = null,
             duration = 180_000L,
             mimeType = "audio/mpeg",

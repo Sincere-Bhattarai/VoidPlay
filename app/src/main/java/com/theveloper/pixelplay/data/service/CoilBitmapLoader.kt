@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service
+package com.theveloper.voidplay.data.service
 
 import android.content.Context
 import android.graphics.Bitmap

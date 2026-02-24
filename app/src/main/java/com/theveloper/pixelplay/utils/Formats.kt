@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import java.util.concurrent.TimeUnit
 
 fun formatDuration(milliseconds: Long): String {

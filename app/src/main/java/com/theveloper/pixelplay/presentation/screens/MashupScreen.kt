@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -55,11 +55,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import com.linc.audiowaveform.AudioWaveform
 import com.linc.audiowaveform.model.WaveformAlignment
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.viewmodel.DeckState
-import com.theveloper.pixelplay.presentation.viewmodel.MashupViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.viewmodel.DeckState
+import com.theveloper.voidplay.presentation.viewmodel.MashupViewModel
 import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(UnstableApi::class)

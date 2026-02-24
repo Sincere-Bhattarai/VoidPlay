@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,11 +26,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.PlaylistShapeType
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.utils.resolvePlaylistCoverContentColor
-import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.PlaylistShapeType
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.utils.resolvePlaylistCoverContentColor
+import com.theveloper.voidplay.utils.shapes.RoundedStarShape
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @Composable

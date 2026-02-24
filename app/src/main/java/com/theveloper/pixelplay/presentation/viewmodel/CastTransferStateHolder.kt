@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import android.content.Intent
@@ -17,12 +17,12 @@ import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.cast.framework.SessionManagerListener
 import com.google.android.gms.cast.framework.media.RemoteMediaClient
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.service.http.MediaFileHttpServerService
-import com.theveloper.pixelplay.data.service.player.CastPlayer
-import com.theveloper.pixelplay.data.service.player.DualPlayerEngine
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.service.http.MediaFileHttpServerService
+import com.theveloper.voidplay.data.service.player.CastPlayer
+import com.theveloper.voidplay.data.service.player.DualPlayerEngine
 
-import com.theveloper.pixelplay.utils.MediaItemBuilder
+import com.theveloper.voidplay.utils.MediaItemBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope

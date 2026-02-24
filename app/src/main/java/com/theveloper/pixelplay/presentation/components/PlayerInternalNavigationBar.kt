@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import android.os.SystemClock
 import androidx.compose.foundation.background
@@ -27,10 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.theveloper.pixelplay.BottomNavItem
-import com.theveloper.pixelplay.data.preferences.NavBarStyle
-import com.theveloper.pixelplay.presentation.components.scoped.CustomNavigationBarItem
-import com.theveloper.pixelplay.presentation.navigation.Screen
+import com.theveloper.voidplay.BottomNavItem
+import com.theveloper.voidplay.data.preferences.NavBarStyle
+import com.theveloper.voidplay.presentation.components.scoped.CustomNavigationBarItem
+import com.theveloper.voidplay.presentation.navigation.Screen
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

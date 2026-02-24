@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
-import com.theveloper.pixelplay.data.model.TransitionResolution
-import com.theveloper.pixelplay.data.model.TransitionRule
-import com.theveloper.pixelplay.data.model.TransitionSettings
+import com.theveloper.voidplay.data.model.TransitionResolution
+import com.theveloper.voidplay.data.model.TransitionRule
+import com.theveloper.voidplay.data.model.TransitionSettings
 import kotlinx.coroutines.flow.Flow
 
 /**

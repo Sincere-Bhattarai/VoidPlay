@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.worker.SyncManager
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.worker.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

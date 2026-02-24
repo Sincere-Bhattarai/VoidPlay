@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay
+package com.theveloper.voidplay
 
 import android.content.Intent
 import android.net.Uri
@@ -13,13 +13,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.components.external.ExternalPlayerOverlay
-import com.theveloper.pixelplay.ui.theme.PixelPlayTheme
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.components.external.ExternalPlayerOverlay
+import com.theveloper.voidplay.ui.theme.VoidPlayTheme
 import android.content.Intent.EXTRA_STREAM
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.data.preferences.AppThemeMode
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.preferences.AppThemeMode
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
 import javax.inject.Inject
 
 @UnstableApi
@@ -51,7 +51,7 @@ class ExternalPlayerActivity : ComponentActivity() {
                 AppThemeMode.LIGHT -> false
                 else -> systemDarkTheme
             }
-            PixelPlayTheme(darkTheme = useDarkTheme) {
+            VoidPlayTheme(darkTheme = useDarkTheme) {
                 ExternalPlayerOverlay(
                     playerViewModel = playerViewModel,
                     onDismiss = { finish() },

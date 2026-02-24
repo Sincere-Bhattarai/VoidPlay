@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope

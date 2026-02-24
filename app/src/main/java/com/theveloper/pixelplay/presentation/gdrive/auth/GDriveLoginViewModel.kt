@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.presentation.gdrive.auth
+package com.theveloper.voidplay.presentation.gdrive.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.gdrive.GDriveRepository
+import com.theveloper.voidplay.data.gdrive.GDriveRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -107,7 +107,7 @@ class GDriveLoginViewModel @Inject constructor(
     }
 
     /**
-     * Create a "PixelPlay Music" folder in the current directory.
+     * Create a "VoidPlay Music" folder in the current directory.
      */
     fun createMusicFolder() {
         val parentId = breadcrumb.lastOrNull()?.id ?: "root"

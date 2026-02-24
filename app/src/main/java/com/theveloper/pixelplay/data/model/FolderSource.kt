@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.model
+package com.theveloper.voidplay.data.model
 
 enum class FolderSource(val storageKey: String, val displayName: String) {
     INTERNAL("internal", "Internal Storage"),

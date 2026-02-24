@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.observer
+package com.theveloper.voidplay.data.observer
 
 import android.content.Context
 import android.database.ContentObserver

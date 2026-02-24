@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.navigation
+package com.theveloper.voidplay.presentation.navigation
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween

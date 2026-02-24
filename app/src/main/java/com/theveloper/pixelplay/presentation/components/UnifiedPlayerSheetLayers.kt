@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
@@ -28,14 +28,14 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.FullPlayerLoadingTweaks
-import com.theveloper.pixelplay.presentation.components.player.FullPlayerContent
-import com.theveloper.pixelplay.presentation.components.scoped.FullPlayerVisualState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberFullPlayerRuntimePolicy
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.FullPlayerLoadingTweaks
+import com.theveloper.voidplay.presentation.components.player.FullPlayerContent
+import com.theveloper.voidplay.presentation.components.scoped.FullPlayerVisualState
+import com.theveloper.voidplay.presentation.components.scoped.rememberFullPlayerRuntimePolicy
+import com.theveloper.voidplay.presentation.viewmodel.PlayerSheetState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
 import kotlinx.collections.immutable.ImmutableList
 
 @OptIn(UnstableApi::class)

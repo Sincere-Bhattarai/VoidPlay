@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import android.net.Uri
@@ -7,11 +7,11 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.ArtistImageRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.ArtistImageRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

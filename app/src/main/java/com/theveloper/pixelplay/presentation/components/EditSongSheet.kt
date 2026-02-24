@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -59,11 +59,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 import java.net.URLEncoder
 import timber.log.Timber
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -81,7 +81,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.media3.common.Player
-import com.theveloper.pixelplay.data.media.CoverArtUpdate
+import com.theveloper.voidplay.data.media.CoverArtUpdate
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.io.ByteArrayOutputStream
 
@@ -93,7 +93,7 @@ fun EditSongSheet(
     song: Song,
     onDismiss: () -> Unit,
     onSave: (title: String, artist: String, album: String, genre: String, lyrics: String, trackNumber: Int, coverArtUpdate: CoverArtUpdate?) -> Unit,
-    generateAiMetadata: suspend (List<String>) -> Result<com.theveloper.pixelplay.data.ai.SongMetadata>
+    generateAiMetadata: suspend (List<String>) -> Result<com.theveloper.voidplay.data.ai.SongMetadata>
 ) {
     val transitionState = remember { MutableTransitionState(false) }
     transitionState.targetState = visible
@@ -128,7 +128,7 @@ private fun EditSongContent(
     song: Song,
     onDismiss: () -> Unit,
     onSave: (title: String, artist: String, album: String, genre: String, lyrics: String, trackNumber: Int, coverArtUpdate: CoverArtUpdate?) -> Unit,
-    generateAiMetadata: suspend (List<String>) -> Result<com.theveloper.pixelplay.data.ai.SongMetadata>
+    generateAiMetadata: suspend (List<String>) -> Result<com.theveloper.voidplay.data.ai.SongMetadata>
 ) {
     var title by remember { mutableStateOf(song.title) }
     var artist by remember { mutableStateOf(song.displayArtist) }

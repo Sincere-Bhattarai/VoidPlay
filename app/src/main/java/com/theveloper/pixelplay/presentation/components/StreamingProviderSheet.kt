@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -24,11 +24,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.netease.NeteaseRepository
-import com.theveloper.pixelplay.presentation.netease.auth.NeteaseLoginActivity
-import com.theveloper.pixelplay.presentation.telegram.auth.TelegramLoginActivity
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.netease.NeteaseRepository
+import com.theveloper.voidplay.presentation.netease.auth.NeteaseLoginActivity
+import com.theveloper.voidplay.presentation.telegram.auth.TelegramLoginActivity
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 /**

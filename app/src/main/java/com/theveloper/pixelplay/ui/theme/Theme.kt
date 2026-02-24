@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.theme
+package com.theveloper.voidplay.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -19,38 +19,38 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.theveloper.pixelplay.presentation.viewmodel.ColorSchemePair
+import com.theveloper.voidplay.presentation.viewmodel.ColorSchemePair
 import androidx.core.graphics.ColorUtils
 import androidx.compose.ui.unit.dp
 
-val LocalPixelPlayDarkTheme = staticCompositionLocalOf { false }
+val LocalVoidPlayDarkTheme = staticCompositionLocalOf { false }
 
 val DarkColorScheme = darkColorScheme(
-    primary = PixelPlayPurplePrimary,
-    secondary = PixelPlayPink,
-    tertiary = PixelPlayOrange,
-    background = PixelPlayPurpleDark,
-    surface = PixelPlaySurface,
-    onPrimary = PixelPlayWhite,
-    onSecondary = PixelPlayWhite,
-    onTertiary = PixelPlayWhite,
-    onBackground = PixelPlayWhite,
-    onSurface = PixelPlayLightPurple, // Texto sobre superficies
+    primary = VoidPlayPurplePrimary,
+    secondary = VoidPlayPink,
+    tertiary = VoidPlayOrange,
+    background = VoidPlayPurpleDark,
+    surface = VoidPlaySurface,
+    onPrimary = VoidPlayWhite,
+    onSecondary = VoidPlayWhite,
+    onTertiary = VoidPlayWhite,
+    onBackground = VoidPlayWhite,
+    onSurface = VoidPlayLightPurple, // Texto sobre superficies
     error = Color(0xFFFF5252),
-    onError = PixelPlayWhite
+    onError = VoidPlayWhite
 )
 
 val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
-    onPrimary = PixelPlayWhite,
+    onPrimary = VoidPlayWhite,
     primaryContainer = LightPrimaryContainer,
     onPrimaryContainer = LightOnPrimaryContainer,
-    secondary = PixelPlayPink,
-    onSecondary = PixelPlayWhite,
-    secondaryContainer = PixelPlayPink.copy(alpha = 0.15f),
-    onSecondaryContainer = PixelPlayPink.copy(alpha = 0.85f),
-    tertiary = PixelPlayOrange,
-    onTertiary = PixelPlayBlack,
+    secondary = VoidPlayPink,
+    onSecondary = VoidPlayWhite,
+    secondaryContainer = VoidPlayPink.copy(alpha = 0.15f),
+    onSecondaryContainer = VoidPlayPink.copy(alpha = 0.85f),
+    tertiary = VoidPlayOrange,
+    onTertiary = VoidPlayBlack,
     background = LightBackground,
     onBackground = LightOnSurface,
     surface = LightSurface,
@@ -61,11 +61,11 @@ val LightColorScheme = lightColorScheme(
     outlineVariant = LightOutline.copy(alpha = 0.6f),
     surfaceTint = LightPrimary,
     error = Color(0xFFD32F2F),
-    onError = PixelPlayWhite
+    onError = VoidPlayWhite
 )
 
 @Composable
-fun PixelPlayTheme(
+fun VoidPlayTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     colorSchemePairOverride: ColorSchemePair? = null,
     content: @Composable () -> Unit
@@ -103,7 +103,7 @@ fun PixelPlayTheme(
         }
     }
 
-    CompositionLocalProvider(LocalPixelPlayDarkTheme provides darkTheme) {
+    CompositionLocalProvider(LocalVoidPlayDarkTheme provides darkTheme) {
         MaterialTheme(
             colorScheme = finalColorScheme,
             typography = Typography,

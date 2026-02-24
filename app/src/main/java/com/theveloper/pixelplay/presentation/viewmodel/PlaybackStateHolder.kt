@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.media3.session.MediaController
 import androidx.media3.common.Player
 import androidx.media3.common.C
-import com.theveloper.pixelplay.data.service.player.DualPlayerEngine
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.service.player.DualPlayerEngine
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,11 +18,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import com.google.android.gms.cast.MediaStatus
 import timber.log.Timber
-import com.theveloper.pixelplay.utils.QueueUtils
-import com.theveloper.pixelplay.utils.MediaItemBuilder
+import com.theveloper.voidplay.utils.QueueUtils
+import com.theveloper.voidplay.utils.MediaItemBuilder
 import kotlin.math.abs
 
 @Singleton

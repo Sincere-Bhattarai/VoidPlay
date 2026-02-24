@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.player
+package com.theveloper.voidplay.data.service.player
 
 import android.content.Context
 import android.media.AudioFocusRequest
@@ -21,8 +21,8 @@ import androidx.media3.exoplayer.mediacodec.MediaCodecInfo
 import android.os.Handler
 import kotlin.math.max
 //import androidx.media3.exoplayer.ffmpeg.FfmpegAudioRenderer
-import com.theveloper.pixelplay.data.model.TransitionSettings
-import com.theveloper.pixelplay.utils.envelope
+import com.theveloper.voidplay.data.model.TransitionSettings
+import com.theveloper.voidplay.utils.envelope
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
@@ -37,8 +37,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 
-import com.theveloper.pixelplay.data.netease.NeteaseStreamProxy
-import com.theveloper.pixelplay.data.telegram.TelegramRepository
+import com.theveloper.voidplay.data.netease.NeteaseStreamProxy
+import com.theveloper.voidplay.data.telegram.TelegramRepository
 import androidx.media3.datasource.ResolvingDataSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DataSpec
@@ -58,10 +58,10 @@ import java.io.File
 class DualPlayerEngine @Inject constructor(
     @ApplicationContext private val context: Context,
     private val telegramRepository: TelegramRepository,
-    private val telegramStreamProxy: com.theveloper.pixelplay.data.telegram.TelegramStreamProxy,
+    private val telegramStreamProxy: com.theveloper.voidplay.data.telegram.TelegramStreamProxy,
     private val neteaseStreamProxy: NeteaseStreamProxy,
-    private val telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager,
-    private val connectivityStateHolder: com.theveloper.pixelplay.presentation.viewmodel.ConnectivityStateHolder
+    private val telegramCacheManager: com.theveloper.voidplay.data.telegram.TelegramCacheManager,
+    private val connectivityStateHolder: com.theveloper.voidplay.presentation.viewmodel.ConnectivityStateHolder
 ) {
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var transitionJob: Job? = null

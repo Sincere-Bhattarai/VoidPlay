@@ -1,7 +1,7 @@
-package com.theveloper.pixelplay.data.telegram
+package com.theveloper.voidplay.data.telegram
 
-import com.theveloper.pixelplay.utils.LogUtils
-import com.theveloper.pixelplay.data.stream.CloudStreamSecurity
+import com.theveloper.voidplay.utils.LogUtils
+import com.theveloper.voidplay.data.stream.CloudStreamSecurity
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call

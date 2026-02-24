@@ -1,7 +1,7 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.widget.Toast
-import com.theveloper.pixelplay.presentation.components.ExpressiveOfflineDialog
+import com.theveloper.voidplay.presentation.components.ExpressiveOfflineDialog
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -49,30 +49,30 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.scoped.PlayerArtistNavigationEffect
-import com.theveloper.pixelplay.presentation.components.scoped.PlayerSheetPredictiveBackHandler
-import com.theveloper.pixelplay.presentation.components.scoped.QueueSheetRuntimeEffects
-import com.theveloper.pixelplay.presentation.components.scoped.SheetMotionController
-import com.theveloper.pixelplay.presentation.components.scoped.miniPlayerDismissHorizontalGesture
-import com.theveloper.pixelplay.presentation.components.scoped.playerSheetVerticalDragGesture
-import com.theveloper.pixelplay.presentation.components.scoped.rememberFullPlayerCompositionPolicy
-import com.theveloper.pixelplay.presentation.components.scoped.rememberCastSheetState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberFullPlayerVisualState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberMiniPlayerDismissGestureHandler
-import com.theveloper.pixelplay.presentation.components.scoped.rememberPrewarmFullPlayer
-import com.theveloper.pixelplay.presentation.components.scoped.rememberQueueSheetState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetActionHandlers
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetBackAndDragState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetInteractionState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetModalOverlayController
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetOverlayState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetThemeState
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSheetVisualState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
-import com.theveloper.pixelplay.ui.theme.LocalPixelPlayDarkTheme
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.scoped.PlayerArtistNavigationEffect
+import com.theveloper.voidplay.presentation.components.scoped.PlayerSheetPredictiveBackHandler
+import com.theveloper.voidplay.presentation.components.scoped.QueueSheetRuntimeEffects
+import com.theveloper.voidplay.presentation.components.scoped.SheetMotionController
+import com.theveloper.voidplay.presentation.components.scoped.miniPlayerDismissHorizontalGesture
+import com.theveloper.voidplay.presentation.components.scoped.playerSheetVerticalDragGesture
+import com.theveloper.voidplay.presentation.components.scoped.rememberFullPlayerCompositionPolicy
+import com.theveloper.voidplay.presentation.components.scoped.rememberCastSheetState
+import com.theveloper.voidplay.presentation.components.scoped.rememberFullPlayerVisualState
+import com.theveloper.voidplay.presentation.components.scoped.rememberMiniPlayerDismissGestureHandler
+import com.theveloper.voidplay.presentation.components.scoped.rememberPrewarmFullPlayer
+import com.theveloper.voidplay.presentation.components.scoped.rememberQueueSheetState
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetActionHandlers
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetBackAndDragState
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetInteractionState
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetModalOverlayController
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetOverlayState
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetThemeState
+import com.theveloper.voidplay.presentation.components.scoped.rememberSheetVisualState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerSheetState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.ui.theme.LocalVoidPlayDarkTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -438,7 +438,7 @@ fun UnifiedPlayerSheetV2(
 
     val activePlayerSchemePair by playerViewModel.activePlayerColorSchemePair.collectAsStateWithLifecycle()
     val themedAlbumArtUri by playerViewModel.currentThemedAlbumArtUri.collectAsStateWithLifecycle()
-    val isDarkTheme = LocalPixelPlayDarkTheme.current
+    val isDarkTheme = LocalVoidPlayDarkTheme.current
     val currentSong = infrequentPlayerState.currentSong
     val sheetThemeState = rememberSheetThemeState(
         activePlayerSchemePair = activePlayerSchemePair,

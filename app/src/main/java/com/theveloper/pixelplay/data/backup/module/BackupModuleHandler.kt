@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.data.backup.module
+package com.theveloper.voidplay.data.backup.module
 
-import com.theveloper.pixelplay.data.backup.model.BackupSection
+import com.theveloper.voidplay.data.backup.model.BackupSection
 
 interface BackupModuleHandler {
     val section: BackupSection

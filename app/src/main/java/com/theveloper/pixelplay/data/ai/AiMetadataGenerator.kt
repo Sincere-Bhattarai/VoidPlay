@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.data.ai
+package com.theveloper.voidplay.data.ai
 
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.SerializationException
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

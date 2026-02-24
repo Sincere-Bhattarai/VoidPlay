@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -33,9 +33,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.SyncedLine
-import com.theveloper.pixelplay.data.model.SyncedWord
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.SyncedLine
+import com.theveloper.voidplay.data.model.SyncedWord
 import kotlinx.coroutines.flow.Flow
 import java.lang.Character
 import java.util.regex.Pattern

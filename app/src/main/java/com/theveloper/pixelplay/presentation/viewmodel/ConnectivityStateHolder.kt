@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.Manifest
 import android.annotation.SuppressLint

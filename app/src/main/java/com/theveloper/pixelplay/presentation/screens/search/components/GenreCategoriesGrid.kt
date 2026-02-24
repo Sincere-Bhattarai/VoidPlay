@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens.search.components
+package com.theveloper.voidplay.presentation.screens.search.components
 
 import androidx.annotation.OptIn
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,13 +41,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.data.model.Genre
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.NavBarContentHeight
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.getNavigationBarHeight
-import com.theveloper.pixelplay.presentation.utils.GenreIconProvider
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.data.model.Genre
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.NavBarContentHeight
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.getNavigationBarHeight
+import com.theveloper.voidplay.presentation.utils.GenreIconProvider
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @OptIn(UnstableApi::class)
@@ -155,7 +155,7 @@ private fun GenreCard(
 ) {
     val isDark = androidx.compose.foundation.isSystemInDarkTheme()
     val themeColor = remember(genre, isDark) {
-        com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreThemeColor(
+        com.theveloper.voidplay.ui.theme.GenreThemeUtils.getGenreThemeColor(
             genre = genre,
             isDark = isDark,
             fallbackGenreId = genre.id

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -98,13 +98,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.github.GitHubContributorService
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.brickbreaker.BrickBreakerOverlay
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.github.GitHubContributorService
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.brickbreaker.BrickBreakerOverlay
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import timber.log.Timber
@@ -127,7 +127,7 @@ private val CoreMaintainer = Contributor(
     id = "theovilardo",
     displayName = "Theo Vilardo",
     role = "Creator and maintainer",
-    detail = "Building PixelPlayer with direct community feedback.",
+    detail = "Building VoidPlayer with direct community feedback.",
     avatarUrl = "https://avatars.githubusercontent.com/u/26845343?v=4",
     iconRes = R.drawable.round_developer_board_24,
     githubUrl = "https://github.com/theovilardo",
@@ -157,7 +157,7 @@ private val PinnedCommunityMembers = listOf(
         id = "colbycabrera",
         displayName = "@ColbyCabrera",
         role = "Early contributor",
-        detail = "Helped shape PixelPlayer in the first stages of the app.",
+        detail = "Helped shape VoidPlayer in the first stages of the app.",
         badge = "Early Support",
         iconRes = R.drawable.round_newspaper_24,
         githubUrl = "https://github.com/ColbyCabrera",
@@ -380,7 +380,7 @@ fun AboutScreen(
             item(key = "maintainer_title") {
                 AboutSectionHeader(
                     title = "Maintainer",
-                    subtitle = "The person behind PixelPlayer.",
+                    subtitle = "The person behind VoidPlayer.",
                     modifier = Modifier.padding(top = 24.dp),
                 )
             }
@@ -543,7 +543,7 @@ private fun AboutHeroCard(
                         color = MaterialTheme.colorScheme.primaryContainer,
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.pixelplay_base_monochrome),
+                            painter = painterResource(R.drawable.voidplay_base_monochrome),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(10.dp).size(28.dp),
@@ -557,7 +557,7 @@ private fun AboutHeroCard(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         Text(
-                            text = "PixelPlayer",
+                            text = "VoidPlayer",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,

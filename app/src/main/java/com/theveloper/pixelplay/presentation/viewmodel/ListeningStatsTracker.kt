@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.os.SystemClock
 import androidx.media3.common.C
-import com.theveloper.pixelplay.data.DailyMixManager
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
+import com.theveloper.voidplay.data.DailyMixManager
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

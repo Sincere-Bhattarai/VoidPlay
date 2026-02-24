@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.data.media
+package com.theveloper.voidplay.data.media
 
 import android.content.Context
 import androidx.media3.common.MediaItem
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.utils.MediaItemBuilder
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.utils.MediaItemBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

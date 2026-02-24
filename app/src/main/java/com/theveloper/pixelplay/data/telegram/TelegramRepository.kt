@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.data.telegram
+package com.theveloper.voidplay.data.telegram
 
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
@@ -11,7 +11,7 @@ import coil.Coil
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.distinctUntilChanged
 

@@ -1,13 +1,13 @@
-package com.theveloper.pixelplay.data.paging
+package com.theveloper.voidplay.data.paging
 
 import android.content.ContentUris
 import android.content.Context
 import android.provider.MediaStore
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.utils.normalizeMetadataText
-import com.theveloper.pixelplay.utils.normalizeMetadataTextOrEmpty
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.utils.normalizeMetadataText
+import com.theveloper.voidplay.utils.normalizeMetadataTextOrEmpty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

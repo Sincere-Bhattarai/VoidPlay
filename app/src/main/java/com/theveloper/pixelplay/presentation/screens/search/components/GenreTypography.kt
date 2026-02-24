@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens.search.components
+package com.theveloper.voidplay.presentation.screens.search.components
 
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -7,7 +7,7 @@ import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontVariation

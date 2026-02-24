@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

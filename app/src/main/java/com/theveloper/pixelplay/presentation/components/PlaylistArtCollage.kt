@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.dp
 import coil.size.Size
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
 import kotlin.math.floor
 import kotlin.math.sqrt
 

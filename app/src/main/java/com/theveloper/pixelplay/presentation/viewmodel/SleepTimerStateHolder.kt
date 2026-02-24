@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -8,9 +8,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
-import com.theveloper.pixelplay.data.service.MusicNotificationProvider
-import com.theveloper.pixelplay.data.service.SleepTimerReceiver
-import com.theveloper.pixelplay.data.EotStateHolder
+import com.theveloper.voidplay.data.service.MusicNotificationProvider
+import com.theveloper.voidplay.data.service.SleepTimerReceiver
+import com.theveloper.voidplay.data.EotStateHolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

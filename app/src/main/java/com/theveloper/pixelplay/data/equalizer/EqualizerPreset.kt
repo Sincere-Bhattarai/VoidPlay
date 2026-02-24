@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.equalizer
+package com.theveloper.voidplay.data.equalizer
 
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable

@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.presentation.netease.dashboard
+package com.theveloper.voidplay.presentation.netease.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.database.NeteasePlaylistEntity
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.netease.NeteaseRepository
+import com.theveloper.voidplay.data.database.NeteasePlaylistEntity
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.netease.NeteaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

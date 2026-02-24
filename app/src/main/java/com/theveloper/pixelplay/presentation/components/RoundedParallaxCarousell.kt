@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.annotation.FloatRange
 import androidx.compose.animation.core.*
@@ -53,7 +53,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.invalidateMeasurement
-import com.theveloper.pixelplay.data.preferences.CarouselStyle
+import com.theveloper.voidplay.data.preferences.CarouselStyle
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /* ================================================================================================

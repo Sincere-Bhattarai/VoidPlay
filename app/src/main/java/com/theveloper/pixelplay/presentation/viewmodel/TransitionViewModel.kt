@@ -1,13 +1,13 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.model.Curve
-import com.theveloper.pixelplay.data.model.TransitionMode
-import com.theveloper.pixelplay.data.model.TransitionRule
-import com.theveloper.pixelplay.data.model.TransitionSettings
-import com.theveloper.pixelplay.data.repository.TransitionRepository
+import com.theveloper.voidplay.data.model.Curve
+import com.theveloper.voidplay.data.model.TransitionMode
+import com.theveloper.voidplay.data.model.TransitionRule
+import com.theveloper.voidplay.data.model.TransitionSettings
+import com.theveloper.voidplay.data.repository.TransitionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
@@ -36,7 +36,7 @@ import coil.request.ImageRequest
 import coil.size.Size // Import Coil's Size
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 @Composable
 fun SmartImage(

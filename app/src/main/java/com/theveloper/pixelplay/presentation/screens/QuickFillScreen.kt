@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
 
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.SongPickerList
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.utils.GenreIconProvider
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.SongPickerList
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.utils.GenreIconProvider
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @Composable

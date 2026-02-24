@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -29,8 +29,8 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.data.model.PlayerInfo
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.data.model.PlayerInfo
 import kotlin.text.ifEmpty
 
 class BarWidget4x1 : GlanceAppWidget() {
@@ -52,7 +52,7 @@ class BarWidget4x1 : GlanceAppWidget() {
         playerInfo: PlayerInfo,
         context: Context
     ) {
-        val title = playerInfo.songTitle.ifEmpty { "PixelPlayer" }
+        val title = playerInfo.songTitle.ifEmpty { "VoidPlayer" }
         val artist = playerInfo.artistName.ifEmpty { "Tap to open" }
         val isPlaying = playerInfo.isPlaying
         val albumArtBitmapData = playerInfo.albumArtBitmapData

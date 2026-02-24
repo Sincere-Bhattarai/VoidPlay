@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.presentation.telegram.dashboard
+package com.theveloper.voidplay.presentation.telegram.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.database.TelegramChannelEntity
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.telegram.TelegramRepository
+import com.theveloper.voidplay.data.database.TelegramChannelEntity
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.telegram.TelegramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
-import com.theveloper.pixelplay.presentation.viewmodel.ConnectivityStateHolder
+import com.theveloper.voidplay.presentation.viewmodel.ConnectivityStateHolder
 
 @HiltViewModel
 class TelegramDashboardViewModel @Inject constructor(

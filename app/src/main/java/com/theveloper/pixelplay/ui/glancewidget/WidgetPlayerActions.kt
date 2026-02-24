@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.app.PendingIntent
 import android.content.Context
@@ -6,12 +6,12 @@ import android.content.Intent
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSessionService
-import com.theveloper.pixelplay.data.service.MusicService
+import com.theveloper.voidplay.data.service.MusicService
 
 object WidgetPlayerActions {
-    const val PLAY_PAUSE = "com.theveloper.pixelplay.PLAY_PAUSE"
-    const val NEXT = "com.theveloper.pixelplay.NEXT"
-    const val PREVIOUS = "com.theveloper.pixelplay.PREVIOUS"
+    const val PLAY_PAUSE = "com.theveloper.voidplay.PLAY_PAUSE"
+    const val NEXT = "com.theveloper.voidplay.NEXT"
+    const val PREVIOUS = "com.theveloper.voidplay.PREVIOUS"
 
     @OptIn(UnstableApi::class)
     fun playPause(context: Context): PendingIntent {

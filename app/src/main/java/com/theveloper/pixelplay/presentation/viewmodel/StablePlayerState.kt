@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.compose.runtime.Immutable
 import androidx.media3.common.Player
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.Lyrics
 
 @Immutable
 data class StablePlayerState(

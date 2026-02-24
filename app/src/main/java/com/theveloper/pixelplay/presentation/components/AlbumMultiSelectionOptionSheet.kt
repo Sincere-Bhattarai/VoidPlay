@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.size.Size
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

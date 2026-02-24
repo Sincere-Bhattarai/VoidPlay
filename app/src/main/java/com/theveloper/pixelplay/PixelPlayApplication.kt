@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay
+package com.theveloper.voidplay
 
 import android.app.Application
 import android.app.NotificationChannel
@@ -8,14 +8,14 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import com.theveloper.pixelplay.utils.CrashHandler
+import com.theveloper.voidplay.utils.CrashHandler
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
-class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Provider {
+class VoidPlayApplication : Application(), ImageLoaderFactory, Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -24,20 +24,20 @@ class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Pr
     lateinit var imageLoader: dagger.Lazy<ImageLoader>
 
     @Inject
-    lateinit var telegramStreamProxy: com.theveloper.pixelplay.data.telegram.TelegramStreamProxy
+    lateinit var telegramStreamProxy: com.theveloper.voidplay.data.telegram.TelegramStreamProxy
 
     @Inject
-    lateinit var neteaseStreamProxy: com.theveloper.pixelplay.data.netease.NeteaseStreamProxy
+    lateinit var neteaseStreamProxy: com.theveloper.voidplay.data.netease.NeteaseStreamProxy
     
     @Inject
-    lateinit var telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager
+    lateinit var telegramCacheManager: com.theveloper.voidplay.data.telegram.TelegramCacheManager
     
     @Inject
-    lateinit var telegramCoilFetcherFactory: com.theveloper.pixelplay.data.image.TelegramCoilFetcher.Factory
+    lateinit var telegramCoilFetcherFactory: com.theveloper.voidplay.data.image.TelegramCoilFetcher.Factory
 
     // AÑADE EL COMPANION OBJECT
     companion object {
-        const val NOTIFICATION_CHANNEL_ID = "pixelplay_music_channel"
+        const val NOTIFICATION_CHANNEL_ID = "voidplay_music_channel"
     }
 
     override fun onCreate() {
@@ -59,7 +59,7 @@ class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Pr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "PixelPlayer Music Playback",
+                "VoidPlayer Music Playback",
                 NotificationManager.IMPORTANCE_LOW
             )
             val notificationManager = getSystemService(NotificationManager::class.java)

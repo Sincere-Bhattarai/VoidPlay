@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import kotlin.math.absoluteValue
 
 @Entity(tableName = "gdrive_songs")

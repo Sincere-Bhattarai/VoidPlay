@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.SaveQueueOverlayData
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.SaveQueueOverlayData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

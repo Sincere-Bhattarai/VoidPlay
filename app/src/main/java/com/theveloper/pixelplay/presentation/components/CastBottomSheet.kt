@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.Manifest
 import androidx.compose.animation.AnimatedVisibility
@@ -115,8 +115,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.mediarouter.media.MediaRouter
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import android.content.pm.PackageManager
 import androidx.compose.animation.animateColorAsState
@@ -131,7 +131,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Velocity
-import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
+import com.theveloper.voidplay.utils.shapes.RoundedStarShape
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -405,7 +405,7 @@ private fun CastPermissionStep(
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
         )
         Text(
-            text = "Allow PixelPlayer to see your nearby devices and current Wi‑Fi so we can keep your cast, Bluetooth audio, and speakers in sync.",
+            text = "Allow VoidPlayer to see your nearby devices and current Wi‑Fi so we can keep your cast, Bluetooth audio, and speakers in sync.",
             style = MaterialTheme.typography.bodyMedium,
             color = colors.onSurfaceVariant
         )

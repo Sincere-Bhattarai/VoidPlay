@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.github
+package com.theveloper.voidplay.data.github
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +26,7 @@ class GitHubContributorService @Inject constructor() {
      */
     suspend fun fetchContributors(
         owner: String = "theovilardo",
-        repo: String = "PixelPlay"
+        repo: String = "VoidPlay"
     ): Result<List<GitHubContributor>> {
         return withContext(Dispatchers.IO) {
             try {

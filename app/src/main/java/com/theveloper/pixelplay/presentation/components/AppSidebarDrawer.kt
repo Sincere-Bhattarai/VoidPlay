@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 sealed class DrawerDestination(val route: String, val title: String) {
     object Home : DrawerDestination("home", "Home")
@@ -80,7 +80,7 @@ private fun DrawerContent(
             modifier = Modifier.padding(vertical = 24.dp, horizontal = 8.dp)
         ) {
             Text(
-                text = "PixelPlay",
+                text = "VoidPlay",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

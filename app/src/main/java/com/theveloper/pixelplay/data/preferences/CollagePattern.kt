@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.preferences
+package com.theveloper.voidplay.data.preferences
 
 enum class CollagePattern(
     val storageKey: String,

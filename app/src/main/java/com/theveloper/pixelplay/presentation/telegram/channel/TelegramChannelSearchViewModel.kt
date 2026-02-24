@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.presentation.telegram.channel
+package com.theveloper.voidplay.presentation.telegram.channel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.telegram.TelegramRepository
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.telegram.TelegramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import org.drinkless.tdlib.TdApi
 import javax.inject.Inject
 
-import com.theveloper.pixelplay.presentation.viewmodel.ConnectivityStateHolder
+import com.theveloper.voidplay.presentation.viewmodel.ConnectivityStateHolder
 
 @HiltViewModel
 class TelegramChannelSearchViewModel @Inject constructor(
@@ -106,7 +106,7 @@ class TelegramChannelSearchViewModel @Inject constructor(
                         localPhotoPath = telegramRepository.downloadFileAwait(photoFileId)
                     }
 
-                    val entity = com.theveloper.pixelplay.data.database.TelegramChannelEntity(
+                    val entity = com.theveloper.voidplay.data.database.TelegramChannelEntity(
                         chatId = chat.id,
                         title = chat.title,
                         username = _resolvedUsername.value,

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import androidx.mediarouter.media.MediaControlIntent
@@ -9,8 +9,8 @@ import com.google.android.gms.cast.MediaStatus
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManager
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.service.player.CastPlayer
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.service.player.CastPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow

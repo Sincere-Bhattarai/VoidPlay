@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.util.LruCache
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.network.deezer.DeezerApiService
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.network.deezer.DeezerApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex

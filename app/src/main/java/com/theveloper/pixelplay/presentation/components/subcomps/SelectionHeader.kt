@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
@@ -48,9 +48,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.size.Size
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 
 /**
  * Header component displayed during multi-selection mode.

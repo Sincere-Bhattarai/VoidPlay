@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -40,18 +40,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.subcomps.SineWaveLine
-import com.theveloper.pixelplay.ui.theme.ExpTitleTypography
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.subcomps.SineWaveLine
+import com.theveloper.voidplay.ui.theme.ExpTitleTypography
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BetaInfoBottomSheet(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val issuesUrl = "https://github.com/theovilardo/PixelPlay/issues"
-    val reportUrl = "https://github.com/theovilardo/PixelPlay/issues/new/choose"
+    val issuesUrl = "https://github.com/theovilardo/VoidPlay/issues"
+    val reportUrl = "https://github.com/theovilardo/VoidPlay/issues/new/choose"
 
     val fabCornerRadius = 18.dp
 

@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.data.stats
+package com.theveloper.voidplay.data.stats
 
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.time.DayOfWeek

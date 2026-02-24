@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import androidx.datastore.core.CorruptionException
@@ -9,7 +9,7 @@ import androidx.datastore.preferences.protobuf.InvalidProtocolBufferException
 import androidx.glance.state.GlanceStateDefinition
 import java.io.InputStream
 import java.io.OutputStream
-import com.theveloper.pixelplay.data.model.PlayerInfo
+import com.theveloper.voidplay.data.model.PlayerInfo
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import okio.IOException

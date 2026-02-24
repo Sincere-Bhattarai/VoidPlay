@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerSheetState
 import kotlinx.coroutines.CoroutineScope
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 

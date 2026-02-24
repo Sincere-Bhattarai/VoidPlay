@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +16,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.theveloper.pixelplay.presentation.components.FileExplorerContent
-import com.theveloper.pixelplay.presentation.viewmodel.DirectoryEntry
+import com.theveloper.voidplay.presentation.components.FileExplorerContent
+import com.theveloper.voidplay.presentation.viewmodel.DirectoryEntry
 import java.io.File
 
 //@OptIn(ExperimentalMaterial3Api::class)

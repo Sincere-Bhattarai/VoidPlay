@@ -1,17 +1,17 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.theveloper.pixelplay.data.media.CoverArtUpdate
-import com.theveloper.pixelplay.data.media.ImageCacheManager
-import com.theveloper.pixelplay.data.media.MetadataEditError
-import com.theveloper.pixelplay.data.media.SongMetadataEditor
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.utils.FileDeletionUtils
-import com.theveloper.pixelplay.utils.LyricsUtils
+import com.theveloper.voidplay.data.media.CoverArtUpdate
+import com.theveloper.voidplay.data.media.ImageCacheManager
+import com.theveloper.voidplay.data.media.MetadataEditError
+import com.theveloper.voidplay.data.media.SongMetadataEditor
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.utils.FileDeletionUtils
+import com.theveloper.voidplay.utils.LyricsUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -70,7 +70,7 @@ class MetadataEditStateHolder @Inject constructor(
         // overwrites the file structure. Explicitly re-saving the existing artwork prevents this.
         val finalCoverArtUpdate = if (coverArtUpdate == null) {
             val existingMetadata = try {
-                 com.theveloper.pixelplay.data.media.AudioMetadataReader.read(java.io.File(song.path))
+                 com.theveloper.voidplay.data.media.AudioMetadataReader.read(java.io.File(song.path))
             } catch (e: Exception) {
                 null
             }

@@ -1,7 +1,7 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.utils.QueueUtils
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.utils.QueueUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

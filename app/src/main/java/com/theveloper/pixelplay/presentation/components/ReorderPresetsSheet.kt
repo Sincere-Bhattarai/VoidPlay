@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -69,9 +69,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.equalizer.EqualizerPreset
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.equalizer.EqualizerPreset
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import sh.calvin.reorderable.ReorderableItem

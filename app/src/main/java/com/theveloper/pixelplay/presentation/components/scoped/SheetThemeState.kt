@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -16,9 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.util.lerp
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.ThemePreference
-import com.theveloper.pixelplay.presentation.viewmodel.ColorSchemePair
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.ThemePreference
+import com.theveloper.voidplay.presentation.viewmodel.ColorSchemePair
 
 /**
  * Theme state for the player sheet.

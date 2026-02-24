@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.telegram.channel
+package com.theveloper.voidplay.presentation.telegram.channel
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,11 +42,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.size.Size
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.AutoScrollingText
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.AutoScrollingText
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

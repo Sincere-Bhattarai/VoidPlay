@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.util.Log
-import com.theveloper.pixelplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.MusicDao
 import java.io.File
 import java.util.Locale
 

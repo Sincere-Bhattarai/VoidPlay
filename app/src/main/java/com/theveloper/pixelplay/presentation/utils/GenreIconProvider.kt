@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.utils
+package com.theveloper.voidplay.presentation.utils
 
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 object GenreIconProvider {
     

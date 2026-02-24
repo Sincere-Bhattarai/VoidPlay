@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.Context
 import android.net.Uri
@@ -10,16 +10,16 @@ import android.util.LruCache
 import androidx.core.net.toUri
 import com.google.gson.Gson
 import com.kyant.taglib.TagLib
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.SyncedLine
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.network.lyrics.LrcLibApiService
-import com.theveloper.pixelplay.data.network.lyrics.LrcLibResponse
-import com.theveloper.pixelplay.utils.LogUtils
-import com.theveloper.pixelplay.utils.LyricsUtils
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.SyncedLine
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.network.lyrics.LrcLibApiService
+import com.theveloper.voidplay.data.network.lyrics.LrcLibResponse
+import com.theveloper.voidplay.utils.LogUtils
+import com.theveloper.voidplay.utils.LyricsUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,7 +78,7 @@ private data class RemoteSearchBatch(
 class LyricsRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val lrcLibApiService: LrcLibApiService,
-    private val lyricsDao: com.theveloper.pixelplay.data.database.LyricsDao,
+    private val lyricsDao: com.theveloper.voidplay.data.database.LyricsDao,
     private val okHttpClient: OkHttpClient
 ) : LyricsRepository {
 
@@ -480,7 +480,7 @@ class LyricsRepositoryImpl @Inject constructor(
                         // Save to database
                         try {
                             lyricsDao.insert(
-                                com.theveloper.pixelplay.data.database.LyricsEntity(
+                                com.theveloper.voidplay.data.database.LyricsEntity(
                                     songId = song.id.toLong(),
                                     content = rawLyrics,
                                     isSynced = !bestMatch.syncedLyrics.isNullOrBlank(),
@@ -872,7 +872,7 @@ class LyricsRepositoryImpl @Inject constructor(
 
                     try {
                         lyricsDao.insert(
-                             com.theveloper.pixelplay.data.database.LyricsEntity(
+                             com.theveloper.voidplay.data.database.LyricsEntity(
                                  songId = song.id.toLong(),
                                  content = rawLyricsToSave,
                                  isSynced = !best.lyrics.synced.isNullOrEmpty(),
@@ -914,7 +914,7 @@ class LyricsRepositoryImpl @Inject constructor(
 
                 try {
                     lyricsDao.insert(
-                         com.theveloper.pixelplay.data.database.LyricsEntity(
+                         com.theveloper.voidplay.data.database.LyricsEntity(
                              songId = song.id.toLong(),
                              content = rawLyricsToSave,
                              isSynced = !parsedLyrics.synced.isNullOrEmpty(),
@@ -1090,7 +1090,7 @@ class LyricsRepositoryImpl @Inject constructor(
         }
 
         lyricsDao.insert(
-             com.theveloper.pixelplay.data.database.LyricsEntity(
+             com.theveloper.voidplay.data.database.LyricsEntity(
                  songId = songId,
                  content = lyricsContent,
                  isSynced = parsedLyrics.synced?.isNotEmpty() == true,
@@ -1202,7 +1202,7 @@ class LyricsRepositoryImpl @Inject constructor(
                                     if (LyricsUtils.parseLyrics(content).isValid()) {
                                         try {
                                             lyricsDao.insert(
-                                                 com.theveloper.pixelplay.data.database.LyricsEntity(
+                                                 com.theveloper.voidplay.data.database.LyricsEntity(
                                                      songId = song.id.toLong(),
                                                      content = content,
                                                      isSynced = LyricsUtils.parseLyrics(content).synced?.isNotEmpty() == true,

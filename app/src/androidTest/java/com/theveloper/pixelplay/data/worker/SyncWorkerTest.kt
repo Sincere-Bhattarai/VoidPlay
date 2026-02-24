@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.worker
+package com.theveloper.voidplay.data.worker
 
 import android.content.Context
 import android.database.MatrixCursor
@@ -13,8 +13,8 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.Futures
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.PixelPlayDatabase
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.VoidPlayDatabase
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
@@ -29,7 +29,7 @@ import java.io.IOException
 class SyncWorkerTest {
 
     private lateinit var context: Context
-    private lateinit var database: PixelPlayDatabase
+    private lateinit var database: VoidPlayDatabase
     private lateinit var musicDao: MusicDao
     private lateinit var mockContentResolver: android.content.ContentResolver
 
@@ -60,7 +60,7 @@ class SyncWorkerTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        database = Room.inMemoryDatabaseBuilder(context, PixelPlayDatabase::class.java)
+        database = Room.inMemoryDatabaseBuilder(context, VoidPlayDatabase::class.java)
             .allowMainThreadQueries() // Para tests, está bien.
             .build()
         musicDao = database.musicDao()

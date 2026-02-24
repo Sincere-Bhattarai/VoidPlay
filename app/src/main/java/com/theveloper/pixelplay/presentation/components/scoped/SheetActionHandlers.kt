@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Composable
@@ -8,9 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

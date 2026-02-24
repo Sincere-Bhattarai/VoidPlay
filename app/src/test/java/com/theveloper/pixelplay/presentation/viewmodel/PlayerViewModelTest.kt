@@ -1,17 +1,17 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import app.cash.turbine.test
-import com.theveloper.pixelplay.data.database.AlbumArtThemeDao
+import com.theveloper.voidplay.data.database.AlbumArtThemeDao
 import com.google.common.util.concurrent.ListenableFuture
-import com.theveloper.pixelplay.data.model.SearchFilterType
-import com.theveloper.pixelplay.data.model.SearchHistoryItem
-import com.theveloper.pixelplay.data.model.SearchResultItem
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.model.StorageFilter
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.model.SearchFilterType
+import com.theveloper.voidplay.data.model.SearchHistoryItem
+import com.theveloper.voidplay.data.model.SearchResultItem
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.model.StorageFilter
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
 import io.mockk.*
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -39,12 +39,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import com.theveloper.pixelplay.MainCoroutineExtension
-import com.theveloper.pixelplay.data.service.player.DualPlayerEngine
-import com.theveloper.pixelplay.data.telegram.TelegramCacheManager
-import com.theveloper.pixelplay.data.worker.SyncManager
-import com.theveloper.pixelplay.utils.AppShortcutManager
-import com.theveloper.pixelplay.presentation.viewmodel.*
+import com.theveloper.voidplay.MainCoroutineExtension
+import com.theveloper.voidplay.data.service.player.DualPlayerEngine
+import com.theveloper.voidplay.data.telegram.TelegramCacheManager
+import com.theveloper.voidplay.data.worker.SyncManager
+import com.theveloper.voidplay.utils.AppShortcutManager
+import com.theveloper.voidplay.presentation.viewmodel.*
 import app.cash.turbine.Turbine
 
 import androidx.core.content.ContextCompat
@@ -64,7 +64,7 @@ class PlayerViewModelTest {
     private val mockDualPlayerEngine: DualPlayerEngine = mockk(relaxed = true)
     private val mockAppShortcutManager: AppShortcutManager = mockk(relaxed = true)
     private val mockTelegramCacheManager: TelegramCacheManager = mockk(relaxed = true)
-    private val mockTelegramRepository: com.theveloper.pixelplay.data.telegram.TelegramRepository = mockk(relaxed = true)
+    private val mockTelegramRepository: com.theveloper.voidplay.data.telegram.TelegramRepository = mockk(relaxed = true)
     private val mockListeningStatsTracker: ListeningStatsTracker = mockk(relaxed = true)
     private val mockDailyMixStateHolder: DailyMixStateHolder = mockk(relaxed = true)
     private val mockLyricsStateHolder: LyricsStateHolder = mockk(relaxed = true)
@@ -81,7 +81,7 @@ class PlayerViewModelTest {
     private val mockExternalMediaStateHolder: ExternalMediaStateHolder = mockk(relaxed = true)
     private val mockThemeStateHolder: ThemeStateHolder = mockk(relaxed = true)
     private val mockMultiSelectionStateHolder: MultiSelectionStateHolder = mockk(relaxed = true)
-    private lateinit var mockMediaControllerFactory: com.theveloper.pixelplay.data.media.MediaControllerFactory
+    private lateinit var mockMediaControllerFactory: com.theveloper.voidplay.data.media.MediaControllerFactory
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -115,7 +115,7 @@ class PlayerViewModelTest {
         coEvery { mockUserPreferencesRepository.libraryNavigationModeFlow } returns flowOf("TabRow")
         coEvery { mockUserPreferencesRepository.carouselStyleFlow } returns flowOf("NoPeek")
         coEvery { mockUserPreferencesRepository.geminiApiKey } returns flowOf("")
-        coEvery { mockUserPreferencesRepository.fullPlayerLoadingTweaksFlow } returns flowOf(com.theveloper.pixelplay.data.preferences.FullPlayerLoadingTweaks())
+        coEvery { mockUserPreferencesRepository.fullPlayerLoadingTweaksFlow } returns flowOf(com.theveloper.voidplay.data.preferences.FullPlayerLoadingTweaks())
         coEvery { mockUserPreferencesRepository.tapBackgroundClosesPlayerFlow } returns flowOf(true)
         coEvery { mockUserPreferencesRepository.hapticsEnabledFlow } returns flowOf(true)
         coEvery { mockUserPreferencesRepository.foldersSortOptionFlow } returns flowOf("FolderNameAZ") // Added missing mock

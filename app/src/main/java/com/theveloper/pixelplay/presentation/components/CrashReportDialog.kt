@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.theveloper.pixelplay.utils.CrashLogData
+import com.theveloper.voidplay.utils.CrashLogData
 
 /**
  * Material3 Expressive styled dialog that displays crash information
@@ -166,7 +166,7 @@ fun CrashReportDialog(
                         onClick = {
                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
-                                putExtra(Intent.EXTRA_SUBJECT, "PixelPlayer Crash Report")
+                                putExtra(Intent.EXTRA_SUBJECT, "VoidPlayer Crash Report")
                                 putExtra(Intent.EXTRA_TEXT, crashLog.getFullLog())
                             }
                             context.startActivity(Intent.createChooser(shareIntent, "Share crash report"))

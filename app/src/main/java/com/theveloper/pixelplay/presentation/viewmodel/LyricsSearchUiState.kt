@@ -1,7 +1,7 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.repository.LyricsSearchResult
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.repository.LyricsSearchResult
 
 sealed interface LyricsSearchUiState {
     object Idle : LyricsSearchUiState

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import android.graphics.Bitmap
 import android.graphics.Paint

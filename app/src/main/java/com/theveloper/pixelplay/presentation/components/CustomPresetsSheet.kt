@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,8 +35,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.data.equalizer.EqualizerPreset
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.equalizer.EqualizerPreset
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

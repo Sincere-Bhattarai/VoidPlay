@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 import androidx.compose.animation.*
@@ -49,23 +49,23 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.components.ExpressiveScrollBar
-import com.theveloper.pixelplay.presentation.components.GenreSortBottomSheet
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.SongInfoBottomSheet
-import com.theveloper.pixelplay.presentation.components.subcomps.EnhancedSongListItem
-import com.theveloper.pixelplay.presentation.screens.QuickFillDialog
-import com.theveloper.pixelplay.presentation.viewmodel.GenreDetailViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.GroupedSongListItem
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
-import com.theveloper.pixelplay.ui.theme.LocalPixelPlayDarkTheme
-import com.theveloper.pixelplay.utils.formatDuration
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.components.ExpressiveScrollBar
+import com.theveloper.voidplay.presentation.components.GenreSortBottomSheet
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.SongInfoBottomSheet
+import com.theveloper.voidplay.presentation.components.subcomps.EnhancedSongListItem
+import com.theveloper.voidplay.presentation.screens.QuickFillDialog
+import com.theveloper.voidplay.presentation.viewmodel.GenreDetailViewModel
+import com.theveloper.voidplay.presentation.viewmodel.GroupedSongListItem
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.ui.theme.LocalVoidPlayDarkTheme
+import com.theveloper.voidplay.utils.formatDuration
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -112,7 +112,7 @@ fun GenreDetailScreen(
     decodedGenreId: String = java.net.URLDecoder.decode(genreId, "UTF-8"),
     playerViewModel: PlayerViewModel,
     viewModel: GenreDetailViewModel = hiltViewModel(),
-    playlistViewModel: com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel = hiltViewModel()
+    playlistViewModel: com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val stablePlayerState by playerViewModel.stablePlayerState.collectAsStateWithLifecycle()
@@ -123,7 +123,7 @@ fun GenreDetailScreen(
     // Get artists to resolve images
     val artists by playerViewModel.artistsFlow.collectAsStateWithLifecycle(initialValue = persistentListOf())
 
-    val darkMode = LocalPixelPlayDarkTheme.current
+    val darkMode = LocalVoidPlayDarkTheme.current
 
     // Scroll & Collapsing Top Bar State
     val density = LocalDensity.current
@@ -200,13 +200,13 @@ fun GenreDetailScreen(
     }
     val themeColor = remember(themeGenre, decodedGenreId, darkMode, defaultContainer, defaultOnContainer) {
         if (themeGenre != null) {
-            com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreThemeColor(
+            com.theveloper.voidplay.ui.theme.GenreThemeUtils.getGenreThemeColor(
                 genre = themeGenre,
                 isDark = darkMode,
                 fallbackGenreId = decodedGenreId
             )
         } else {
-            com.theveloper.pixelplay.ui.theme.GenreThemeColor(
+            com.theveloper.voidplay.ui.theme.GenreThemeColor(
                 defaultContainer,
                 defaultOnContainer
             )
@@ -257,7 +257,7 @@ fun GenreDetailScreen(
 
     // Dynamic Theme
     val genreColorScheme = remember(themeGenre, decodedGenreId, darkMode) {
-        com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreColorScheme(
+        com.theveloper.voidplay.ui.theme.GenreThemeUtils.getGenreColorScheme(
             genre = themeGenre,
             genreIdFallback = decodedGenreId,
             isDark = darkMode
@@ -481,13 +481,13 @@ fun GenreDetailScreen(
                         },
                         onDeleteFromDevice = playerViewModel::deleteFromDevice,
                         onNavigateToAlbum = {
-                            com.theveloper.pixelplay.presentation.navigation.Screen.AlbumDetail.createRoute(song.albumId).let { route ->
+                            com.theveloper.voidplay.presentation.navigation.Screen.AlbumDetail.createRoute(song.albumId).let { route ->
                                 navController.navigateSafely(route)
                             }
                             showSongOptionsSheet = null
                         },
                         onNavigateToArtist = {
-                            com.theveloper.pixelplay.presentation.navigation.Screen.ArtistDetail.createRoute(song.artistId).let { route ->
+                            com.theveloper.voidplay.presentation.navigation.Screen.ArtistDetail.createRoute(song.artistId).let { route ->
                                 navController.navigateSafely(route)
                             }
                             showSongOptionsSheet = null
@@ -503,7 +503,7 @@ fun GenreDetailScreen(
                 }
 
                 if (showPlaylistBottomSheet) {
-                    com.theveloper.pixelplay.presentation.components.PlaylistBottomSheet(
+                    com.theveloper.voidplay.presentation.components.PlaylistBottomSheet(
                         playlistUiState = playlistUiState,
                         songs = listOf(song),
                         onDismiss = { showPlaylistBottomSheet = false },

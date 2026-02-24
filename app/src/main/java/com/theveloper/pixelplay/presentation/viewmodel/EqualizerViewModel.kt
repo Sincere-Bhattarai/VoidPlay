@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.equalizer.EqualizerManager
-import com.theveloper.pixelplay.data.equalizer.EqualizerPreset
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.service.player.DualPlayerEngine
+import com.theveloper.voidplay.data.equalizer.EqualizerManager
+import com.theveloper.voidplay.data.equalizer.EqualizerPreset
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.service.player.DualPlayerEngine
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

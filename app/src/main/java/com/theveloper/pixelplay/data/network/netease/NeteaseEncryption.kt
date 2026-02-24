@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.network.netease
+package com.theveloper.voidplay.data.network.netease
 
 import android.util.Base64
 import java.math.BigInteger

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.network.lyrics
+package com.theveloper.voidplay.data.network.lyrics
 
 import retrofit2.http.GET
 import retrofit2.http.Query

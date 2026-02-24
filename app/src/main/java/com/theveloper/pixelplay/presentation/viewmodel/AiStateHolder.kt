@@ -1,13 +1,13 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.DailyMixManager
-import com.theveloper.pixelplay.data.ai.AiMetadataGenerator
-import com.theveloper.pixelplay.data.ai.AiPlaylistGenerator
-import com.theveloper.pixelplay.data.ai.SongMetadata
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.DailyMixManager
+import com.theveloper.voidplay.data.ai.AiMetadataGenerator
+import com.theveloper.voidplay.data.ai.AiPlaylistGenerator
+import com.theveloper.voidplay.data.ai.SongMetadata
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.model.Song
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

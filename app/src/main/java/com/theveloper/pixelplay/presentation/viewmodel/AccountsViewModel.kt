@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.gdrive.GDriveRepository
-import com.theveloper.pixelplay.data.netease.NeteaseRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.telegram.TelegramRepository
+import com.theveloper.voidplay.data.gdrive.GDriveRepository
+import com.theveloper.voidplay.data.netease.NeteaseRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.telegram.TelegramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

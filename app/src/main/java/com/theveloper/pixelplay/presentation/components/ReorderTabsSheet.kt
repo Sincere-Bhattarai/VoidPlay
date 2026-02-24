@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,11 +52,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import android.view.HapticFeedbackConstants
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.library.LibraryTabId
-import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.performAppCompatHapticFeedback
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.library.LibraryTabId
+import com.theveloper.voidplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.performAppCompatHapticFeedback
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape

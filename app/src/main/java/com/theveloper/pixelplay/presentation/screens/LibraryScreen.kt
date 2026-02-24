@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import android.os.Trace
 import androidx.activity.compose.BackHandler
@@ -58,7 +58,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material.icons.rounded.ViewModule
-import com.theveloper.pixelplay.presentation.components.ToggleSegmentButton
+import com.theveloper.voidplay.presentation.components.ToggleSegmentButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -101,7 +101,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.ui.theme.LocalPixelPlayDarkTheme
+import com.theveloper.voidplay.ui.theme.LocalVoidPlayDarkTheme
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
@@ -112,47 +112,47 @@ import coil.compose.AsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.size.Size
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.ShimmerBox
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.MusicFolder
-import com.theveloper.pixelplay.data.model.FolderSource
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.model.StorageFilter
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.NavBarContentHeight
-import com.theveloper.pixelplay.presentation.components.SmartImage
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.ShimmerBox
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.MusicFolder
+import com.theveloper.voidplay.data.model.FolderSource
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.model.StorageFilter
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.NavBarContentHeight
+import com.theveloper.voidplay.presentation.components.SmartImage
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.ui.res.stringResource
-import com.theveloper.pixelplay.presentation.components.PlaylistArtCollage
-import com.theveloper.pixelplay.presentation.components.ReorderTabsSheet
-import com.theveloper.pixelplay.presentation.components.SongInfoBottomSheet
-import com.theveloper.pixelplay.presentation.components.subcomps.LibraryActionRow
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.components.MultiSelectionBottomSheet
-import com.theveloper.pixelplay.presentation.components.AlbumMultiSelectionOptionSheet
-import com.theveloper.pixelplay.presentation.components.PlaylistMultiSelectionBottomSheet
-import com.theveloper.pixelplay.presentation.components.PlaylistCreationTypeDialog
-import com.theveloper.pixelplay.presentation.components.CreateAiPlaylistDialog
-import com.theveloper.pixelplay.presentation.components.subcomps.SelectionActionRow
-import com.theveloper.pixelplay.presentation.components.subcomps.SelectionCountPill
-import com.theveloper.pixelplay.presentation.viewmodel.ColorSchemePair
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerUiState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistUiState
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
-import com.theveloper.pixelplay.data.model.LibraryTabId
-import com.theveloper.pixelplay.data.model.toLibraryTabIdOrNull
-import com.theveloper.pixelplay.data.preferences.LibraryNavigationMode
-import com.theveloper.pixelplay.data.worker.SyncProgress
-import com.theveloper.pixelplay.presentation.screens.search.components.GenreTypography
-import com.theveloper.pixelplay.presentation.components.SyncProgressBar
-import com.theveloper.pixelplay.presentation.viewmodel.LibraryViewModel
+import com.theveloper.voidplay.presentation.components.PlaylistArtCollage
+import com.theveloper.voidplay.presentation.components.ReorderTabsSheet
+import com.theveloper.voidplay.presentation.components.SongInfoBottomSheet
+import com.theveloper.voidplay.presentation.components.subcomps.LibraryActionRow
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.components.MultiSelectionBottomSheet
+import com.theveloper.voidplay.presentation.components.AlbumMultiSelectionOptionSheet
+import com.theveloper.voidplay.presentation.components.PlaylistMultiSelectionBottomSheet
+import com.theveloper.voidplay.presentation.components.PlaylistCreationTypeDialog
+import com.theveloper.voidplay.presentation.components.CreateAiPlaylistDialog
+import com.theveloper.voidplay.presentation.components.subcomps.SelectionActionRow
+import com.theveloper.voidplay.presentation.components.subcomps.SelectionCountPill
+import com.theveloper.voidplay.presentation.viewmodel.ColorSchemePair
+import com.theveloper.voidplay.presentation.viewmodel.PlayerUiState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistUiState
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.data.model.LibraryTabId
+import com.theveloper.voidplay.data.model.toLibraryTabIdOrNull
+import com.theveloper.voidplay.data.preferences.LibraryNavigationMode
+import com.theveloper.voidplay.data.worker.SyncProgress
+import com.theveloper.voidplay.presentation.screens.search.components.GenreTypography
+import com.theveloper.voidplay.presentation.components.SyncProgressBar
+import com.theveloper.voidplay.presentation.viewmodel.LibraryViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import android.content.Intent
 import android.net.Uri
@@ -201,23 +201,23 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.pointer.pointerInput
-import com.theveloper.pixelplay.presentation.components.AutoScrollingTextOnDemand
-import com.theveloper.pixelplay.presentation.screens.CreatePlaylistDialog
-import com.theveloper.pixelplay.presentation.components.PlaylistBottomSheet
-import com.theveloper.pixelplay.presentation.components.PlaylistContainer
-import com.theveloper.pixelplay.presentation.components.subcomps.PlayingEqIcon
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.presentation.components.AutoScrollingTextOnDemand
+import com.theveloper.voidplay.presentation.screens.CreatePlaylistDialog
+import com.theveloper.voidplay.presentation.components.PlaylistBottomSheet
+import com.theveloper.voidplay.presentation.components.PlaylistContainer
+import com.theveloper.voidplay.presentation.components.subcomps.PlayingEqIcon
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import java.util.Locale
 import androidx.compose.ui.platform.LocalContext
 import android.widget.Toast
-import com.theveloper.pixelplay.data.model.PlaylistShapeType
+import com.theveloper.voidplay.data.model.PlaylistShapeType
 import kotlinx.coroutines.flow.first
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.LoadState
-import com.theveloper.pixelplay.presentation.components.ExpressiveScrollBar
-import com.theveloper.pixelplay.presentation.components.LibrarySortBottomSheet
-import com.theveloper.pixelplay.presentation.components.subcomps.EnhancedSongListItem
+import com.theveloper.voidplay.presentation.components.ExpressiveScrollBar
+import com.theveloper.voidplay.presentation.components.LibrarySortBottomSheet
+import com.theveloper.voidplay.presentation.components.subcomps.EnhancedSongListItem
 import kotlin.math.abs
 
 val ListExtraBottomGap = 30.dp
@@ -400,7 +400,7 @@ fun LibraryScreen(
     var showMergePlaylistDialog by remember { mutableStateOf(false) }
     var pendingMergePlaylistIds by remember { mutableStateOf(emptyList<String>()) }
 
-    val onPlaylistLongPress: (com.theveloper.pixelplay.data.model.Playlist) -> Unit = remember(playlistMultiSelectionState) {
+    val onPlaylistLongPress: (com.theveloper.voidplay.data.model.Playlist) -> Unit = remember(playlistMultiSelectionState) {
         { playlist ->
             // Only toggle selection, don't show sheet immediately (similar to songs multi-selection)
             playlistMultiSelectionState.toggleSelection(playlist)
@@ -408,7 +408,7 @@ fun LibraryScreen(
         }
     }
 
-    val onPlaylistSelectionToggle: (com.theveloper.pixelplay.data.model.Playlist) -> Unit = remember(playlistMultiSelectionState) {
+    val onPlaylistSelectionToggle: (com.theveloper.voidplay.data.model.Playlist) -> Unit = remember(playlistMultiSelectionState) {
         { playlist -> playlistMultiSelectionState.toggleSelection(playlist) }
     }
 
@@ -524,7 +524,7 @@ fun LibraryScreen(
     val systemNavBarInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val bottomBarHeightDp = NavBarContentHeight + systemNavBarInset
 
-    val dm = LocalPixelPlayDarkTheme.current
+    val dm = LocalVoidPlayDarkTheme.current
 
     val iconRotation by transition.animateFloat(
         label = "Action Button Icon Rotation",
@@ -3088,7 +3088,7 @@ fun AlbumGridItemRedesigned(
     onSelectionToggle: () -> Unit = {}
 ) {
     val albumColorSchemePair by albumColorSchemePairFlow.collectAsStateWithLifecycle()
-    val systemIsDark = LocalPixelPlayDarkTheme.current
+    val systemIsDark = LocalVoidPlayDarkTheme.current
 
     // 1. Obtén el colorScheme del tema actual aquí, en el scope Composable.
     val currentMaterialColorScheme = MaterialTheme.colorScheme
@@ -3496,8 +3496,8 @@ fun LibraryPlaylistsTab(
     // Playlist multi-selection parameters
     isSelectionMode: Boolean = false,
     selectedPlaylistIds: Set<String> = emptySet(),
-    onPlaylistLongPress: (com.theveloper.pixelplay.data.model.Playlist) -> Unit = {},
-    onPlaylistSelectionToggle: (com.theveloper.pixelplay.data.model.Playlist) -> Unit = {},
+    onPlaylistLongPress: (com.theveloper.voidplay.data.model.Playlist) -> Unit = {},
+    onPlaylistSelectionToggle: (com.theveloper.voidplay.data.model.Playlist) -> Unit = {},
     onPlaylistOptionsClick: () -> Unit = {}
 ) {
     PlaylistContainer(
@@ -3528,7 +3528,7 @@ fun AlbumListItem(
     onSelectionToggle: () -> Unit = {}
 ) {
     val albumColorSchemePair by albumColorSchemePairFlow.collectAsStateWithLifecycle()
-    val systemIsDark = LocalPixelPlayDarkTheme.current
+    val systemIsDark = LocalVoidPlayDarkTheme.current
     val currentMaterialColorScheme = MaterialTheme.colorScheme
 
     val itemDesignColorScheme = remember(albumColorSchemePair, systemIsDark, currentMaterialColorScheme) {

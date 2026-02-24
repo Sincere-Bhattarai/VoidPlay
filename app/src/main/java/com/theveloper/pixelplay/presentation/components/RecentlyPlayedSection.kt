@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -42,8 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.model.RecentlyPlayedSongUiModel
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.model.RecentlyPlayedSongUiModel
 
 private val HomeRecentlyPlayedPillHeight = 58.dp
 private val HomeRecentlyPlayedPillSpacing = 8.dp

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.github
+package com.theveloper.voidplay.data.github
 
 import java.io.StringReader
 import java.net.HttpURLConnection
@@ -37,7 +37,7 @@ class GitHubAnnouncementPropertiesService @Inject constructor() {
      */
     suspend fun fetchPlayStoreAnnouncement(
         owner: String = "theovilardo",
-        repo: String = "PixelPlay",
+        repo: String = "VoidPlay",
         branch: String = "master",
         configPath: String = "remote-config/app-announcements.properties",
     ): Result<PlayStoreAnnouncementRemoteConfig> {

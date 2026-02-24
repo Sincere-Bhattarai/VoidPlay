@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable

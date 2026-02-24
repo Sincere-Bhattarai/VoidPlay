@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.cast
+package com.theveloper.voidplay.data.service.cast
 
 import android.content.Context
 import com.google.android.gms.cast.CastMediaControlIntent

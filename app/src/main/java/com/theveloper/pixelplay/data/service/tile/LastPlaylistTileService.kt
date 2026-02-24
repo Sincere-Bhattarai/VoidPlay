@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.tile
+package com.theveloper.voidplay.data.service.tile
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -6,8 +6,8 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors

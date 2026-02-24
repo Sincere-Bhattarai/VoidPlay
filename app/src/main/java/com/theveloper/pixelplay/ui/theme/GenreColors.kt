@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.ui.theme
+package com.theveloper.voidplay.ui.theme
 
 import android.util.LruCache
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.theveloper.pixelplay.data.model.Genre
-import com.theveloper.pixelplay.data.preferences.AlbumArtPaletteStyle
+import com.theveloper.voidplay.data.model.Genre
+import com.theveloper.voidplay.data.preferences.AlbumArtPaletteStyle
 import kotlin.math.abs
 
 data class GenreThemeColor(

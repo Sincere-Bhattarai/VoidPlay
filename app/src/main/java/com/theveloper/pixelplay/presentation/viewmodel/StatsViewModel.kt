@@ -1,12 +1,12 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository.PlaybackStatsSummary
-import com.theveloper.pixelplay.data.stats.StatsTimeRange
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository.PlaybackStatsSummary
+import com.theveloper.voidplay.data.stats.StatsTimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers

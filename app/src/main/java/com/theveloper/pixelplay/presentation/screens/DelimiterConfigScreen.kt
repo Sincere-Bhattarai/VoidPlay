@@ -72,11 +72,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.viewmodel.ArtistSettingsViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.viewmodel.ArtistSettingsViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 

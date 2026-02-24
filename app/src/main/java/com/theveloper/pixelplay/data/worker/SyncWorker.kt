@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.worker
+package com.theveloper.voidplay.data.worker
 
 import android.content.ContentResolver
 import android.content.ContentUris
@@ -14,23 +14,23 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.theveloper.pixelplay.data.database.AlbumEntity
-import com.theveloper.pixelplay.data.database.ArtistEntity
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.NeteaseDao
-import com.theveloper.pixelplay.data.database.SongArtistCrossRef
-import com.theveloper.pixelplay.data.database.SongEntity
-import com.theveloper.pixelplay.data.database.TelegramDao // Added
-import com.theveloper.pixelplay.data.media.AudioMetadataReader
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.LyricsRepository
-import com.theveloper.pixelplay.utils.AlbumArtCacheManager
-import com.theveloper.pixelplay.utils.AlbumArtUtils
-import com.theveloper.pixelplay.utils.AudioMetaUtils.getAudioMetadata
-import com.theveloper.pixelplay.utils.DirectoryRuleResolver
-import com.theveloper.pixelplay.utils.normalizeMetadataTextOrEmpty
-import com.theveloper.pixelplay.utils.splitArtistsByDelimiters
+import com.theveloper.voidplay.data.database.AlbumEntity
+import com.theveloper.voidplay.data.database.ArtistEntity
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.NeteaseDao
+import com.theveloper.voidplay.data.database.SongArtistCrossRef
+import com.theveloper.voidplay.data.database.SongEntity
+import com.theveloper.voidplay.data.database.TelegramDao // Added
+import com.theveloper.voidplay.data.media.AudioMetadataReader
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.LyricsRepository
+import com.theveloper.voidplay.utils.AlbumArtCacheManager
+import com.theveloper.voidplay.utils.AlbumArtUtils
+import com.theveloper.voidplay.utils.AudioMetaUtils.getAudioMetadata
+import com.theveloper.voidplay.utils.DirectoryRuleResolver
+import com.theveloper.voidplay.utils.normalizeMetadataTextOrEmpty
+import com.theveloper.voidplay.utils.splitArtistsByDelimiters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
@@ -1307,7 +1307,7 @@ constructor(
     }
 
     companion object {
-        const val WORK_NAME = "com.theveloper.pixelplay.data.worker.SyncWorker"
+        const val WORK_NAME = "com.theveloper.voidplay.data.worker.SyncWorker"
         private const val TAG = "SyncWorker"
         const val INPUT_FORCE_METADATA = "input_force_metadata"
         const val INPUT_SYNC_MODE = "input_sync_mode"

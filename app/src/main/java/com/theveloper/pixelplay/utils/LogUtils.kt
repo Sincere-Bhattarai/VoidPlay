@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import timber.log.Timber
 

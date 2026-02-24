@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.network.lyrics
+package com.theveloper.voidplay.data.network.lyrics
 
 import com.google.gson.annotations.SerializedName
 

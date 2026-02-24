@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,9 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.utils.formatDuration
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.utils.formatDuration
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @Composable

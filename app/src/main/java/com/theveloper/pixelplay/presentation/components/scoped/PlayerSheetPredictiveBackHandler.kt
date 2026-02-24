@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.annotation.OptIn
@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.util.lerp
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlayerSheetState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException

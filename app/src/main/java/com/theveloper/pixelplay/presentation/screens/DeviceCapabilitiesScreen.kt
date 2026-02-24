@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
@@ -64,11 +64,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.viewmodel.CodecInfo
-import com.theveloper.pixelplay.presentation.viewmodel.DeviceCapabilitiesViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.viewmodel.CodecInfo
+import com.theveloper.voidplay.presentation.viewmodel.DeviceCapabilitiesViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import kotlin.math.roundToInt

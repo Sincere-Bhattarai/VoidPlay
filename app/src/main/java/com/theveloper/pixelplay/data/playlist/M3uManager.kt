@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.data.playlist
+package com.theveloper.voidplay.data.playlist
 
 import android.content.Context
 import android.net.Uri
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.MusicRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import java.io.BufferedReader

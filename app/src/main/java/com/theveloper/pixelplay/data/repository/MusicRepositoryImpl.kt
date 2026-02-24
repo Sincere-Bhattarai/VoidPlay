@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 // import kotlinx.coroutines.withContext // May not be needed for Flow transformations
 
@@ -10,8 +10,8 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.ArtistImageRepository
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.ArtistImageRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -20,35 +20,35 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.data.database.FavoritesDao
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.SearchHistoryDao
-import com.theveloper.pixelplay.data.database.SearchHistoryEntity
-import com.theveloper.pixelplay.data.database.TelegramChannelEntity
-import com.theveloper.pixelplay.data.database.TelegramDao
-import com.theveloper.pixelplay.data.database.toAlbum
-import com.theveloper.pixelplay.data.database.toArtist
-import com.theveloper.pixelplay.data.database.toSearchHistoryItem
-import com.theveloper.pixelplay.data.database.toSong
-import com.theveloper.pixelplay.data.database.toTelegramEntity
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Genre
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.model.MusicFolder
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.SearchFilterType
-import com.theveloper.pixelplay.data.model.SearchHistoryItem
-import com.theveloper.pixelplay.data.model.SearchResultItem
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.model.FolderSource
-import com.theveloper.pixelplay.data.model.StorageFilter
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.utils.DirectoryRuleResolver
-import com.theveloper.pixelplay.utils.LogUtils
-import com.theveloper.pixelplay.utils.StorageType
-import com.theveloper.pixelplay.utils.StorageUtils
+import com.theveloper.voidplay.data.database.FavoritesDao
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.SearchHistoryDao
+import com.theveloper.voidplay.data.database.SearchHistoryEntity
+import com.theveloper.voidplay.data.database.TelegramChannelEntity
+import com.theveloper.voidplay.data.database.TelegramDao
+import com.theveloper.voidplay.data.database.toAlbum
+import com.theveloper.voidplay.data.database.toArtist
+import com.theveloper.voidplay.data.database.toSearchHistoryItem
+import com.theveloper.voidplay.data.database.toSong
+import com.theveloper.voidplay.data.database.toTelegramEntity
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Genre
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.data.model.MusicFolder
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.SearchFilterType
+import com.theveloper.voidplay.data.model.SearchHistoryItem
+import com.theveloper.voidplay.data.model.SearchResultItem
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.model.FolderSource
+import com.theveloper.voidplay.data.model.StorageFilter
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.utils.DirectoryRuleResolver
+import com.theveloper.voidplay.utils.LogUtils
+import com.theveloper.voidplay.utils.StorageType
+import com.theveloper.voidplay.utils.StorageUtils
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -79,8 +79,8 @@ class MusicRepositoryImpl @Inject constructor(
     private val musicDao: MusicDao,
     private val lyricsRepository: LyricsRepository,
     private val telegramDao: TelegramDao,
-    private val telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager,
-    override val telegramRepository: com.theveloper.pixelplay.data.telegram.TelegramRepository,
+    private val telegramCacheManager: com.theveloper.voidplay.data.telegram.TelegramCacheManager,
+    override val telegramRepository: com.theveloper.voidplay.data.telegram.TelegramRepository,
     private val songRepository: SongRepository,
     private val favoritesDao: FavoritesDao,
     private val artistImageRepository: ArtistImageRepository,
@@ -123,7 +123,7 @@ class MusicRepositoryImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getPaginatedSongs(sortOption: SortOption, storageFilter: com.theveloper.pixelplay.data.model.StorageFilter): Flow<PagingData<Song>> {
+    override fun getPaginatedSongs(sortOption: SortOption, storageFilter: com.theveloper.voidplay.data.model.StorageFilter): Flow<PagingData<Song>> {
         return songRepository.getPaginatedSongs(sortOption, storageFilter)
     }
 
@@ -159,7 +159,7 @@ class MusicRepositoryImpl @Inject constructor(
              telegramDao.insertSongs(entities)
              // Trigger sync to update main DB
              androidx.work.WorkManager.getInstance(context).enqueue(
-                 com.theveloper.pixelplay.data.worker.SyncWorker.incrementalSyncWork()
+                 com.theveloper.voidplay.data.worker.SyncWorker.incrementalSyncWork()
              )
          }
     }
@@ -444,7 +444,7 @@ class MusicRepositoryImpl @Inject constructor(
         val id = songId.toLongOrNull() ?: return@withContext
         if (isFavorite) {
             favoritesDao.setFavorite(
-                com.theveloper.pixelplay.data.database.FavoritesEntity(
+                com.theveloper.voidplay.data.database.FavoritesEntity(
                     songId = id,
                     isFavorite = true
                 )
@@ -662,7 +662,7 @@ class MusicRepositoryImpl @Inject constructor(
 
     override suspend fun getSongIdsSorted(
         sortOption: SortOption,
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter
     ): List<Long> = withContext(Dispatchers.IO) {
         val allowedDirsFlow = userPreferencesRepository.allowedDirectoriesFlow.first()
         val blockedDirsFlow = userPreferencesRepository.blockedDirectoriesFlow.first()

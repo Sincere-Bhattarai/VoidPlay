@@ -1,14 +1,14 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 
 object MediaItemBuilder {
     private const val EXTERNAL_MEDIA_ID_PREFIX = "external:"
-    private const val EXTERNAL_EXTRA_PREFIX = "com.theveloper.pixelplay.external."
+    private const val EXTERNAL_EXTRA_PREFIX = "com.theveloper.voidplay.external."
     const val EXTERNAL_EXTRA_FLAG = EXTERNAL_EXTRA_PREFIX + "FLAG"
     const val EXTERNAL_EXTRA_ALBUM = EXTERNAL_EXTRA_PREFIX + "ALBUM"
     const val EXTERNAL_EXTRA_DURATION = EXTERNAL_EXTRA_PREFIX + "DURATION"

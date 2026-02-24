@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -71,20 +71,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.model.SettingsCategory
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.model.SettingsCategory
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.data.preferences.LaunchTab
+import com.theveloper.voidplay.data.preferences.LaunchTab
 
 // SettingsTopBar removed, replaced by CollapsibleCommonTopBar
 
@@ -296,7 +296,7 @@ fun SettingsScreen(
         // Block interaction during transition
         var isTransitioning by remember { mutableStateOf(true) }
         LaunchedEffect(Unit) {
-            kotlinx.coroutines.delay(com.theveloper.pixelplay.presentation.navigation.TRANSITION_DURATION.toLong())
+            kotlinx.coroutines.delay(com.theveloper.voidplay.presentation.navigation.TRANSITION_DURATION.toLong())
             isTransitioning = false
         }
 

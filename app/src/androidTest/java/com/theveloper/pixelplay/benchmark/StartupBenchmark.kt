@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.benchmark
+package com.theveloper.voidplay.benchmark
 
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-private const val PACKAGE_NAME = "com.theveloper.pixelplay"
+private const val PACKAGE_NAME = "com.theveloper.voidplay"
 private const val ITERATIONS = 5
 private const val STARTUP_TIMEOUT_MS = 15_000L
 

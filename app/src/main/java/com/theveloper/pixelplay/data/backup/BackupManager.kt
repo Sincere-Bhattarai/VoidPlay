@@ -1,24 +1,24 @@
-package com.theveloper.pixelplay.data.backup
+package com.theveloper.voidplay.data.backup
 
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import com.theveloper.pixelplay.data.backup.format.BackupReader
-import com.theveloper.pixelplay.data.backup.format.BackupWriter
-import com.theveloper.pixelplay.data.backup.history.BackupHistoryRepository
-import com.theveloper.pixelplay.data.backup.model.BackupHistoryEntry
-import com.theveloper.pixelplay.data.backup.model.BackupManifest
-import com.theveloper.pixelplay.data.backup.model.BackupOperationType
-import com.theveloper.pixelplay.data.backup.model.BackupSection
-import com.theveloper.pixelplay.data.backup.model.BackupTransferProgressUpdate
-import com.theveloper.pixelplay.data.backup.model.BackupValidationResult
-import com.theveloper.pixelplay.data.backup.model.DeviceInfo
-import com.theveloper.pixelplay.data.backup.model.RestorePlan
-import com.theveloper.pixelplay.data.backup.model.RestoreResult
-import com.theveloper.pixelplay.data.backup.module.BackupModuleHandler
-import com.theveloper.pixelplay.data.backup.restore.RestoreExecutor
-import com.theveloper.pixelplay.data.backup.restore.RestorePlanner
-import com.theveloper.pixelplay.data.backup.validation.ValidationPipeline
+import com.theveloper.voidplay.data.backup.format.BackupReader
+import com.theveloper.voidplay.data.backup.format.BackupWriter
+import com.theveloper.voidplay.data.backup.history.BackupHistoryRepository
+import com.theveloper.voidplay.data.backup.model.BackupHistoryEntry
+import com.theveloper.voidplay.data.backup.model.BackupManifest
+import com.theveloper.voidplay.data.backup.model.BackupOperationType
+import com.theveloper.voidplay.data.backup.model.BackupSection
+import com.theveloper.voidplay.data.backup.model.BackupTransferProgressUpdate
+import com.theveloper.voidplay.data.backup.model.BackupValidationResult
+import com.theveloper.voidplay.data.backup.model.DeviceInfo
+import com.theveloper.voidplay.data.backup.model.RestorePlan
+import com.theveloper.voidplay.data.backup.model.RestoreResult
+import com.theveloper.voidplay.data.backup.module.BackupModuleHandler
+import com.theveloper.voidplay.data.backup.restore.RestoreExecutor
+import com.theveloper.voidplay.data.backup.restore.RestorePlanner
+import com.theveloper.voidplay.data.backup.validation.ValidationPipeline
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -91,7 +91,7 @@ class BackupManager @Inject constructor(
             backupWriter.write(uri, manifest, modulePayloads).getOrThrow()
 
             reportProgress(onProgress, BackupOperationType.EXPORT, ++step, totalSteps,
-                "Backup complete", "Your PixelPlay backup was created successfully.")
+                "Backup complete", "Your VoidPlay backup was created successfully.")
         }
     }
 

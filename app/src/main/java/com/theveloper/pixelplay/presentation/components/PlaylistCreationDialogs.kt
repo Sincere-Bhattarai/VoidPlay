@@ -4,7 +4,7 @@
     ExperimentalMaterial3ExpressiveApi::class
 )
 
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -89,7 +89,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import kotlin.math.max
 import kotlin.math.min
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape

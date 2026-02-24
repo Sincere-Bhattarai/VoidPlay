@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.player
+package com.theveloper.voidplay.data.service.player
 
 import androidx.annotation.OptIn
 import androidx.media3.common.C
@@ -6,11 +6,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.data.model.TransitionMode
-import com.theveloper.pixelplay.data.model.TransitionResolution
-import com.theveloper.pixelplay.data.model.TransitionSource
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.TransitionRepository
+import com.theveloper.voidplay.data.model.TransitionMode
+import com.theveloper.voidplay.data.model.TransitionResolution
+import com.theveloper.voidplay.data.model.TransitionSource
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.TransitionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

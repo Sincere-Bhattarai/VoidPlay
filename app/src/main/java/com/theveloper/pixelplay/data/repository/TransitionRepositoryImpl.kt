@@ -1,12 +1,12 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
-import com.theveloper.pixelplay.data.database.TransitionDao
-import com.theveloper.pixelplay.data.database.TransitionRuleEntity
-import com.theveloper.pixelplay.data.model.TransitionResolution
-import com.theveloper.pixelplay.data.model.TransitionRule
-import com.theveloper.pixelplay.data.model.TransitionSettings
-import com.theveloper.pixelplay.data.model.TransitionSource
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.database.TransitionDao
+import com.theveloper.voidplay.data.database.TransitionRuleEntity
+import com.theveloper.voidplay.data.model.TransitionResolution
+import com.theveloper.voidplay.data.model.TransitionRule
+import com.theveloper.voidplay.data.model.TransitionSettings
+import com.theveloper.voidplay.data.model.TransitionSource
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest

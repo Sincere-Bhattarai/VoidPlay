@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -134,18 +134,18 @@ import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.AutoScrollingText
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.subcomps.PlayingEqIcon
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
-import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.performAppCompatHapticFeedback
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.AutoScrollingText
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.subcomps.PlayingEqIcon
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.performAppCompatHapticFeedback
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
@@ -174,7 +174,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.layout.onGloballyPositioned
-import com.theveloper.pixelplay.presentation.components.scoped.QueueItemDismissGestureHandler
+import com.theveloper.voidplay.presentation.components.scoped.QueueItemDismissGestureHandler
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
 import coil.size.Size

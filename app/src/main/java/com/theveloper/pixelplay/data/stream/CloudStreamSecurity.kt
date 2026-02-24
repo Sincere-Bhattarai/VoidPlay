@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.stream
+package com.theveloper.voidplay.data.stream
 
 import io.ktor.http.HttpStatusCode
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull

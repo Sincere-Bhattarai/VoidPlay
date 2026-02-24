@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.gdrive.auth
+package com.theveloper.voidplay.presentation.gdrive.auth
 
 import android.os.Bundle
 import android.widget.Toast
@@ -37,9 +37,9 @@ import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.theveloper.pixelplay.data.gdrive.GDriveConstants
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.ui.theme.PixelPlayTheme
+import com.theveloper.voidplay.data.gdrive.GDriveConstants
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.ui.theme.VoidPlayTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
@@ -51,7 +51,7 @@ class GDriveLoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PixelPlayTheme {
+            VoidPlayTheme {
                 GDriveLoginScreen(onClose = { finish() })
             }
         }
@@ -379,7 +379,7 @@ private fun FolderSetupContent(
                 Spacer(Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "Create \"PixelPlay Music\"",
+                        text = "Create \"VoidPlay Music\"",
                         style = MaterialTheme.typography.titleSmall,
                         fontFamily = GoogleSansRounded,
                         fontWeight = FontWeight.SemiBold,

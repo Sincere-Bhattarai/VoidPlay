@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.brickbreaker
+package com.theveloper.voidplay.presentation.components.brickbreaker
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -69,9 +69,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.performAppHapticFeedback
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.performAppHapticFeedback
 import kotlinx.coroutines.isActive
 import kotlin.math.abs
 import kotlin.math.max
@@ -484,7 +484,7 @@ fun BrickBreakerOverlay(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "PixelPlay",
+                        text = "VoidPlay",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.onSurface

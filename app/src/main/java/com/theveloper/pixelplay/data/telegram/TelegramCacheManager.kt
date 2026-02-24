@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.telegram
+package com.theveloper.voidplay.data.telegram
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

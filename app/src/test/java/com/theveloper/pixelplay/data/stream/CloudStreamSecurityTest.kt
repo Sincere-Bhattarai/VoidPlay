@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.stream
+package com.theveloper.voidplay.data.stream
 
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

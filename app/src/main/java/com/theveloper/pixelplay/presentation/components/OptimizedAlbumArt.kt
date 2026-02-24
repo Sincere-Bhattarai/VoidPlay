@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
@@ -26,7 +26,7 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 @OptIn(ExperimentalCoilApi::class, ExperimentalComposeUiApi::class)
 @Composable

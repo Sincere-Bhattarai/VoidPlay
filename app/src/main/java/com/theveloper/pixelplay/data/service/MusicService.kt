@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service
+package com.theveloper.voidplay.data.service
 
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.PendingIntent
@@ -34,17 +34,17 @@ import coil.size.Size
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.PlayerInfo
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.service.player.DualPlayerEngine
-import com.theveloper.pixelplay.data.service.player.TransitionController
-import com.theveloper.pixelplay.ui.glancewidget.ControlWidget4x2
-import com.theveloper.pixelplay.ui.glancewidget.PixelPlayGlanceWidget
-import com.theveloper.pixelplay.ui.glancewidget.PlayerActions
-import com.theveloper.pixelplay.ui.glancewidget.PlayerInfoStateDefinition
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.PlayerInfo
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.service.player.DualPlayerEngine
+import com.theveloper.voidplay.data.service.player.TransitionController
+import com.theveloper.voidplay.ui.glancewidget.ControlWidget4x2
+import com.theveloper.voidplay.ui.glancewidget.VoidPlayGlanceWidget
+import com.theveloper.voidplay.ui.glancewidget.PlayerActions
+import com.theveloper.voidplay.ui.glancewidget.PlayerInfoStateDefinition
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,19 +57,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
-import com.theveloper.pixelplay.data.equalizer.EqualizerManager
-import com.theveloper.pixelplay.data.model.WidgetThemeColors
-import com.theveloper.pixelplay.data.preferences.AlbumArtPaletteStyle
-import com.theveloper.pixelplay.presentation.viewmodel.ColorSchemeProcessor
+import com.theveloper.voidplay.data.equalizer.EqualizerManager
+import com.theveloper.voidplay.data.model.WidgetThemeColors
+import com.theveloper.voidplay.data.preferences.AlbumArtPaletteStyle
+import com.theveloper.voidplay.presentation.viewmodel.ColorSchemeProcessor
 import androidx.compose.ui.graphics.toArgb
-import com.theveloper.pixelplay.ui.glancewidget.BarWidget4x1
-import com.theveloper.pixelplay.ui.glancewidget.GridWidget2x2
+import com.theveloper.voidplay.ui.glancewidget.BarWidget4x1
+import com.theveloper.voidplay.ui.glancewidget.GridWidget2x2
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import com.theveloper.pixelplay.data.preferences.ThemePreference
-import com.theveloper.pixelplay.data.service.auto.AutoMediaBrowseTree
-import com.theveloper.pixelplay.presentation.viewmodel.ColorSchemePair
-import com.theveloper.pixelplay.utils.MediaItemBuilder
+import com.theveloper.voidplay.data.preferences.ThemePreference
+import com.theveloper.voidplay.data.service.auto.AutoMediaBrowseTree
+import com.theveloper.voidplay.presentation.viewmodel.ColorSchemePair
+import com.theveloper.voidplay.utils.MediaItemBuilder
 
 import javax.inject.Inject
 
@@ -109,9 +109,9 @@ class MusicService : MediaLibraryService() {
     private var countedPlayListener: Player.Listener? = null
 
     companion object {
-        private const val TAG = "MusicService_PixelPlay"
+        private const val TAG = "MusicService_VoidPlay"
         const val NOTIFICATION_ID = 101
-        const val ACTION_SLEEP_TIMER_EXPIRED = "com.theveloper.pixelplay.ACTION_SLEEP_TIMER_EXPIRED"
+        const val ACTION_SLEEP_TIMER_EXPIRED = "com.theveloper.voidplay.ACTION_SLEEP_TIMER_EXPIRED"
     }
 
     override fun onCreate() {
@@ -299,7 +299,7 @@ class MusicService : MediaLibraryService() {
                     .setMediaId(AutoMediaBrowseTree.ROOT_ID)
                     .setMediaMetadata(
                         androidx.media3.common.MediaMetadata.Builder()
-                            .setTitle("PixelPlay")
+                            .setTitle("VoidPlay")
                             .setIsBrowsable(true)
                             .setIsPlayable(false)
                             .setMediaType(androidx.media3.common.MediaMetadata.MEDIA_TYPE_FOLDER_MIXED)
@@ -649,7 +649,7 @@ class MusicService : MediaLibraryService() {
 //            //musicRepository.getFavoriteSongs().firstOrNull()?.any { song -> song.id.toString() == it }
 //        } ?: false
 
-        val queueItems = mutableListOf<com.theveloper.pixelplay.data.model.QueueItem>()
+        val queueItems = mutableListOf<com.theveloper.voidplay.data.model.QueueItem>()
         val timeline = withContext(Dispatchers.Main) { player.currentTimeline }
         if (!timeline.isEmpty) {
             val window = androidx.media3.common.Timeline.Window()
@@ -670,7 +670,7 @@ class MusicService : MediaLibraryService() {
                         artUri = mediaItem.mediaMetadata?.artworkUri
                     )
                     queueItems.add(
-                        com.theveloper.pixelplay.data.model.QueueItem(
+                        com.theveloper.voidplay.data.model.QueueItem(
                             id = songId,
                             albumArtBitmapData = artBytes
                         )
@@ -718,10 +718,10 @@ class MusicService : MediaLibraryService() {
         try {
             val glanceManager = GlanceAppWidgetManager(applicationContext)
 
-            val glanceIds = glanceManager.getGlanceIds(PixelPlayGlanceWidget::class.java)
+            val glanceIds = glanceManager.getGlanceIds(VoidPlayGlanceWidget::class.java)
             glanceIds.forEach { id ->
                 updateAppWidgetState(applicationContext, PlayerInfoStateDefinition, id) { playerInfo }
-                PixelPlayGlanceWidget().update(applicationContext, id)
+                VoidPlayGlanceWidget().update(applicationContext, id)
             }
 
             val barGlanceIds = glanceManager.getGlanceIds(BarWidget4x1::class.java)

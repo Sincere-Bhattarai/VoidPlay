@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.data.backup.model
+package com.theveloper.voidplay.data.backup.model
 
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 enum class BackupSection(
     val key: String,

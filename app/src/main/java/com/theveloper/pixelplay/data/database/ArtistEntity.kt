@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.utils.normalizeMetadataTextOrEmpty
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.utils.normalizeMetadataTextOrEmpty
 
 @Entity(
     tableName = "artists",

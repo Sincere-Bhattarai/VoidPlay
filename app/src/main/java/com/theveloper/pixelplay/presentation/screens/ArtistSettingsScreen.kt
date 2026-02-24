@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -88,10 +88,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.viewmodel.ArtistSettingsViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.viewmodel.ArtistSettingsViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -260,7 +260,7 @@ fun ArtistSettingsScreen(
             item {
                 InfoCard(
                     title = "About Multi-Artist Parsing",
-                    content = "PixelPlayer automatically splits artist tags containing multiple artists. This is useful for songs downloaded with yt-dlp or other tools that use delimiters like '/' to separate artists.\n\nBackslash (\\) can be used to escape delimiters."
+                    content = "VoidPlayer automatically splits artist tags containing multiple artists. This is useful for songs downloaded with yt-dlp or other tools that use delimiters like '/' to separate artists.\n\nBackslash (\\) can be used to escape delimiters."
                 )
             }
 

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.backup.model
+package com.theveloper.voidplay.data.backup.model
 
 data class BackupManifest(
     val schemaVersion: Int = CURRENT_SCHEMA_VERSION,

@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -71,16 +71,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.subcomps.SineWaveLine
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.screens.PlayerSheetCollapsedCornerRadius
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistUiState
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistSelectionStateHolder
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.subcomps.SineWaveLine
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.screens.PlayerSheetCollapsedCornerRadius
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistUiState
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistSelectionStateHolder
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import androidx.compose.foundation.combinedClickable
 
 @androidx.annotation.OptIn(UnstableApi::class)

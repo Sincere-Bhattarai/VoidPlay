@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.media
+package com.theveloper.voidplay.data.media
 
 import android.content.Context
 import android.net.Uri

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,10 +42,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.presentation.components.LocalMaterialTheme
-import com.theveloper.pixelplay.presentation.components.player.BottomToggleRow
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.presentation.components.LocalMaterialTheme
+import com.theveloper.voidplay.presentation.components.player.BottomToggleRow
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

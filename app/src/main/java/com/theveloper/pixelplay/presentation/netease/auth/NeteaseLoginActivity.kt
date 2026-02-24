@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.netease.auth
+package com.theveloper.voidplay.presentation.netease.auth
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -75,9 +75,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.ui.theme.PixelPlayTheme
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.ui.theme.VoidPlayTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import org.json.JSONObject
@@ -97,7 +97,7 @@ class NeteaseLoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PixelPlayTheme {
+            VoidPlayTheme {
                 NeteaseWebLoginScreen(onClose = { finish() })
             }
         }
@@ -386,7 +386,7 @@ fun NeteaseWebLoginScreen(
                 )
             ) {
                 Text(
-                    text = "Security note: your password is entered only in NetEase web pages. PixelPlay stores session cookies (MUSIC_U) to sync your library.",
+                    text = "Security note: your password is entered only in NetEase web pages. VoidPlay stores session cookies (MUSIC_U) to sync your library.",
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.bodySmall,
                     fontFamily = GoogleSansRounded,

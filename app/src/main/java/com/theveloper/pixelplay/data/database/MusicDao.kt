@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -8,7 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SimpleSQLiteQuery
-import com.theveloper.pixelplay.utils.AudioMeta
+import com.theveloper.voidplay.utils.AudioMeta
 import kotlinx.coroutines.flow.Flow
 
 @Dao

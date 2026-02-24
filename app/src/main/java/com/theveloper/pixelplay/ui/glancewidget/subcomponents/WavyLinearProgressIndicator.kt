@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget.subcomponents
+package com.theveloper.voidplay.ui.glancewidget.subcomponents
 
 import android.content.Context
 import android.graphics.Bitmap

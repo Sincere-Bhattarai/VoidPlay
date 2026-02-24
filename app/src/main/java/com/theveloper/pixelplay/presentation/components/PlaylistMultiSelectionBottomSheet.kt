@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.app.Activity
 import androidx.compose.animation.animateContentSize
@@ -56,9 +56,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.utils.resolvePlaylistCoverContentColor
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.utils.resolvePlaylistCoverContentColor
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 /**

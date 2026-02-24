@@ -11,7 +11,7 @@ plugins {
 }
 
 android {
-    namespace = "com.theveloper.pixelplay"
+    namespace = "com.theveloper.voidplay"
     compileSdk = 35
 
     androidResources {
@@ -27,7 +27,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.theveloper.pixelplay"
+        applicationId = "com.theveloper.voidplay"
         minSdk = 29
         targetSdk = 35
         versionCode = (project.findProperty("APP_VERSION_CODE") as String).toInt()
