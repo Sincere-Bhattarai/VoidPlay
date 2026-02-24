@@ -3,12 +3,14 @@ package com.theveloper.pixelplay
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentCallbacks2
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.theveloper.pixelplay.utils.CrashHandler
+import com.theveloper.pixelplay.utils.MediaMetadataRetrieverPool
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -89,6 +91,13 @@ class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Pr
                 add(telegramCoilFetcherFactory)
             }
             .build()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
+            MediaMetadataRetrieverPool.clear()
+        }
     }
 
     // 3. Sobrescribe el método para proveer la configuración de WorkManager

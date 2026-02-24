@@ -903,23 +903,25 @@ constructor(
         val concurrencyLimit = 4 // Reduced concurrency to save memory
         val semaphore = Semaphore(concurrencyLimit)
 
-        val songs = coroutineScope {
-            songsToProcess.chunked(200).flatMap { batch ->
-                val ids = batch.map { it.id }
-                val existingMap = if (isRebuild) emptyMap() else musicDao.getSongsByIdsListSimple(ids).associateBy { it.id }
-                
+        // Process batches sequentially so each batch's existingMap can be GC'd before the next
+        // batch is loaded. The semaphore still limits concurrency within each batch.
+        val songs = mutableListOf<SongEntity>()
+        for (batch in songsToProcess.chunked(200)) {
+            val ids = batch.map { it.id }
+            val existingMap = if (isRebuild) emptyMap() else musicDao.getSongsByIdsListSimple(ids).associateBy { it.id }
+            val batchResults = coroutineScope {
                 batch.map { raw ->
                     async {
                         semaphore.withPermit {
                             val mediaStoreSong = processSongData(raw, albumArtByAlbumId, genreMap, deepScan)
                             val localSong = existingMap[raw.id]
-                            
+
                             val song = if (localSong != null) {
                                 // Preserve user-edited fields
                                 val mediaStoreArtists = mediaStoreSong.artistName.splitArtistsByDelimiters(artistDelimiters)
                                 val mediaStorePrimaryArtist = mediaStoreArtists.firstOrNull()?.trim()
-                                val shouldPreserveArtistName = (mediaStoreArtists.size > 1 && 
-                                    mediaStorePrimaryArtist != null && 
+                                val shouldPreserveArtistName = (mediaStoreArtists.size > 1 &&
+                                    mediaStorePrimaryArtist != null &&
                                     localSong.artistName.trim() == mediaStorePrimaryArtist)
 
                                 mediaStoreSong.copy(
@@ -943,8 +945,9 @@ constructor(
                             song
                         }
                     }
-                }
-            }.awaitAll()
+                }.awaitAll()
+            }
+            songs.addAll(batchResults)
         }
 
         Trace.endSection()
@@ -1371,7 +1374,7 @@ constructor(
                 val file = java.io.File(tSong.filePath)
                 if (tSong.filePath.isNotEmpty() && file.exists()) {
                      try {
-                        AudioMetadataReader.read(file)?.let { meta ->
+                        AudioMetadataReader.read(file, readArtwork = false)?.let { meta ->
                             if (!meta.title.isNullOrBlank()) realTitle = meta.title
                             if (!meta.artist.isNullOrBlank()) realArtistName = meta.artist
                             if (!meta.album.isNullOrBlank()) {
