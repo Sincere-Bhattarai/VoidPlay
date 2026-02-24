@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.util.Log
-import com.theveloper.pixelplay.data.model.SearchFilterType
-import com.theveloper.pixelplay.data.model.SearchHistoryItem
-import com.theveloper.pixelplay.data.model.SearchResultItem
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.model.SearchFilterType
+import com.theveloper.voidplay.data.model.SearchHistoryItem
+import com.theveloper.voidplay.data.model.SearchResultItem
+import com.theveloper.voidplay.data.repository.MusicRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

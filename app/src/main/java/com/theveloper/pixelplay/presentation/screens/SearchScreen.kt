@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
@@ -69,18 +69,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.SearchFilterType
-import com.theveloper.pixelplay.data.model.SearchHistoryItem
-import com.theveloper.pixelplay.data.model.SearchResultItem
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.SongInfoBottomSheet
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.SearchFilterType
+import com.theveloper.voidplay.data.model.SearchHistoryItem
+import com.theveloper.voidplay.data.model.SearchResultItem
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.SongInfoBottomSheet
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import android.util.Log
-import com.theveloper.pixelplay.ui.theme.LocalPixelPlayDarkTheme
+import com.theveloper.voidplay.ui.theme.LocalVoidPlayDarkTheme
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.PlaylistPlay
 import androidx.compose.material.icons.rounded.History
@@ -101,15 +101,15 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.NavBarContentHeight
-import com.theveloper.pixelplay.presentation.components.PlaylistBottomSheet
-import com.theveloper.pixelplay.presentation.components.PlaylistCover
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.screens.search.components.GenreCategoriesGrid
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.NavBarContentHeight
+import com.theveloper.voidplay.presentation.components.PlaylistBottomSheet
+import com.theveloper.voidplay.presentation.components.PlaylistCover
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.screens.search.components.GenreCategoriesGrid
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -117,7 +117,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import timber.log.Timber
-import com.theveloper.pixelplay.presentation.components.subcomps.EnhancedSongListItem
+import com.theveloper.voidplay.presentation.components.subcomps.EnhancedSongListItem
 
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -169,7 +169,7 @@ fun SearchScreen(
 
     val searchbarCornerRadius = 28.dp
 
-    val dm = LocalPixelPlayDarkTheme.current
+    val dm = LocalVoidPlayDarkTheme.current
 
     val gradientColorsDark = listOf(
         MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),

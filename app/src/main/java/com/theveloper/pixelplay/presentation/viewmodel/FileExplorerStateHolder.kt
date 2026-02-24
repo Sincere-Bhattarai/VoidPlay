@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import android.os.Environment
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.utils.DirectoryRuleResolver
-import com.theveloper.pixelplay.utils.StorageInfo
-import com.theveloper.pixelplay.utils.StorageUtils
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.utils.DirectoryRuleResolver
+import com.theveloper.voidplay.utils.StorageInfo
+import com.theveloper.voidplay.utils.StorageUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

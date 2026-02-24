@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -63,10 +63,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.viewmodel.SettingsViewModel
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
-import com.theveloper.pixelplay.data.preferences.NavBarStyle
+import com.theveloper.voidplay.data.preferences.NavBarStyle
 
 const val DEFAULT_NAV_BAR_CORNER_RADIUS = 28f
 

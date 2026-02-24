@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.theme
+package com.theveloper.voidplay.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.PlatformTextStyle
@@ -11,7 +11,7 @@ import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 
 private val montserrat = GoogleFont("Montserrat")

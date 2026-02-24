@@ -1,18 +1,18 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.net.Uri
 import androidx.paging.PagingData
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.SearchFilterType
-import com.theveloper.pixelplay.data.model.SearchHistoryItem
-import com.theveloper.pixelplay.data.model.SearchResultItem
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.SearchFilterType
+import com.theveloper.voidplay.data.model.SearchHistoryItem
+import com.theveloper.voidplay.data.model.SearchResultItem
+import com.theveloper.voidplay.data.model.Song
 import kotlinx.coroutines.flow.Flow
-import com.theveloper.pixelplay.data.database.TelegramChannelEntity
+import com.theveloper.voidplay.data.database.TelegramChannelEntity
 
 interface MusicRepository {
     /**
@@ -25,29 +25,29 @@ interface MusicRepository {
      * Returns paginated songs for efficient display of large libraries.
      * @return Flow of PagingData<Song> for use with LazyPagingItems.
      */
-    fun getPaginatedSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption, storageFilter: com.theveloper.pixelplay.data.model.StorageFilter): Flow<PagingData<Song>>
+    fun getPaginatedSongs(sortOption: com.theveloper.voidplay.data.model.SortOption, storageFilter: com.theveloper.voidplay.data.model.StorageFilter): Flow<PagingData<Song>>
 
     /**
      * Returns paginated favorite songs for efficient display.
      * @return Flow of PagingData<Song> for use with LazyPagingItems.
      */
     fun getPaginatedFavoriteSongs(
-        sortOption: com.theveloper.pixelplay.data.model.SortOption,
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL
+        sortOption: com.theveloper.voidplay.data.model.SortOption,
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL
     ): Flow<PagingData<Song>>
 
     /**
      * Returns all favorite songs as a list (for playback queue on shuffle).
      */
     suspend fun getFavoriteSongsOnce(
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL
     ): List<Song>
 
     /**
      * Returns the count of favorite songs (reactive).
      */
     fun getFavoriteSongCountFlow(
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL
     ): Flow<Int>
 
     /**
@@ -68,14 +68,14 @@ interface MusicRepository {
      * Obtiene la lista de álbumes filtrada.
      * @return Flow que emite una lista completa de objetos Album.
      */
-    fun getAlbums(storageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL): Flow<List<Album>> // Existing Flow for reactive updates
+    fun getAlbums(storageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL): Flow<List<Album>> // Existing Flow for reactive updates
 
     /**
      * Obtiene la lista de artistas filtrada.
      * @return Flow que emite una lista completa de objetos Artist.
      */
     fun getArtists(
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL
     ): Flow<List<Artist>> // Existing Flow for reactive updates
 
     /**
@@ -200,7 +200,7 @@ interface MusicRepository {
      * Obtiene la lista de géneros, ya sea mockeados o leídos de los metadatos.
      * @return Flow que emite una lista de objetos Genre.
      */
-    fun getGenres(): Flow<List<com.theveloper.pixelplay.data.model.Genre>>
+    fun getGenres(): Flow<List<com.theveloper.voidplay.data.model.Genre>>
 
     suspend fun getLyrics(
         song: Song,
@@ -231,8 +231,8 @@ interface MusicRepository {
     suspend fun resetAllLyrics()
 
     fun getMusicFolders(
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL
-    ): Flow<List<com.theveloper.pixelplay.data.model.MusicFolder>>
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL
+    ): Flow<List<com.theveloper.voidplay.data.model.MusicFolder>>
 
     suspend fun deleteById(id: Long)
     suspend fun saveTelegramSongs(songs: List<Song>)
@@ -246,10 +246,10 @@ interface MusicRepository {
     suspend fun deleteTelegramChannel(chatId: Long)
     
     
-    val telegramRepository: com.theveloper.pixelplay.data.telegram.TelegramRepository
+    val telegramRepository: com.theveloper.voidplay.data.telegram.TelegramRepository
 
     suspend fun getSongIdsSorted(
-        sortOption: com.theveloper.pixelplay.data.model.SortOption,
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter
+        sortOption: com.theveloper.voidplay.data.model.SortOption,
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter
     ): List<Long>
 }

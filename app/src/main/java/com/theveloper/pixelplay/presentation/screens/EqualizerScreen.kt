@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
@@ -98,12 +98,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.equalizer.EqualizerPreset
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.viewmodel.EqualizerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.equalizer.EqualizerPreset
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.viewmodel.EqualizerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import androidx.compose.animation.animateColorAsState
@@ -120,7 +120,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.Close
@@ -129,7 +129,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
-import com.theveloper.pixelplay.presentation.components.WavyArcSlider
+import com.theveloper.voidplay.presentation.components.WavyArcSlider
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.rounded.Edit // Added
@@ -137,11 +137,11 @@ import androidx.compose.material.icons.rounded.ExpandMore // Added
 import androidx.compose.material.icons.rounded.Save // Added
 import androidx.compose.material.icons.filled.Star // Added
 import androidx.compose.material3.Surface
-import com.theveloper.pixelplay.presentation.components.CustomPresetsSheet
-import com.theveloper.pixelplay.presentation.components.ReorderPresetsSheet
-import com.theveloper.pixelplay.presentation.components.SavePresetDialog
-import com.theveloper.pixelplay.presentation.components.RenamePresetDialog
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository.EqualizerViewMode
+import com.theveloper.voidplay.presentation.components.CustomPresetsSheet
+import com.theveloper.voidplay.presentation.components.ReorderPresetsSheet
+import com.theveloper.voidplay.presentation.components.SavePresetDialog
+import com.theveloper.voidplay.presentation.components.RenamePresetDialog
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository.EqualizerViewMode
 import androidx.compose.material.icons.rounded.ViewQuilt
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.navigationBars
@@ -965,7 +965,7 @@ private fun CustomVerticalSlider(
     }
     
     // Create the Path
-    val starShape = remember { com.theveloper.pixelplay.utils.shapes.RoundedStarShape(sides = 8, curve = 0.1) }
+    val starShape = remember { com.theveloper.voidplay.utils.shapes.RoundedStarShape(sides = 8, curve = 0.1) }
     val finalShape = thumbShape ?: starShape
     
     val thumbPath = remember(thumbSizePx, finalShape) {

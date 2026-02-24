@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +27,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 data class PlayStoreAnnouncementUiModel(
@@ -46,7 +46,7 @@ object PlayStoreAnnouncementDefaults {
 
     val Template = PlayStoreAnnouncementUiModel(
         enabled = false,
-        title = "PixelPlay is now available on Google Play",
+        title = "VoidPlay is now available on Google Play",
         body = "Use the stable channel on Google Play for release updates while we keep beta builds active.",
         playStoreUrl = null,
     )
@@ -107,7 +107,7 @@ fun PlayStoreAnnouncementDialog(
                         color = MaterialTheme.colorScheme.primaryContainer,
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.pixelplay_base_monochrome),
+                            painter = painterResource(id = R.drawable.voidplay_base_monochrome),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier
@@ -123,7 +123,7 @@ fun PlayStoreAnnouncementDialog(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         Text(
-                            text = "PixelPlay",
+                            text = "VoidPlay",
                             fontFamily = GoogleSansRounded,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,

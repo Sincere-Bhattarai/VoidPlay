@@ -1,12 +1,12 @@
-package com.theveloper.pixelplay.data.backup.validation
+package com.theveloper.voidplay.data.backup.validation
 
 import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import com.theveloper.pixelplay.data.backup.format.BackupFormatDetector
-import com.theveloper.pixelplay.data.backup.model.BackupValidationResult
-import com.theveloper.pixelplay.data.backup.model.Severity
-import com.theveloper.pixelplay.data.backup.model.ValidationError
+import com.theveloper.voidplay.data.backup.format.BackupFormatDetector
+import com.theveloper.voidplay.data.backup.model.BackupValidationResult
+import com.theveloper.voidplay.data.backup.model.Severity
+import com.theveloper.voidplay.data.backup.model.ValidationError
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayInputStream
 import java.util.zip.ZipInputStream
@@ -58,7 +58,7 @@ class BackupFileValidator @Inject constructor(
         val format = formatDetector.detect(header)
 
         if (format == BackupFormatDetector.Format.UNKNOWN) {
-            errors.add(ValidationError("FORMAT_UNKNOWN", "File is not a recognized PixelPlay backup format."))
+            errors.add(ValidationError("FORMAT_UNKNOWN", "File is not a recognized VoidPlay backup format."))
             return BackupValidationResult.Invalid(errors)
         }
 

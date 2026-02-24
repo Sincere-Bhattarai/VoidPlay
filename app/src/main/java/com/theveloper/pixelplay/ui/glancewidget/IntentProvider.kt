@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import android.content.Intent
-import com.theveloper.pixelplay.MainActivity
+import com.theveloper.voidplay.MainActivity
 
 object IntentProvider {
     fun mainActivityIntent(context: Context): Intent {

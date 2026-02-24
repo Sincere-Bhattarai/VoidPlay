@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 /**
  * Resolves directory allow/deny rules using the nearest ancestor match strategy.

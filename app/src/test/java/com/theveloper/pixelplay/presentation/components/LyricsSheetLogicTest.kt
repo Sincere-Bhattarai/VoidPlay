@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.data.model.SyncedLine
-import com.theveloper.pixelplay.data.model.SyncedWord
+import com.theveloper.voidplay.data.model.SyncedLine
+import com.theveloper.voidplay.data.model.SyncedWord
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

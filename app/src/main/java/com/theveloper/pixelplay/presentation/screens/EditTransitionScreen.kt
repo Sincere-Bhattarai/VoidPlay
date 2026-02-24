@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -76,11 +76,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Curve
-import com.theveloper.pixelplay.data.model.TransitionMode
-import com.theveloper.pixelplay.data.model.TransitionSettings
-import com.theveloper.pixelplay.presentation.viewmodel.TransitionViewModel
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Curve
+import com.theveloper.voidplay.data.model.TransitionMode
+import com.theveloper.voidplay.data.model.TransitionSettings
+import com.theveloper.voidplay.presentation.viewmodel.TransitionViewModel
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import java.util.concurrent.TimeUnit
 

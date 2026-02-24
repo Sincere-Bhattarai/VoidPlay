@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.navigation
+package com.theveloper.voidplay.presentation.navigation
 
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController

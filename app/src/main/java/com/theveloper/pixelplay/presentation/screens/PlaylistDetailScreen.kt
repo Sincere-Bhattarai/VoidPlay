@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -102,31 +102,31 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import coil.size.Size
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.NavBarContentHeight
-import com.theveloper.pixelplay.presentation.components.PlaylistBottomSheet
-import com.theveloper.pixelplay.presentation.components.QueuePlaylistSongItem
-import com.theveloper.pixelplay.presentation.components.SongPickerBottomSheet
-import com.theveloper.pixelplay.presentation.components.ExpressiveScrollBar
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.components.SongInfoBottomSheet
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel.Companion.FOLDER_PLAYLIST_PREFIX
-import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.performAppCompatHapticFeedback
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistSongsOrderMode
-import com.theveloper.pixelplay.utils.formatTotalDuration
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.NavBarContentHeight
+import com.theveloper.voidplay.presentation.components.PlaylistBottomSheet
+import com.theveloper.voidplay.presentation.components.QueuePlaylistSongItem
+import com.theveloper.voidplay.presentation.components.SongPickerBottomSheet
+import com.theveloper.voidplay.presentation.components.ExpressiveScrollBar
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.components.SongInfoBottomSheet
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel.Companion.FOLDER_PLAYLIST_PREFIX
+import com.theveloper.voidplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.performAppCompatHapticFeedback
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistSongsOrderMode
+import com.theveloper.voidplay.utils.formatTotalDuration
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import com.theveloper.pixelplay.presentation.components.LibrarySortBottomSheet
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.model.PlaylistShapeType
+import com.theveloper.voidplay.presentation.components.LibrarySortBottomSheet
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.model.PlaylistShapeType
 import kotlinx.coroutines.launch
 
 @androidx.annotation.OptIn(UnstableApi::class)
@@ -975,7 +975,7 @@ private fun PlaylistActionItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-// SongPickerBottomSheet moved to com.theveloper.pixelplay.presentation.components
+// SongPickerBottomSheet moved to com.theveloper.voidplay.presentation.components
 fun RenamePlaylistDialog(currentName: String, onDismiss: () -> Unit, onRename: (String) -> Unit) {
     var newName by remember { mutableStateOf(TextFieldValue(currentName)) }
     AlertDialog(

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.player
+package com.theveloper.voidplay.data.service.player
 
 import android.content.ContentResolver
 import android.media.MediaExtractor
@@ -18,7 +18,7 @@ import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.media.RemoteMediaClient
 import com.google.android.gms.common.api.PendingResult
 import com.google.android.gms.common.images.WebImage
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.Locale

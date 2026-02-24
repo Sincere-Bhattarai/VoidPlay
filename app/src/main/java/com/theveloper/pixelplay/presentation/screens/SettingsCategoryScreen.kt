@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 import android.content.Intent
 import android.net.Uri
@@ -131,32 +131,32 @@ import androidx.navigation.NavController
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.backup.model.BackupHistoryEntry
-import com.theveloper.pixelplay.data.backup.model.BackupOperationType
-import com.theveloper.pixelplay.data.backup.model.BackupSection
-import com.theveloper.pixelplay.data.backup.model.BackupTransferProgressUpdate
-import com.theveloper.pixelplay.data.backup.model.ModuleRestoreDetail
-import com.theveloper.pixelplay.data.backup.model.RestorePlan
-import com.theveloper.pixelplay.data.preferences.AppThemeMode
-import com.theveloper.pixelplay.data.preferences.CollagePattern
-import com.theveloper.pixelplay.data.preferences.CarouselStyle
-import com.theveloper.pixelplay.data.preferences.LaunchTab
-import com.theveloper.pixelplay.data.preferences.LibraryNavigationMode
-import com.theveloper.pixelplay.data.preferences.NavBarStyle
-import com.theveloper.pixelplay.data.preferences.ThemePreference
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.components.FileExplorerDialog
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.model.SettingsCategory
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.viewmodel.LyricsRefreshProgress
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.SettingsViewModel
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.backup.model.BackupHistoryEntry
+import com.theveloper.voidplay.data.backup.model.BackupOperationType
+import com.theveloper.voidplay.data.backup.model.BackupSection
+import com.theveloper.voidplay.data.backup.model.BackupTransferProgressUpdate
+import com.theveloper.voidplay.data.backup.model.ModuleRestoreDetail
+import com.theveloper.voidplay.data.backup.model.RestorePlan
+import com.theveloper.voidplay.data.preferences.AppThemeMode
+import com.theveloper.voidplay.data.preferences.CollagePattern
+import com.theveloper.voidplay.data.preferences.CarouselStyle
+import com.theveloper.voidplay.data.preferences.LaunchTab
+import com.theveloper.voidplay.data.preferences.LibraryNavigationMode
+import com.theveloper.voidplay.data.preferences.NavBarStyle
+import com.theveloper.voidplay.data.preferences.ThemePreference
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.components.FileExplorerDialog
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.model.SettingsCategory
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.viewmodel.LyricsRefreshProgress
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.SettingsViewModel
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -166,7 +166,7 @@ fun SettingsCategoryScreen(
     navController: NavController,
     playerViewModel: PlayerViewModel,
     settingsViewModel: SettingsViewModel = hiltViewModel(),
-    statsViewModel: com.theveloper.pixelplay.presentation.viewmodel.StatsViewModel = hiltViewModel(),
+    statsViewModel: com.theveloper.voidplay.presentation.viewmodel.StatsViewModel = hiltViewModel(),
     onBackClick: () -> Unit
 ) {
     val category = SettingsCategory.fromId(categoryId) ?: return
@@ -808,7 +808,7 @@ fun SettingsCategoryScreen(
                             ) {
                                 GeminiSystemPromptItem(
                                     systemPrompt = geminiSystemPrompt,
-                                    defaultPrompt = com.theveloper.pixelplay.data.preferences.UserPreferencesRepository.DEFAULT_SYSTEM_PROMPT,
+                                    defaultPrompt = com.theveloper.voidplay.data.preferences.UserPreferencesRepository.DEFAULT_SYSTEM_PROMPT,
                                     onSystemPromptSave = { settingsViewModel.onGeminiSystemPromptChange(it) },
                                     onReset = { settingsViewModel.resetGeminiSystemPrompt() },
                                     title = "System Prompt",
@@ -927,7 +927,7 @@ fun SettingsCategoryScreen(
                                 addBottomSpace = false
                             ) {
                                 SettingsItem(
-                                    title = "About PixelPlayer",
+                                    title = "About VoidPlayer",
                                     subtitle = "App version, credits, and more.",
                                     leadingIcon = { Icon(Icons.Outlined.Info, null, tint = MaterialTheme.colorScheme.secondary) },
                                     trailingIcon = { Icon(Icons.Rounded.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
@@ -964,7 +964,7 @@ fun SettingsCategoryScreen(
         // Block interaction during transition
         var isTransitioning by remember { mutableStateOf(true) }
         LaunchedEffect(Unit) {
-            kotlinx.coroutines.delay(com.theveloper.pixelplay.presentation.navigation.TRANSITION_DURATION.toLong())
+            kotlinx.coroutines.delay(com.theveloper.voidplay.presentation.navigation.TRANSITION_DURATION.toLong())
             isTransitioning = false
         }
         
@@ -1147,7 +1147,7 @@ fun SettingsCategoryScreen(
             onSelectionChanged = { exportSections = it },
             onConfirm = {
                 showExportDataDialog = false
-                val fileName = "PixelPlayer_Backup_${System.currentTimeMillis()}.pxpl"
+                val fileName = "VoidPlayer_Backup_${System.currentTimeMillis()}.pxpl"
                 exportLauncher.launch(fileName)
             }
         )

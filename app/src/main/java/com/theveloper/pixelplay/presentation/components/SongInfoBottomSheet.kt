@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -59,23 +59,23 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.subcomps.AutoSizingTextToFill
-import com.theveloper.pixelplay.utils.formatDuration
-import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.subcomps.AutoSizingTextToFill
+import com.theveloper.voidplay.utils.formatDuration
+import com.theveloper.voidplay.utils.shapes.RoundedStarShape
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.theveloper.pixelplay.data.ai.SongMetadata
-import com.theveloper.pixelplay.data.media.CoverArtUpdate
-import com.theveloper.pixelplay.ui.theme.MontserratFamily
+import com.theveloper.voidplay.data.ai.SongMetadata
+import com.theveloper.voidplay.data.media.CoverArtUpdate
+import com.theveloper.voidplay.ui.theme.MontserratFamily
 import kotlinx.coroutines.launch
 import java.io.File
 
 import androidx.compose.ui.graphics.TransformOrigin
-import com.theveloper.pixelplay.presentation.screens.TabAnimation
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.presentation.screens.TabAnimation
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

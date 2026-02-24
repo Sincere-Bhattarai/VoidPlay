@@ -1,14 +1,14 @@
 ```kotlin
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.ContentResolver
 import android.provider.MediaStore
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Playlist // Assuming Playlist model exists
-import com.theveloper.pixelplay.data.model.SearchResultItem
-import com.theveloper.pixelplay.data.model.Song
-// import com.theveloper.pixelplay.data.database.PlaylistDao // Assuming a DAO for playlists
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Playlist // Assuming Playlist model exists
+import com.theveloper.voidplay.data.model.SearchResultItem
+import com.theveloper.voidplay.data.model.Song
+// import com.theveloper.voidplay.data.database.PlaylistDao // Assuming a DAO for playlists
 
 class MusicRepositoryImpl constructor(
     private val contentResolver: ContentResolver,

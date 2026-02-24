@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import android.content.Context
 import android.content.Intent
@@ -6,9 +6,9 @@ import android.os.Build
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

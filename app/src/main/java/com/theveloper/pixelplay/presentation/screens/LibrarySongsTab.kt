@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,14 +39,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.data.model.LibraryTabId
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.StorageFilter
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.StablePlayerState
-import com.theveloper.pixelplay.presentation.components.subcomps.EnhancedSongListItem
+import com.theveloper.voidplay.data.model.LibraryTabId
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.StorageFilter
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.StablePlayerState
+import com.theveloper.voidplay.presentation.components.subcomps.EnhancedSongListItem
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import androidx.paging.compose.LazyPagingItems
@@ -337,7 +337,7 @@ fun LibrarySongsTab(
                         else 
                             bottomBarHeight + 16.dp
 
-                        com.theveloper.pixelplay.presentation.components.ExpressiveScrollBar(
+                        com.theveloper.voidplay.presentation.components.ExpressiveScrollBar(
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .padding(end = 4.dp, top = 16.dp, bottom = bottomPadding),

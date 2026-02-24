@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.ui.theme
+package com.theveloper.voidplay.ui.theme
 
 import android.graphics.Bitmap
 import android.util.LruCache
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.theveloper.pixelplay.presentation.viewmodel.ColorSchemePair
+import com.theveloper.voidplay.presentation.viewmodel.ColorSchemePair
 import com.google.android.material.color.utilities.DynamicScheme
 import com.google.android.material.color.utilities.Hct
 import com.google.android.material.color.utilities.MathUtils
@@ -16,7 +16,7 @@ import com.google.android.material.color.utilities.SchemeMonochrome
 import com.google.android.material.color.utilities.SchemeNeutral
 import com.google.android.material.color.utilities.SchemeTonalSpot
 import com.google.android.material.color.utilities.SchemeVibrant
-import com.theveloper.pixelplay.data.preferences.AlbumArtPaletteStyle
+import com.theveloper.voidplay.data.preferences.AlbumArtPaletteStyle
 import androidx.core.graphics.scale
 import kotlin.math.floor
 import kotlin.math.max

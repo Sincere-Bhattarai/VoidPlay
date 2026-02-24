@@ -1,14 +1,14 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.Context
 import android.os.Environment
-import com.theveloper.pixelplay.data.database.FolderSongRow
-import com.theveloper.pixelplay.data.model.FolderSource
-import com.theveloper.pixelplay.data.model.MusicFolder
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.utils.DirectoryRuleResolver
-import com.theveloper.pixelplay.utils.StorageType
-import com.theveloper.pixelplay.utils.StorageUtils
+import com.theveloper.voidplay.data.database.FolderSongRow
+import com.theveloper.voidplay.data.model.FolderSource
+import com.theveloper.voidplay.data.model.MusicFolder
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.utils.DirectoryRuleResolver
+import com.theveloper.voidplay.utils.StorageType
+import com.theveloper.voidplay.utils.StorageUtils
 import kotlinx.collections.immutable.toImmutableList
 import javax.inject.Inject
 import javax.inject.Singleton

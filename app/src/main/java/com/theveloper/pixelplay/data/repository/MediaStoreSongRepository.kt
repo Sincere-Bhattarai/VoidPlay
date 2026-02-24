@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.ContentUris
 import android.content.Context
@@ -8,16 +8,16 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.FavoritesDao
-import com.theveloper.pixelplay.data.database.toSong
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.observer.MediaStoreObserver
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.utils.DirectoryRuleResolver
-import com.theveloper.pixelplay.utils.LogUtils
-import com.theveloper.pixelplay.utils.normalizeMetadataText
-import com.theveloper.pixelplay.utils.normalizeMetadataTextOrEmpty
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.FavoritesDao
+import com.theveloper.voidplay.data.database.toSong
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.observer.MediaStoreObserver
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.utils.DirectoryRuleResolver
+import com.theveloper.voidplay.utils.LogUtils
+import com.theveloper.voidplay.utils.normalizeMetadataText
+import com.theveloper.voidplay.utils.normalizeMetadataTextOrEmpty
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -279,7 +279,7 @@ class MediaStoreSongRepository @Inject constructor(
                     initialLoadSize = 50
                 ),
                 pagingSourceFactory = {
-                    com.theveloper.pixelplay.data.paging.MediaStorePagingSource(context, musicIds, genreMap)
+                    com.theveloper.voidplay.data.paging.MediaStorePagingSource(context, musicIds, genreMap)
                 }
             ).flow
         }.flowOn(Dispatchers.IO)
@@ -353,7 +353,7 @@ class MediaStoreSongRepository @Inject constructor(
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getPaginatedSongs(sortOption: com.theveloper.pixelplay.data.model.SortOption, storageFilter: com.theveloper.pixelplay.data.model.StorageFilter): Flow<PagingData<Song>> {
+    override fun getPaginatedSongs(sortOption: com.theveloper.voidplay.data.model.SortOption, storageFilter: com.theveloper.voidplay.data.model.StorageFilter): Flow<PagingData<Song>> {
         return combine(
             userPreferencesRepository.allowedDirectoriesFlow,
             userPreferencesRepository.blockedDirectoriesFlow
@@ -384,8 +384,8 @@ class MediaStoreSongRepository @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getPaginatedFavoriteSongs(
-        sortOption: com.theveloper.pixelplay.data.model.SortOption,
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter
+        sortOption: com.theveloper.voidplay.data.model.SortOption,
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter
     ): Flow<PagingData<Song>> {
         return combine(
             userPreferencesRepository.allowedDirectoriesFlow,
@@ -416,7 +416,7 @@ class MediaStoreSongRepository @Inject constructor(
     }
 
     override suspend fun getFavoriteSongsOnce(
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter
     ): List<Song> = withContext(Dispatchers.IO) {
         val allowedDirs = userPreferencesRepository.allowedDirectoriesFlow.first()
         val blockedDirs = userPreferencesRepository.blockedDirectoriesFlow.first()
@@ -432,7 +432,7 @@ class MediaStoreSongRepository @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getFavoriteSongCountFlow(
-        storageFilter: com.theveloper.pixelplay.data.model.StorageFilter
+        storageFilter: com.theveloper.voidplay.data.model.StorageFilter
     ): Flow<Int> {
         return combine(
             userPreferencesRepository.allowedDirectoriesFlow,

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import android.content.Intent
@@ -9,7 +9,7 @@ import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.data.service.MusicService
+import com.theveloper.voidplay.data.service.MusicService
 import timber.log.Timber
 
 class PlayerControlActionCallback : ActionCallback {
@@ -60,11 +60,11 @@ class PlayerControlActionCallback : ActionCallback {
 object PlayerActions {
     val key = ActionParameters.Key<String>("playerActionKey_v1")
     val songIdKey = ActionParameters.Key<Long>("songIdKey_v1")
-    const val PLAY_PAUSE = "com.example.pixelplay.ACTION_WIDGET_PLAY_PAUSE"
-    const val NEXT = "com.example.pixelplay.ACTION_WIDGET_NEXT"
-    const val PREVIOUS = "com.example.pixelplay.ACTION_WIDGET_PREVIOUS"
-    const val FAVORITE = "com.example.pixelplay.ACTION_WIDGET_FAVORITE"
-    const val PLAY_FROM_QUEUE = "com.example.pixelplay.ACTION_WIDGET_PLAY_FROM_QUEUE"
-    const val SHUFFLE = "com.example.pixelplay.ACTION_WIDGET_SHUFFLE"
-    const val REPEAT = "com.example.pixelplay.ACTION_WIDGET_REPEAT"
+    const val PLAY_PAUSE = "com.example.voidplay.ACTION_WIDGET_PLAY_PAUSE"
+    const val NEXT = "com.example.voidplay.ACTION_WIDGET_NEXT"
+    const val PREVIOUS = "com.example.voidplay.ACTION_WIDGET_PREVIOUS"
+    const val FAVORITE = "com.example.voidplay.ACTION_WIDGET_FAVORITE"
+    const val PLAY_FROM_QUEUE = "com.example.voidplay.ACTION_WIDGET_PLAY_FROM_QUEUE"
+    const val SHUFFLE = "com.example.voidplay.ACTION_WIDGET_SHUFFLE"
+    const val REPEAT = "com.example.voidplay.ACTION_WIDGET_REPEAT"
 }

@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.net.Uri
 import android.os.Trace
 import androidx.compose.ui.graphics.Color
-import com.theveloper.pixelplay.data.preferences.AlbumArtPaletteStyle
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.ui.theme.DarkColorScheme
+import com.theveloper.voidplay.data.preferences.AlbumArtPaletteStyle
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.ui.theme.DarkColorScheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -46,7 +46,7 @@ class ThemeStateHolder @Inject constructor(
         playerThemePreference, _currentAlbumArtColorSchemePair
     ) { playerPref, albumScheme ->
         when (playerPref) {
-            com.theveloper.pixelplay.data.preferences.ThemePreference.ALBUM_ART -> albumScheme
+            com.theveloper.voidplay.data.preferences.ThemePreference.ALBUM_ART -> albumScheme
             // DYNAMIC and DEFAULT fall back to null (system theme)
             else -> null
         }

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.snapping
+package com.theveloper.voidplay.presentation.components.snapping
 
 import androidx.compose.animation.core.AnimationScope
 import androidx.compose.animation.core.AnimationSpec

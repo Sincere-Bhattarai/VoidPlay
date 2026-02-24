@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.model
+package com.theveloper.voidplay.data.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable

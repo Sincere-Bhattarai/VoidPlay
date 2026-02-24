@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -30,9 +30,9 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.media3.common.Player
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.PlayerInfo
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.PlayerInfo
 import kotlin.text.ifEmpty
 
 class ControlWidget4x2 : GlanceAppWidget() {
@@ -54,7 +54,7 @@ class ControlWidget4x2 : GlanceAppWidget() {
         playerInfo: PlayerInfo,
         context: Context
     ) {
-        val title = playerInfo.songTitle.ifEmpty { "PixelPlayer" }
+        val title = playerInfo.songTitle.ifEmpty { "VoidPlayer" }
         val artist = playerInfo.artistName.ifEmpty { "Tap to open" }
         val isPlaying = playerInfo.isPlaying
         val isShuffleEnabled = playerInfo.isShuffleEnabled

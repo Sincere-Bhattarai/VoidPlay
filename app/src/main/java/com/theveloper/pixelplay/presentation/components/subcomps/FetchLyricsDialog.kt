@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -52,12 +52,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.LyricsSearchResult
-import com.theveloper.pixelplay.presentation.viewmodel.LyricsSearchUiState
-import com.theveloper.pixelplay.utils.ProviderText
-import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.LyricsSearchResult
+import com.theveloper.voidplay.presentation.viewmodel.LyricsSearchUiState
+import com.theveloper.voidplay.utils.ProviderText
+import com.theveloper.voidplay.utils.shapes.RoundedStarShape
 
 @Composable
 fun FetchLyricsDialog(

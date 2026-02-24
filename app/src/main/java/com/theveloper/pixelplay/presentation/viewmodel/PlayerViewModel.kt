@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -11,7 +11,7 @@ import android.media.MediaMetadataRetriever
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.core.content.ContextCompat
-import com.theveloper.pixelplay.data.model.LibraryTabId
+import com.theveloper.voidplay.data.model.LibraryTabId
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,43 +42,43 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.EotStateHolder
-import com.theveloper.pixelplay.data.ai.SongMetadata
-import com.theveloper.pixelplay.data.database.AlbumArtThemeDao
-import com.theveloper.pixelplay.data.media.CoverArtUpdate
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.FolderSource
-import com.theveloper.pixelplay.data.model.Genre
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.model.MusicFolder
-import com.theveloper.pixelplay.data.model.SearchFilterType
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.model.toLibraryTabIdOrNull
-import com.theveloper.pixelplay.data.preferences.CarouselStyle
-import com.theveloper.pixelplay.data.preferences.LibraryNavigationMode
-import com.theveloper.pixelplay.data.preferences.NavBarStyle
-import com.theveloper.pixelplay.data.preferences.FullPlayerLoadingTweaks
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.preferences.AlbumArtQuality
-import com.theveloper.pixelplay.data.preferences.ThemePreference
-import com.theveloper.pixelplay.data.repository.LyricsSearchResult
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.service.MusicNotificationProvider
-import com.theveloper.pixelplay.data.service.MusicService
-import com.theveloper.pixelplay.data.service.player.CastPlayer
-import com.theveloper.pixelplay.data.service.http.MediaFileHttpServerService
-import com.theveloper.pixelplay.data.service.player.DualPlayerEngine
-import com.theveloper.pixelplay.data.worker.SyncManager
-import com.theveloper.pixelplay.utils.AppShortcutManager
-import com.theveloper.pixelplay.utils.QueueUtils
-import com.theveloper.pixelplay.utils.MediaItemBuilder
-import com.theveloper.pixelplay.utils.StorageType
-import com.theveloper.pixelplay.utils.StorageUtils
-import com.theveloper.pixelplay.utils.ZipShareHelper
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.EotStateHolder
+import com.theveloper.voidplay.data.ai.SongMetadata
+import com.theveloper.voidplay.data.database.AlbumArtThemeDao
+import com.theveloper.voidplay.data.media.CoverArtUpdate
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.FolderSource
+import com.theveloper.voidplay.data.model.Genre
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.data.model.MusicFolder
+import com.theveloper.voidplay.data.model.SearchFilterType
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.model.toLibraryTabIdOrNull
+import com.theveloper.voidplay.data.preferences.CarouselStyle
+import com.theveloper.voidplay.data.preferences.LibraryNavigationMode
+import com.theveloper.voidplay.data.preferences.NavBarStyle
+import com.theveloper.voidplay.data.preferences.FullPlayerLoadingTweaks
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.preferences.AlbumArtQuality
+import com.theveloper.voidplay.data.preferences.ThemePreference
+import com.theveloper.voidplay.data.repository.LyricsSearchResult
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.service.MusicNotificationProvider
+import com.theveloper.voidplay.data.service.MusicService
+import com.theveloper.voidplay.data.service.player.CastPlayer
+import com.theveloper.voidplay.data.service.http.MediaFileHttpServerService
+import com.theveloper.voidplay.data.service.player.DualPlayerEngine
+import com.theveloper.voidplay.data.worker.SyncManager
+import com.theveloper.voidplay.utils.AppShortcutManager
+import com.theveloper.voidplay.utils.QueueUtils
+import com.theveloper.voidplay.utils.MediaItemBuilder
+import com.theveloper.voidplay.utils.StorageType
+import com.theveloper.voidplay.utils.StorageUtils
+import com.theveloper.voidplay.utils.ZipShareHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
@@ -164,7 +164,7 @@ class PlayerViewModel @Inject constructor(
 
     private val dualPlayerEngine: DualPlayerEngine,
     private val appShortcutManager: AppShortcutManager,
-    private val telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager,
+    private val telegramCacheManager: com.theveloper.voidplay.data.telegram.TelegramCacheManager,
     private val listeningStatsTracker: ListeningStatsTracker,
     private val dailyMixStateHolder: DailyMixStateHolder,
     private val lyricsStateHolder: LyricsStateHolder,
@@ -183,7 +183,7 @@ class PlayerViewModel @Inject constructor(
     val multiSelectionStateHolder: MultiSelectionStateHolder,
     val playlistSelectionStateHolder: PlaylistSelectionStateHolder,
     private val sessionToken: SessionToken,
-    private val mediaControllerFactory: com.theveloper.pixelplay.data.media.MediaControllerFactory
+    private val mediaControllerFactory: com.theveloper.voidplay.data.media.MediaControllerFactory
 ) : ViewModel() {
 
     private val _playerUiState = MutableStateFlow(PlayerUiState())
@@ -568,10 +568,10 @@ class PlayerViewModel @Inject constructor(
 
 
     @Inject
-    lateinit var mediaMapper: com.theveloper.pixelplay.data.media.MediaMapper
+    lateinit var mediaMapper: com.theveloper.voidplay.data.media.MediaMapper
 
     @Inject
-    lateinit var imageCacheManager: com.theveloper.pixelplay.data.media.ImageCacheManager
+    lateinit var imageCacheManager: com.theveloper.voidplay.data.media.ImageCacheManager
 
     init {
         // Initialize helper classes with our coroutine scope
@@ -582,7 +582,7 @@ class PlayerViewModel @Inject constructor(
         themeStateHolder.initialize(viewModelScope)
 
         viewModelScope.launch {
-            lyricsStateHolder.songUpdates.collect { update: Pair<com.theveloper.pixelplay.data.model.Song, com.theveloper.pixelplay.data.model.Lyrics?> ->
+            lyricsStateHolder.songUpdates.collect { update: Pair<com.theveloper.voidplay.data.model.Song, com.theveloper.voidplay.data.model.Lyrics?> ->
                 val song = update.first
                 val lyrics = update.second
                 // Check if this update is relevant to the currently playing song OR the selected song
@@ -1488,16 +1488,16 @@ class PlayerViewModel @Inject constructor(
     fun loadArtistsIfNeeded() = libraryStateHolder.loadArtistsIfNeeded()
     fun loadFoldersFromRepository() = libraryStateHolder.loadFoldersFromRepository()
 
-    fun setStorageFilter(filter: com.theveloper.pixelplay.data.model.StorageFilter) {
+    fun setStorageFilter(filter: com.theveloper.voidplay.data.model.StorageFilter) {
         libraryStateHolder.setStorageFilter(filter)
     }
 
     fun toggleStorageFilter() {
         val current = _playerUiState.value.currentStorageFilter
         val next = when (current) {
-            com.theveloper.pixelplay.data.model.StorageFilter.ALL -> com.theveloper.pixelplay.data.model.StorageFilter.ONLINE
-            com.theveloper.pixelplay.data.model.StorageFilter.ONLINE -> com.theveloper.pixelplay.data.model.StorageFilter.OFFLINE
-            com.theveloper.pixelplay.data.model.StorageFilter.OFFLINE -> com.theveloper.pixelplay.data.model.StorageFilter.ALL
+            com.theveloper.voidplay.data.model.StorageFilter.ALL -> com.theveloper.voidplay.data.model.StorageFilter.ONLINE
+            com.theveloper.voidplay.data.model.StorageFilter.ONLINE -> com.theveloper.voidplay.data.model.StorageFilter.OFFLINE
+            com.theveloper.voidplay.data.model.StorageFilter.OFFLINE -> com.theveloper.voidplay.data.model.StorageFilter.ALL
         }
         setStorageFilter(next)
     }
@@ -3987,7 +3987,7 @@ class PlayerViewModel @Inject constructor(
 
         // Optimistic local update since holder event handles persistence
         if (currentSong?.id?.toLong() == songId) {
-            val parsed = com.theveloper.pixelplay.utils.LyricsUtils.parseLyrics(lyricsContent)
+            val parsed = com.theveloper.voidplay.utils.LyricsUtils.parseLyrics(lyricsContent)
             val updatedSong = currentSong.copy(lyrics = lyricsContent)
             updateSongInStates(updatedSong, parsed)
         }

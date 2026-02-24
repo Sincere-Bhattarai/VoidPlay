@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -13,14 +13,14 @@ import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
-import com.theveloper.pixelplay.data.preferences.AlbumArtPaletteStyle
-import com.theveloper.pixelplay.data.database.AlbumArtThemeDao
-import com.theveloper.pixelplay.data.database.AlbumArtThemeEntity
-import com.theveloper.pixelplay.data.database.StoredColorSchemeValues
-import com.theveloper.pixelplay.data.database.toComposeColor
-import com.theveloper.pixelplay.ui.theme.clearExtractedColorCache
-import com.theveloper.pixelplay.ui.theme.extractSeedColor
-import com.theveloper.pixelplay.ui.theme.generateColorSchemeFromSeed
+import com.theveloper.voidplay.data.preferences.AlbumArtPaletteStyle
+import com.theveloper.voidplay.data.database.AlbumArtThemeDao
+import com.theveloper.voidplay.data.database.AlbumArtThemeEntity
+import com.theveloper.voidplay.data.database.StoredColorSchemeValues
+import com.theveloper.voidplay.data.database.toComposeColor
+import com.theveloper.voidplay.ui.theme.clearExtractedColorCache
+import com.theveloper.voidplay.ui.theme.extractSeedColor
+import com.theveloper.voidplay.ui.theme.generateColorSchemeFromSeed
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -46,10 +46,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.size.Size
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.AutoScrollingTextOnDemand
-import com.theveloper.pixelplay.presentation.components.ShimmerBox
-import com.theveloper.pixelplay.presentation.components.SmartImage
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.AutoScrollingTextOnDemand
+import com.theveloper.voidplay.presentation.components.ShimmerBox
+import com.theveloper.voidplay.presentation.components.SmartImage
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 /**

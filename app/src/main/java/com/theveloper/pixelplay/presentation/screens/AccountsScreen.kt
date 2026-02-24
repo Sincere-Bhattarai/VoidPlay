@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import android.content.Context
 import android.content.Intent
@@ -68,13 +68,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.netease.auth.NeteaseLoginActivity
-import com.theveloper.pixelplay.presentation.telegram.auth.TelegramLoginActivity
-import com.theveloper.pixelplay.presentation.viewmodel.AccountsViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.ExternalAccountUiModel
-import com.theveloper.pixelplay.presentation.viewmodel.ExternalServiceAccount
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.netease.auth.NeteaseLoginActivity
+import com.theveloper.voidplay.presentation.telegram.auth.TelegramLoginActivity
+import com.theveloper.voidplay.presentation.viewmodel.AccountsViewModel
+import com.theveloper.voidplay.presentation.viewmodel.ExternalAccountUiModel
+import com.theveloper.voidplay.presentation.viewmodel.ExternalServiceAccount
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt

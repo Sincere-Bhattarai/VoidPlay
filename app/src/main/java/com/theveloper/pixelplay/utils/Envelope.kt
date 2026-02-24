@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
-import com.theveloper.pixelplay.data.model.Curve
+import com.theveloper.voidplay.data.model.Curve
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sqrt

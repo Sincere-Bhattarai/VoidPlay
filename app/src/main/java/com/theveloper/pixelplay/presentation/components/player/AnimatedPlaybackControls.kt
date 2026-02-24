@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.player
+package com.theveloper.voidplay.presentation.components.player
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.AnimationSpec
@@ -37,8 +37,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.LocalMaterialTheme
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.LocalMaterialTheme
 import kotlinx.coroutines.delay
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 

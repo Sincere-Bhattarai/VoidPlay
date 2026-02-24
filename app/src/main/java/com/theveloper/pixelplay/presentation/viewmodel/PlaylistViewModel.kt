@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.net.Uri
 import android.util.Log
@@ -6,12 +6,12 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.playlist.M3uManager
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.playlist.M3uManager
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +70,7 @@ sealed class PlaylistSongsOrderMode {
 class PlaylistViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val musicRepository: MusicRepository,
-    private val aiPlaylistGenerator: com.theveloper.pixelplay.data.ai.AiPlaylistGenerator,
+    private val aiPlaylistGenerator: com.theveloper.voidplay.data.ai.AiPlaylistGenerator,
     private val m3uManager: M3uManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -771,9 +771,9 @@ class PlaylistViewModel @Inject constructor(
 
     private fun findFolder(
         targetPath: String,
-        folders: List<com.theveloper.pixelplay.data.model.MusicFolder>
-    ): com.theveloper.pixelplay.data.model.MusicFolder? {
-        val queue: ArrayDeque<com.theveloper.pixelplay.data.model.MusicFolder> = ArrayDeque(folders)
+        folders: List<com.theveloper.voidplay.data.model.MusicFolder>
+    ): com.theveloper.voidplay.data.model.MusicFolder? {
+        val queue: ArrayDeque<com.theveloper.voidplay.data.model.MusicFolder> = ArrayDeque(folders)
         while (queue.isNotEmpty()) {
             val folder = queue.removeFirst()
             if (folder.path == targetPath) {
@@ -784,7 +784,7 @@ class PlaylistViewModel @Inject constructor(
         return null
     }
 
-    private fun com.theveloper.pixelplay.data.model.MusicFolder.collectAllSongs(): List<Song> {
+    private fun com.theveloper.voidplay.data.model.MusicFolder.collectAllSongs(): List<Song> {
         return songs + subFolders.flatMap { it.collectAllSongs() }
     }
 
@@ -1056,7 +1056,7 @@ class PlaylistViewModel @Inject constructor(
                     musicDir.mkdirs()
                 }
                 
-                val exportDir = File(musicDir, "PixelPlayer Exports")
+                val exportDir = File(musicDir, "VoidPlayer Exports")
                 if (!exportDir.exists()) {
                     exportDir.mkdirs()
                 }
@@ -1076,7 +1076,7 @@ class PlaylistViewModel @Inject constructor(
                 }
                 
                 Log.d("PlaylistViewModel", "Successfully exported ${playlistIds.size} playlists to $exportDir")
-                Toast.makeText(context, "Exported ${playlistsWithSongs.size} playlist(s) to Music/PixelPlayer Exports", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Exported ${playlistsWithSongs.size} playlist(s) to Music/VoidPlayer Exports", Toast.LENGTH_SHORT).show()
                 
             } catch (e: Exception) {
                 Log.e("PlaylistViewModel", "Error exporting playlists", e)

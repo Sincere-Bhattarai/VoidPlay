@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.theveloper.pixelplay.data.model.SearchHistoryItem
+import com.theveloper.voidplay.data.model.SearchHistoryItem
 
 @Entity(tableName = "search_history")
 data class SearchHistoryEntity(

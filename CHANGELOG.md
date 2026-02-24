@@ -101,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0-beta] - 2024-08-30
 
 ### Added
-- Initial beta release of PixelPlayer Music Player.
+- Initial beta release of VoidPlayer Music Player.
 - Local music scanning and playback (MP3, FLAC, AAC).
 - Background playback using a foreground service and Media3.
 - Modern UI with Jetpack Compose, Material 3, and Dynamic Color support.

@@ -29,6 +29,6 @@ app/release/
 app/build/
 =======
 AGENTS.md
-app/src/main/java/com/theveloper/pixelplay/data/AGENTS.md
-app/src/main/java/com/theveloper/pixelplay/presentation/AGENTS.md
+app/src/main/java/com/theveloper/voidplay/data/AGENTS.md
+app/src/main/java/com/theveloper/voidplay/presentation/AGENTS.md
 >>>>>>> upstream/master

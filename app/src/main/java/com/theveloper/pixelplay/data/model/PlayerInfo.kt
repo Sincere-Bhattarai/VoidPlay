@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.model
+package com.theveloper.voidplay.data.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient // Para campos que no queremos serializar

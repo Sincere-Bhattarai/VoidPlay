@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.http
+package com.theveloper.voidplay.data.service.http
 
 import android.app.Service
 import android.content.Context
@@ -14,8 +14,8 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.repository.MusicRepository
 import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -168,7 +168,7 @@ class MediaFileHttpServerService : Service() {
 
     private fun startForegroundService() {
         runCatching {
-            val channelId = "pixelplay_cast_server"
+            val channelId = "voidplay_cast_server"
             val channelName = "Cast Media Server"
             
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

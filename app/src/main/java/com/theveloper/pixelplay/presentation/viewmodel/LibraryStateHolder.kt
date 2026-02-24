@@ -1,18 +1,18 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.os.Trace
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import androidx.compose.ui.graphics.toArgb
 import android.util.Log
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.LibraryTabId
-import com.theveloper.pixelplay.data.model.MusicFolder
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.model.SortOption
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.LibraryTabId
+import com.theveloper.voidplay.data.model.MusicFolder
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.model.SortOption
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -65,16 +65,16 @@ class LibraryStateHolder @Inject constructor(
     val currentSongSortOption = _currentSongSortOption.asStateFlow()
 
     // Filter Options
-    private val _currentStorageFilter = MutableStateFlow(com.theveloper.pixelplay.data.model.StorageFilter.ALL)
+    private val _currentStorageFilter = MutableStateFlow(com.theveloper.voidplay.data.model.StorageFilter.ALL)
     val currentStorageFilter = _currentStorageFilter.asStateFlow()
 
     private fun effectiveFoldersStorageFilter(
-        selectedFilter: com.theveloper.pixelplay.data.model.StorageFilter
-    ): com.theveloper.pixelplay.data.model.StorageFilter {
+        selectedFilter: com.theveloper.voidplay.data.model.StorageFilter
+    ): com.theveloper.voidplay.data.model.StorageFilter {
         return if (ENABLE_FOLDERS_STORAGE_FILTER) {
             selectedFilter
         } else {
-            com.theveloper.pixelplay.data.model.StorageFilter.OFFLINE
+            com.theveloper.voidplay.data.model.StorageFilter.OFFLINE
         }
     }
 
@@ -115,7 +115,7 @@ class LibraryStateHolder @Inject constructor(
         .flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalStdlibApi::class)
-    val genres: kotlinx.coroutines.flow.Flow<ImmutableList<com.theveloper.pixelplay.data.model.Genre>> = _allSongs
+    val genres: kotlinx.coroutines.flow.Flow<ImmutableList<com.theveloper.voidplay.data.model.Genre>> = _allSongs
         .map { songs ->
             val genreMap = mutableMapOf<String, MutableList<Song>>()
             val unknownGenreName = "Unknown Genre"
@@ -136,10 +136,10 @@ class LibraryStateHolder @Inject constructor(
                     } else {
                         genreName.lowercase().replace(" ", "_").replace("/", "_")
                     }
-                    val lightThemeColor = com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = false)
-                    val darkThemeColor = com.theveloper.pixelplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = true)
+                    val lightThemeColor = com.theveloper.voidplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = false)
+                    val darkThemeColor = com.theveloper.voidplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = true)
 
-                    com.theveloper.pixelplay.data.model.Genre(
+                    com.theveloper.voidplay.data.model.Genre(
                         id = id,
                         name = genreName,
                         lightColorHex = lightThemeColor.container.toHexString(),
@@ -391,7 +391,7 @@ class LibraryStateHolder @Inject constructor(
         }
     }
 
-    fun setStorageFilter(filter: com.theveloper.pixelplay.data.model.StorageFilter) {
+    fun setStorageFilter(filter: com.theveloper.voidplay.data.model.StorageFilter) {
         _currentStorageFilter.value = filter
     }
 }

@@ -1,16 +1,16 @@
-package com.theveloper.pixelplay.data.service.auto
+package com.theveloper.voidplay.data.service.auto
 
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.theveloper.pixelplay.data.database.EngagementDao
-import com.theveloper.pixelplay.data.model.Album
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.database.EngagementDao
+import com.theveloper.voidplay.data.model.Album
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -71,7 +71,7 @@ class AutoMediaBrowseTree @Inject constructor(
 
     suspend fun getItem(mediaId: String): MediaItem? {
         return when {
-            mediaId == ROOT_ID -> buildBrowsableItem(ROOT_ID, "PixelPlay", null, MediaMetadata.MEDIA_TYPE_MUSIC)
+            mediaId == ROOT_ID -> buildBrowsableItem(ROOT_ID, "VoidPlay", null, MediaMetadata.MEDIA_TYPE_MUSIC)
             mediaId == RECENT_ID || mediaId == FAVORITES_ID || mediaId == PLAYLISTS_ID ||
                     mediaId == ALBUMS_ID || mediaId == ARTISTS_ID || mediaId == SONGS_ID -> {
                 getRootItems().find { it.mediaId == mediaId }

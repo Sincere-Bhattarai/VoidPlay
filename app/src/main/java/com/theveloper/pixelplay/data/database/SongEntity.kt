@@ -1,14 +1,14 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.theveloper.pixelplay.data.model.ArtistRef
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.utils.normalizeMetadataText
-import com.theveloper.pixelplay.utils.normalizeMetadataTextOrEmpty
+import com.theveloper.voidplay.data.model.ArtistRef
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.utils.normalizeMetadataText
+import com.theveloper.voidplay.utils.normalizeMetadataTextOrEmpty
 
 @Entity(
     tableName = "songs",

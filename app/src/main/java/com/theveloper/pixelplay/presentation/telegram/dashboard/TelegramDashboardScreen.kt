@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.telegram.dashboard
+package com.theveloper.voidplay.presentation.telegram.dashboard
 
 import android.text.format.DateUtils
 import androidx.compose.animation.Crossfade
@@ -79,10 +79,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.theveloper.pixelplay.data.database.TelegramChannelEntity
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.NoInternetScreen
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.database.TelegramChannelEntity
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.NoInternetScreen
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import java.io.File
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch

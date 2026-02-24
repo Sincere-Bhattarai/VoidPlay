@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
-import com.theveloper.pixelplay.data.model.Lyrics
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.data.model.Song
 
 interface LyricsRepository {
     /**

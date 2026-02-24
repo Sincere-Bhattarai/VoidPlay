@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.presentation.netease.auth
+package com.theveloper.voidplay.presentation.netease.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.theveloper.pixelplay.data.netease.NeteaseRepository
+import com.theveloper.voidplay.data.netease.NeteaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow

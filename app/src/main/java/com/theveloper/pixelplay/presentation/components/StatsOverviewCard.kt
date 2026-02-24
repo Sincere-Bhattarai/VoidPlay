@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -33,10 +33,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
-import com.theveloper.pixelplay.data.stats.StatsTimeRange
-import com.theveloper.pixelplay.utils.formatListeningDurationCompact
-import com.theveloper.pixelplay.utils.formatListeningDurationLong
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository
+import com.theveloper.voidplay.data.stats.StatsTimeRange
+import com.theveloper.voidplay.utils.formatListeningDurationCompact
+import com.theveloper.voidplay.utils.formatListeningDurationLong
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @OptIn(ExperimentalMaterial3Api::class)

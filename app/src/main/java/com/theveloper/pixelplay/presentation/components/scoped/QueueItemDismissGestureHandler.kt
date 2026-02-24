@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import android.view.View
 import androidx.compose.animation.core.Animatable
@@ -14,8 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
 import androidx.core.view.HapticFeedbackConstantsCompat
-import com.theveloper.pixelplay.presentation.utils.AppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.performAppCompatHapticFeedback
+import com.theveloper.voidplay.presentation.utils.AppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.performAppCompatHapticFeedback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs

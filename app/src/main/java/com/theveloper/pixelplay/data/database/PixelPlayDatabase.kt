@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -28,7 +28,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
     exportSchema = false
 )
-abstract class PixelPlayDatabase : RoomDatabase() {
+abstract class VoidPlayDatabase : RoomDatabase() {
     abstract fun albumArtThemeDao(): AlbumArtThemeDao
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun musicDao(): MusicDao

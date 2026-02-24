@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.preferences
+package com.theveloper.voidplay.data.preferences
 
 object CarouselStyle {
     const val NO_PEEK = "no_peek"

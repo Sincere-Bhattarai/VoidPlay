@@ -1,10 +1,10 @@
-package com.theveloper.pixelplay.data.database
+package com.theveloper.voidplay.data.database
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.theveloper.pixelplay.data.model.TransitionSettings
+import com.theveloper.voidplay.data.model.TransitionSettings
 
 @Entity(
     tableName = "transition_rules",

@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.presentation.model
+package com.theveloper.voidplay.presentation.model
 
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
-import com.theveloper.pixelplay.data.stats.StatsTimeRange
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository
+import com.theveloper.voidplay.data.stats.StatsTimeRange
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 

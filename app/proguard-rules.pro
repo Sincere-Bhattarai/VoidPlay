@@ -55,21 +55,21 @@
 -keep class androidx.media3.exoplayer.ffmpeg.** { *; }
 
 # Mantener clases de datos y sus miembros para evitar que R8 Full elimine campos
--keepclassmembers class com.theveloper.pixelplay.data.model.** { *; }
--keepclassmembers class com.theveloper.pixelplay.domain.model.** { *; }
+-keepclassmembers class com.theveloper.voidplay.data.model.** { *; }
+-keepclassmembers class com.theveloper.voidplay.domain.model.** { *; }
 
 -keepattributes Signature, InnerClasses, EnclosingMethod, AnnotationDefault, *Annotation*
 
 # Cast framework classes loaded via manifest/reflective entry points.
--keep class com.theveloper.pixelplay.data.service.cast.CastOptionsProvider { *; }
+-keep class com.theveloper.voidplay.data.service.cast.CastOptionsProvider { *; }
 -keep class * implements com.google.android.gms.cast.framework.OptionsProvider
 
 # Gson generic type capture for backup/restore in release builds.
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
--keep class com.theveloper.pixelplay.data.preferences.PreferenceBackupEntry { *; }
--keep class com.theveloper.pixelplay.data.backup.model.** { *; }
--keep class com.theveloper.pixelplay.data.backup.module.** { *; }
+-keep class com.theveloper.voidplay.data.preferences.PreferenceBackupEntry { *; }
+-keep class com.theveloper.voidplay.data.backup.model.** { *; }
+-keep class com.theveloper.voidplay.data.backup.module.** { *; }
 
 # Netty channel classes are instantiated reflectively and require public no-arg constructors.
 # Without these, release builds can fail with:
@@ -167,10 +167,10 @@
 -keepnames class io.netty.** { *; }
 
 # Ensure internal server can start
--keep class com.theveloper.pixelplay.data.telegram.TelegramStreamProxy { *; }
+-keep class com.theveloper.voidplay.data.telegram.TelegramStreamProxy { *; }
 
--keep class com.theveloper.pixelplay.data.telegram.** { *; }
--keep interface com.theveloper.pixelplay.data.telegram.** { *; }
+-keep class com.theveloper.voidplay.data.telegram.** { *; }
+-keep interface com.theveloper.voidplay.data.telegram.** { *; }
 
 # Keep Kotlin reflection if needed by Ktor/Serialization in Release
 -keep class kotlin.reflect.** { *; }

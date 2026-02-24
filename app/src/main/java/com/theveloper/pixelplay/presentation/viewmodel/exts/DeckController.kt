@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.viewmodel.exts
+package com.theveloper.voidplay.presentation.viewmodel.exts
 
 import android.content.Context
 import android.net.Uri

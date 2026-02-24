@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.baselineprofile
+package com.theveloper.voidplay.baselineprofile
 
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
@@ -36,7 +36,7 @@ class StartupBenchmarks {
     )
 
     private fun startup(compilationMode: CompilationMode) = benchmarkRule.measureRepeated(
-        packageName = "com.theveloper.pixelplay",
+        packageName = "com.theveloper.voidplay",
         metrics = listOf(StartupTimingMetric()),
         compilationMode = compilationMode,
         iterations = 5, // Reducido a 5 para acelerar la validación

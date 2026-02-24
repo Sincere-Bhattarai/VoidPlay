@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.player
+package com.theveloper.voidplay.presentation.components.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,9 +10,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.LocalMaterialTheme
-import com.theveloper.pixelplay.presentation.components.ToggleSegmentButton
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.LocalMaterialTheme
+import com.theveloper.voidplay.presentation.components.ToggleSegmentButton
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 @Composable

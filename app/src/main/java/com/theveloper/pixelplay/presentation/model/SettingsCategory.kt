@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.model
+package com.theveloper.voidplay.presentation.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeveloperBoard
@@ -9,7 +9,7 @@ import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 
 enum class SettingsCategory(
     val id: String,

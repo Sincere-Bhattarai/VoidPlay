@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.media
+package com.theveloper.voidplay.data.media
 
 import android.content.ContentUris
 import android.content.ContentValues
@@ -10,9 +10,9 @@ import android.util.Log
 import androidx.core.net.toUri
 import com.kyant.taglib.Picture
 import com.kyant.taglib.TagLib
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.TelegramDao // Added
-import com.theveloper.pixelplay.data.database.TelegramSongEntity // Added
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.TelegramDao // Added
+import com.theveloper.voidplay.data.database.TelegramSongEntity // Added
 import kotlinx.coroutines.flow.first // Added
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull

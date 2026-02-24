@@ -1,6 +1,6 @@
-package com.theveloper.pixelplay
+package com.theveloper.voidplay
 
-import com.theveloper.pixelplay.presentation.navigation.navigateSafely
+import com.theveloper.voidplay.presentation.navigation.navigateSafely
 
 // import androidx.compose.ui.platform.LocalView // No longer needed for this
 // import androidx.core.view.WindowInsetsCompat // No longer needed for this
@@ -89,37 +89,37 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
-import com.theveloper.pixelplay.data.github.GitHubAnnouncementPropertiesService
-import com.theveloper.pixelplay.data.github.PlayStoreAnnouncementRemoteConfig
-import com.theveloper.pixelplay.data.preferences.AppThemeMode
-import com.theveloper.pixelplay.data.preferences.NavBarStyle
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.service.MusicService
-import com.theveloper.pixelplay.data.worker.SyncManager
-import com.theveloper.pixelplay.data.worker.SyncProgress
-import com.theveloper.pixelplay.presentation.components.AllFilesAccessDialog
-import com.theveloper.pixelplay.presentation.components.AppSidebarDrawer
-import com.theveloper.pixelplay.presentation.components.CrashReportDialog
-import com.theveloper.pixelplay.presentation.components.DismissUndoBar
-import com.theveloper.pixelplay.presentation.components.DrawerDestination
-import com.theveloper.pixelplay.presentation.components.MiniPlayerBottomSpacer
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.NavBarContentHeight
-import com.theveloper.pixelplay.presentation.components.NavBarContentHeightFullWidth
-import com.theveloper.pixelplay.presentation.components.PlayerInternalNavigationBar
-import com.theveloper.pixelplay.presentation.components.PlayStoreAnnouncementDefaults
-import com.theveloper.pixelplay.presentation.components.PlayStoreAnnouncementDialog
-import com.theveloper.pixelplay.presentation.components.PlayStoreAnnouncementUiModel
-import com.theveloper.pixelplay.presentation.components.UnifiedPlayerSheet
-import com.theveloper.pixelplay.presentation.components.UnifiedPlayerSheetV2
-import com.theveloper.pixelplay.presentation.navigation.AppNavigation
-import com.theveloper.pixelplay.presentation.navigation.Screen
-import com.theveloper.pixelplay.presentation.screens.SetupScreen
-import com.theveloper.pixelplay.presentation.viewmodel.MainViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.ui.theme.PixelPlayTheme
-import com.theveloper.pixelplay.utils.CrashHandler
-import com.theveloper.pixelplay.utils.LogUtils
+import com.theveloper.voidplay.data.github.GitHubAnnouncementPropertiesService
+import com.theveloper.voidplay.data.github.PlayStoreAnnouncementRemoteConfig
+import com.theveloper.voidplay.data.preferences.AppThemeMode
+import com.theveloper.voidplay.data.preferences.NavBarStyle
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.service.MusicService
+import com.theveloper.voidplay.data.worker.SyncManager
+import com.theveloper.voidplay.data.worker.SyncProgress
+import com.theveloper.voidplay.presentation.components.AllFilesAccessDialog
+import com.theveloper.voidplay.presentation.components.AppSidebarDrawer
+import com.theveloper.voidplay.presentation.components.CrashReportDialog
+import com.theveloper.voidplay.presentation.components.DismissUndoBar
+import com.theveloper.voidplay.presentation.components.DrawerDestination
+import com.theveloper.voidplay.presentation.components.MiniPlayerBottomSpacer
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.NavBarContentHeight
+import com.theveloper.voidplay.presentation.components.NavBarContentHeightFullWidth
+import com.theveloper.voidplay.presentation.components.PlayerInternalNavigationBar
+import com.theveloper.voidplay.presentation.components.PlayStoreAnnouncementDefaults
+import com.theveloper.voidplay.presentation.components.PlayStoreAnnouncementDialog
+import com.theveloper.voidplay.presentation.components.PlayStoreAnnouncementUiModel
+import com.theveloper.voidplay.presentation.components.UnifiedPlayerSheet
+import com.theveloper.voidplay.presentation.components.UnifiedPlayerSheetV2
+import com.theveloper.voidplay.presentation.navigation.AppNavigation
+import com.theveloper.voidplay.presentation.navigation.Screen
+import com.theveloper.voidplay.presentation.screens.SetupScreen
+import com.theveloper.voidplay.presentation.viewmodel.MainViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.ui.theme.VoidPlayTheme
+import com.theveloper.voidplay.utils.CrashHandler
+import com.theveloper.voidplay.utils.LogUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
@@ -127,10 +127,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
-import com.theveloper.pixelplay.presentation.utils.AppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.LocalAppHapticsConfig
-import com.theveloper.pixelplay.presentation.utils.NoOpHapticFeedback
-import com.theveloper.pixelplay.utils.CrashLogData
+import com.theveloper.voidplay.presentation.utils.AppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.LocalAppHapticsConfig
+import com.theveloper.voidplay.presentation.utils.NoOpHapticFeedback
+import com.theveloper.voidplay.utils.CrashLogData
 import javax.annotation.concurrent.Immutable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -247,7 +247,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            PixelPlayTheme(
+            VoidPlayTheme(
                 darkTheme = useDarkTheme
             ) {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -341,14 +341,14 @@ class MainActivity : ComponentActivity() {
                 clearExternalIntentPayload(intent)
             }
             
-            intent.action == "com.theveloper.pixelplay.ACTION_PLAY_SONG" -> {
+            intent.action == "com.theveloper.voidplay.ACTION_PLAY_SONG" -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                     intent.getParcelableExtra("song", com.theveloper.pixelplay.data.model.Song::class.java)?.let { song ->
+                     intent.getParcelableExtra("song", com.theveloper.voidplay.data.model.Song::class.java)?.let { song ->
                          playerViewModel.playSong(song)
                      }
                 } else {
                      @Suppress("DEPRECATION")
-                     intent.getParcelableExtra<com.theveloper.pixelplay.data.model.Song>("song")?.let { song ->
+                     intent.getParcelableExtra<com.theveloper.voidplay.data.model.Song>("song")?.let { song ->
                          playerViewModel.playSong(song)
                      }
                 }
@@ -358,8 +358,8 @@ class MainActivity : ComponentActivity() {
     }
     
     companion object {
-        const val ACTION_SHUFFLE_ALL = "com.theveloper.pixelplay.ACTION_SHUFFLE_ALL"
-        const val ACTION_OPEN_PLAYLIST = "com.theveloper.pixelplay.ACTION_OPEN_PLAYLIST"
+        const val ACTION_SHUFFLE_ALL = "com.theveloper.voidplay.ACTION_SHUFFLE_ALL"
+        const val ACTION_OPEN_PLAYLIST = "com.theveloper.voidplay.ACTION_OPEN_PLAYLIST"
         const val EXTRA_PLAYLIST_ID = "playlist_id"
     }
 
@@ -642,7 +642,7 @@ class MainActivity : ComponentActivity() {
                         DrawerDestination.Equalizer -> navController.navigateSafely(Screen.Equalizer.route)
                         DrawerDestination.Settings -> navController.navigateSafely(Screen.Settings.route)
                         DrawerDestination.Telegram -> {
-                            val intent = Intent(this@MainActivity, com.theveloper.pixelplay.presentation.telegram.auth.TelegramLoginActivity::class.java)
+                            val intent = Intent(this@MainActivity, com.theveloper.voidplay.presentation.telegram.auth.TelegramLoginActivity::class.java)
                             startActivity(intent)
                         }
                         else -> {}

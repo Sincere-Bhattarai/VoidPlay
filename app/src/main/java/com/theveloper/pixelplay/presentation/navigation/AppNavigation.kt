@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.navigation
+package com.theveloper.voidplay.presentation.navigation
 
 import DelimiterConfigScreen
 import android.annotation.SuppressLint
@@ -28,34 +28,34 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.theveloper.pixelplay.data.preferences.LaunchTab
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.presentation.screens.AlbumDetailScreen
-import com.theveloper.pixelplay.presentation.screens.AccountsScreen
-import com.theveloper.pixelplay.presentation.screens.ArtistDetailScreen
-import com.theveloper.pixelplay.presentation.screens.ArtistSettingsScreen
-import com.theveloper.pixelplay.presentation.screens.DailyMixScreen
-import com.theveloper.pixelplay.presentation.screens.EditTransitionScreen
-import com.theveloper.pixelplay.presentation.screens.ExperimentalSettingsScreen
-import com.theveloper.pixelplay.presentation.screens.GenreDetailScreen
-import com.theveloper.pixelplay.presentation.screens.HomeScreen
-import com.theveloper.pixelplay.presentation.screens.LibraryScreen
-import com.theveloper.pixelplay.presentation.screens.MashupScreen
-import com.theveloper.pixelplay.presentation.screens.NavBarCornerRadiusScreen
-import com.theveloper.pixelplay.presentation.screens.PaletteStyleSettingsScreen
-import com.theveloper.pixelplay.presentation.screens.PlaylistDetailScreen
-import com.theveloper.pixelplay.presentation.screens.RecentlyPlayedScreen
+import com.theveloper.voidplay.data.preferences.LaunchTab
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.presentation.screens.AlbumDetailScreen
+import com.theveloper.voidplay.presentation.screens.AccountsScreen
+import com.theveloper.voidplay.presentation.screens.ArtistDetailScreen
+import com.theveloper.voidplay.presentation.screens.ArtistSettingsScreen
+import com.theveloper.voidplay.presentation.screens.DailyMixScreen
+import com.theveloper.voidplay.presentation.screens.EditTransitionScreen
+import com.theveloper.voidplay.presentation.screens.ExperimentalSettingsScreen
+import com.theveloper.voidplay.presentation.screens.GenreDetailScreen
+import com.theveloper.voidplay.presentation.screens.HomeScreen
+import com.theveloper.voidplay.presentation.screens.LibraryScreen
+import com.theveloper.voidplay.presentation.screens.MashupScreen
+import com.theveloper.voidplay.presentation.screens.NavBarCornerRadiusScreen
+import com.theveloper.voidplay.presentation.screens.PaletteStyleSettingsScreen
+import com.theveloper.voidplay.presentation.screens.PlaylistDetailScreen
+import com.theveloper.voidplay.presentation.screens.RecentlyPlayedScreen
 
-import com.theveloper.pixelplay.presentation.screens.AboutScreen
-import com.theveloper.pixelplay.presentation.screens.SearchScreen
-import com.theveloper.pixelplay.presentation.screens.StatsScreen
-import com.theveloper.pixelplay.presentation.screens.SettingsScreen
-import com.theveloper.pixelplay.presentation.screens.SettingsCategoryScreen
-import com.theveloper.pixelplay.presentation.screens.EqualizerScreen
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.presentation.viewmodel.PlaylistViewModel
+import com.theveloper.voidplay.presentation.screens.AboutScreen
+import com.theveloper.voidplay.presentation.screens.SearchScreen
+import com.theveloper.voidplay.presentation.screens.StatsScreen
+import com.theveloper.voidplay.presentation.screens.SettingsScreen
+import com.theveloper.voidplay.presentation.screens.SettingsCategoryScreen
+import com.theveloper.voidplay.presentation.screens.EqualizerScreen
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.presentation.viewmodel.PlaylistViewModel
 import kotlinx.coroutines.flow.first
-import com.theveloper.pixelplay.presentation.components.ScreenWrapper
+import com.theveloper.voidplay.presentation.components.ScreenWrapper
 
 @OptIn(UnstableApi::class)
 @SuppressLint("UnrememberedGetBackStackEntry")
@@ -498,7 +498,7 @@ fun AppNavigation(
                 popExitTransition = { popExitTransition() },
             ) {
                 ScreenWrapper(navController = navController, playerViewModel = playerViewModel) {
-                    com.theveloper.pixelplay.presentation.screens.DeviceCapabilitiesScreen(
+                    com.theveloper.voidplay.presentation.screens.DeviceCapabilitiesScreen(
                         navController = navController,
                         playerViewModel = playerViewModel
                     )
@@ -512,7 +512,7 @@ fun AppNavigation(
                 popExitTransition = { popExitTransition() },
             ) {
                 ScreenWrapper(navController = navController, playerViewModel = playerViewModel) {
-                    com.theveloper.pixelplay.presentation.netease.dashboard.NeteaseDashboardScreen(
+                    com.theveloper.voidplay.presentation.netease.dashboard.NeteaseDashboardScreen(
                         onBack = { navController.popBackStack() }
                     )
                 }

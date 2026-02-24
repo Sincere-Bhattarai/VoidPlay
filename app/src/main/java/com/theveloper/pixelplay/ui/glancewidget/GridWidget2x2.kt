@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -28,8 +28,8 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.data.model.PlayerInfo
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.data.model.PlayerInfo
 
 class GridWidget2x2 : GlanceAppWidget() {
 

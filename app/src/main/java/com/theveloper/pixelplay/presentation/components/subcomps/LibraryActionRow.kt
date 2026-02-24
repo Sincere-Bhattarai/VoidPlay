@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -72,9 +72,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.MusicFolder
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.MusicFolder
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import java.io.File
 
 val defaultShape = RoundedCornerShape(26.dp) // Fallback shape
@@ -101,7 +101,7 @@ fun LibraryActionRow(
     isShuffleEnabled: Boolean = false,
     // Storage Filter
     showStorageFilterButton: Boolean = false,
-    currentStorageFilter: com.theveloper.pixelplay.data.model.StorageFilter = com.theveloper.pixelplay.data.model.StorageFilter.ALL,
+    currentStorageFilter: com.theveloper.voidplay.data.model.StorageFilter = com.theveloper.voidplay.data.model.StorageFilter.ALL,
     onStorageFilterClick: () -> Unit = {}
 ) {
     Row(
@@ -332,14 +332,14 @@ fun LibraryActionRow(
                     exit = slideOutHorizontally(targetOffsetX = { it / 2 }) + fadeOut()
                 ) {
                      val finalIcon = when(currentStorageFilter) {
-                         com.theveloper.pixelplay.data.model.StorageFilter.ALL -> Icons.Rounded.Dataset
-                         com.theveloper.pixelplay.data.model.StorageFilter.ONLINE -> Icons.Rounded.Cloud
-                         com.theveloper.pixelplay.data.model.StorageFilter.OFFLINE -> Icons.Rounded.PhoneAndroid
+                         com.theveloper.voidplay.data.model.StorageFilter.ALL -> Icons.Rounded.Dataset
+                         com.theveloper.voidplay.data.model.StorageFilter.ONLINE -> Icons.Rounded.Cloud
+                         com.theveloper.voidplay.data.model.StorageFilter.OFFLINE -> Icons.Rounded.PhoneAndroid
                      }
                      val tooltipText = when(currentStorageFilter) {
-                         com.theveloper.pixelplay.data.model.StorageFilter.ALL -> "All Songs"
-                         com.theveloper.pixelplay.data.model.StorageFilter.ONLINE -> "Online"
-                         com.theveloper.pixelplay.data.model.StorageFilter.OFFLINE -> "Offline"
+                         com.theveloper.voidplay.data.model.StorageFilter.ALL -> "All Songs"
+                         com.theveloper.voidplay.data.model.StorageFilter.ONLINE -> "Online"
+                         com.theveloper.voidplay.data.model.StorageFilter.OFFLINE -> "Offline"
                      }
                      val tooltipState = rememberTooltipState()
 

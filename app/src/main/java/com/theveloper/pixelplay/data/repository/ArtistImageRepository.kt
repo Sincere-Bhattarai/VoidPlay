@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.Context
 import android.graphics.Bitmap

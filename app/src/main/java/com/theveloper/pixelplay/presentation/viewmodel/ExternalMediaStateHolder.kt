@@ -1,15 +1,15 @@
-package com.theveloper.pixelplay.presentation.viewmodel
+package com.theveloper.voidplay.presentation.viewmodel
 
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import com.theveloper.pixelplay.data.media.AudioMetadataReader
-import com.theveloper.pixelplay.data.media.guessImageMimeType
-import com.theveloper.pixelplay.data.media.imageExtensionFromMimeType
-import com.theveloper.pixelplay.data.media.isValidImageData
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.media.AudioMetadataReader
+import com.theveloper.voidplay.data.media.guessImageMimeType
+import com.theveloper.voidplay.data.media.imageExtensionFromMimeType
+import com.theveloper.voidplay.data.media.isValidImageData
+import com.theveloper.voidplay.data.model.Song
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

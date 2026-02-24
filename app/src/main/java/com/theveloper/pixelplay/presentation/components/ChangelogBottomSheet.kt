@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -40,10 +40,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.subcomps.SineWaveLine
-import com.theveloper.pixelplay.ui.theme.ExpTitleTypography
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.subcomps.SineWaveLine
+import com.theveloper.voidplay.ui.theme.ExpTitleTypography
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 
 data class ChangelogSection(
@@ -203,7 +203,7 @@ fun ChangelogBottomSheet(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val changelogUrl = "https://github.com/theovilardo/PixelPlay/blob/master/CHANGELOG.md"
+    val changelogUrl = "https://github.com/theovilardo/VoidPlay/blob/master/CHANGELOG.md"
 
     val fabCornerRadius = 16.dp
 

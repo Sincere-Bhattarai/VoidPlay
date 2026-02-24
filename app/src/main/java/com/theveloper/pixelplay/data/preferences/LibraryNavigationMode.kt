@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.preferences
+package com.theveloper.voidplay.data.preferences
 
 object LibraryNavigationMode {
     const val TAB_ROW = "tab_row"

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color

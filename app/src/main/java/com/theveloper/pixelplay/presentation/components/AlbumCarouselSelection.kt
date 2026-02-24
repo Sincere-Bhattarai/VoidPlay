@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components
+package com.theveloper.voidplay.presentation.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -12,13 +12,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import coil.size.Size
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.CarouselStyle
-import com.theveloper.pixelplay.presentation.components.scoped.PrefetchAlbumNeighbors
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.CarouselStyle
+import com.theveloper.voidplay.presentation.components.scoped.PrefetchAlbumNeighbors
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.first
 
-import com.theveloper.pixelplay.data.preferences.AlbumArtQuality
+import com.theveloper.voidplay.data.preferences.AlbumArtQuality
 
 // ====== TIPOS/STATE DEL CARRUSEL (wrapper para mantener compatibilidad) ======
 

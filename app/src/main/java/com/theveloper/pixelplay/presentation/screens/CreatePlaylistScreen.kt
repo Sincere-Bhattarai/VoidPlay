@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
 
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -102,17 +102,17 @@ import androidx.compose.ui.window.DialogProperties
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.presentation.components.ImageCropView
-import com.theveloper.pixelplay.data.model.PlaylistShapeType
-// import com.theveloper.pixelplay.presentation.screens.ShapeType // Removed local enum
-import com.theveloper.pixelplay.presentation.components.SongPickerList
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.presentation.components.ImageCropView
+import com.theveloper.voidplay.data.model.PlaylistShapeType
+// import com.theveloper.voidplay.presentation.screens.ShapeType // Removed local enum
+import com.theveloper.voidplay.presentation.components.SongPickerList
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
 import androidx.compose.material3.Slider
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
-import com.theveloper.pixelplay.utils.resolvePlaylistCoverContentColor
+import com.theveloper.voidplay.utils.shapes.RoundedStarShape
+import com.theveloper.voidplay.utils.resolvePlaylistCoverContentColor
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Outline
@@ -183,7 +183,7 @@ fun CreatePlaylistDialog(
     }
 }
 
-// Enum removed, using com.theveloper.pixelplay.data.model.PlaylistShapeType
+// Enum removed, using com.theveloper.voidplay.data.model.PlaylistShapeType
 
 @Composable
 fun EditPlaylistDialog(

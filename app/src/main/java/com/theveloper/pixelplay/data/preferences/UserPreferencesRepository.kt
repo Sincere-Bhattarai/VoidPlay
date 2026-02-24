@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.preferences
+package com.theveloper.voidplay.data.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -12,12 +12,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.media3.common.Player
-import com.theveloper.pixelplay.data.model.Playlist
-import com.theveloper.pixelplay.data.model.SortOption // Added import
-import com.theveloper.pixelplay.data.model.FolderSource
-import com.theveloper.pixelplay.data.model.LyricsSourcePreference
-import com.theveloper.pixelplay.data.model.TransitionSettings
-import com.theveloper.pixelplay.data.equalizer.EqualizerPreset // Added import
+import com.theveloper.voidplay.data.model.Playlist
+import com.theveloper.voidplay.data.model.SortOption // Added import
+import com.theveloper.voidplay.data.model.FolderSource
+import com.theveloper.voidplay.data.model.LyricsSourcePreference
+import com.theveloper.voidplay.data.model.TransitionSettings
+import com.theveloper.voidplay.data.equalizer.EqualizerPreset // Added import
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.theme
+package com.theveloper.voidplay.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes

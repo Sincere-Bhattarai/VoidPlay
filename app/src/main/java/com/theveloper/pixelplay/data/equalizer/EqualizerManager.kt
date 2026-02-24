@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.equalizer
+package com.theveloper.voidplay.data.equalizer
 
 import android.media.audiofx.Equalizer
 import android.media.audiofx.BassBoost

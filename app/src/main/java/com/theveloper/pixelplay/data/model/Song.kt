@@ -1,8 +1,8 @@
-package com.theveloper.pixelplay.data.model
+package com.theveloper.voidplay.data.model
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import com.theveloper.pixelplay.utils.splitArtistsByDelimiters
+import com.theveloper.voidplay.utils.splitArtistsByDelimiters
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 

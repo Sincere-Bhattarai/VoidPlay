@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.external
+package com.theveloper.voidplay.presentation.components.external
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
@@ -53,12 +53,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.components.OptimizedAlbumArt
-import com.theveloper.pixelplay.presentation.components.WavyMusicSlider
-import com.theveloper.pixelplay.presentation.components.player.AnimatedPlaybackControls
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.utils.formatDuration
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.components.OptimizedAlbumArt
+import com.theveloper.voidplay.presentation.components.WavyMusicSlider
+import com.theveloper.voidplay.presentation.components.player.AnimatedPlaybackControls
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.utils.formatDuration
 import kotlin.math.roundToLong
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 

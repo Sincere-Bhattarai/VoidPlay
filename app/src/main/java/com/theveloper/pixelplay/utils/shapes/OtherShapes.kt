@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.utils.shapes
+package com.theveloper.voidplay.utils.shapes
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect

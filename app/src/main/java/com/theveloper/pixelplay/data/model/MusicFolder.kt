@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.model
+package com.theveloper.voidplay.data.model
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

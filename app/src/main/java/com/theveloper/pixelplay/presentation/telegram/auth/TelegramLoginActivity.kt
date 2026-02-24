@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.telegram.auth
+package com.theveloper.voidplay.presentation.telegram.auth
 
 import android.content.Context
 import android.content.Intent
@@ -98,12 +98,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.presentation.telegram.channel.TelegramChannelSearchSheet
-import com.theveloper.pixelplay.presentation.telegram.dashboard.TelegramDashboardScreen
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.ui.theme.PixelPlayTheme
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.presentation.telegram.channel.TelegramChannelSearchSheet
+import com.theveloper.voidplay.presentation.telegram.dashboard.TelegramDashboardScreen
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.ui.theme.VoidPlayTheme
 import dagger.hilt.android.AndroidEntryPoint
 import org.drinkless.tdlib.TdApi
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
@@ -114,7 +114,7 @@ class TelegramLoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            PixelPlayTheme {
+            VoidPlayTheme {
                 TelegramLoginScreen(onFinish = { finish() })
             }
         }
@@ -160,7 +160,7 @@ fun TelegramLoginScreen(
     LaunchedEffect(Unit) {
         viewModel.playbackRequest.collect { song ->
             val intent = Intent(context, MainActivity::class.java).apply {
-                action = "com.theveloper.pixelplay.ACTION_PLAY_SONG"
+                action = "com.theveloper.voidplay.ACTION_PLAY_SONG"
                 putExtra("song", song as android.os.Parcelable)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             }

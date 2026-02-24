@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.model
+package com.theveloper.voidplay.data.model
 
 /**
  * Preference for lyrics source priority order.

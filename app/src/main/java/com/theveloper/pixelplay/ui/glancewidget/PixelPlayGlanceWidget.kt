@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -45,16 +45,16 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.theveloper.pixelplay.MainActivity
-import com.theveloper.pixelplay.data.model.PlayerInfo
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.MainActivity
+import com.theveloper.voidplay.data.model.PlayerInfo
+import com.theveloper.voidplay.R
 import androidx.core.graphics.scale
 import androidx.glance.unit.ColorProvider
-import com.theveloper.pixelplay.data.model.QueueItem
-import com.theveloper.pixelplay.utils.createScalableBackgroundBitmap
+import com.theveloper.voidplay.data.model.QueueItem
+import com.theveloper.voidplay.utils.createScalableBackgroundBitmap
 import timber.log.Timber
 
-class PixelPlayGlanceWidget : GlanceAppWidget() {
+class VoidPlayGlanceWidget : GlanceAppWidget() {
 
     companion object {
         // Tamaños definidos para diferentes configuraciones del widget
@@ -102,7 +102,7 @@ class PixelPlayGlanceWidget : GlanceAppWidget() {
             val playerInfo = currentState<PlayerInfo>()
             val currentSize = LocalSize.current
 
-            Timber.tag("PixelPlayGlanceWidget")
+            Timber.tag("VoidPlayGlanceWidget")
                 .d("Providing Glance. PlayerInfo: title='${playerInfo.songTitle}', artist='${playerInfo.artistName}', isPlaying=${playerInfo.isPlaying}, hasBitmap=${playerInfo.albumArtBitmapData != null}, progress=${playerInfo.currentPositionMs}/${playerInfo.totalDurationMs}")
 
             GlanceTheme {
@@ -117,13 +117,13 @@ class PixelPlayGlanceWidget : GlanceAppWidget() {
         size: DpSize,
         context: Context
     ) {
-        val title = playerInfo.songTitle.ifEmpty { "PixelPlayer" }
+        val title = playerInfo.songTitle.ifEmpty { "VoidPlayer" }
         val artist = playerInfo.artistName.ifEmpty { "Toca para abrir" }
         val isPlaying = playerInfo.isPlaying
         val isFavorite = playerInfo.isFavorite
         val albumArtBitmapData = playerInfo.albumArtBitmapData
 
-        Timber.tag("PixelPlayGlanceWidget")
+        Timber.tag("VoidPlayGlanceWidget")
             .d("WidgetUi: PlayerInfo received. Title: $title, Artist: $artist, HasBitmapData: ${albumArtBitmapData != null}, BitmapDataSize: ${albumArtBitmapData?.size ?: "N/A"}")
 
         val actualBackgroundColor = GlanceTheme.colors.surface

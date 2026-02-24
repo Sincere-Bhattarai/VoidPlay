@@ -1,9 +1,9 @@
-package com.theveloper.pixelplay.presentation.components.player
+package com.theveloper.voidplay.presentation.components.player
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
-import com.theveloper.pixelplay.data.model.Lyrics
+import com.theveloper.voidplay.data.model.Lyrics
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
@@ -102,24 +102,24 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.res.stringResource
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.model.Artist
-import com.theveloper.pixelplay.data.model.Song
-import com.theveloper.pixelplay.data.preferences.AlbumArtQuality
-import com.theveloper.pixelplay.data.preferences.CarouselStyle
-import com.theveloper.pixelplay.data.preferences.FullPlayerLoadingTweaks
-import com.theveloper.pixelplay.presentation.components.AlbumCarouselSection
-import com.theveloper.pixelplay.presentation.components.AutoScrollingTextOnDemand
-import com.theveloper.pixelplay.presentation.components.LocalMaterialTheme
-import com.theveloper.pixelplay.presentation.components.LyricsSheet
-import com.theveloper.pixelplay.presentation.components.scoped.rememberSmoothProgress
-import com.theveloper.pixelplay.presentation.components.subcomps.FetchLyricsDialog
-import com.theveloper.pixelplay.presentation.viewmodel.LyricsSearchUiState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerViewModel
-import com.theveloper.pixelplay.ui.theme.GoogleSansRounded
-import com.theveloper.pixelplay.utils.AudioMetaUtils.mimeTypeToFormat
-import com.theveloper.pixelplay.utils.formatDuration
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.model.Artist
+import com.theveloper.voidplay.data.model.Song
+import com.theveloper.voidplay.data.preferences.AlbumArtQuality
+import com.theveloper.voidplay.data.preferences.CarouselStyle
+import com.theveloper.voidplay.data.preferences.FullPlayerLoadingTweaks
+import com.theveloper.voidplay.presentation.components.AlbumCarouselSection
+import com.theveloper.voidplay.presentation.components.AutoScrollingTextOnDemand
+import com.theveloper.voidplay.presentation.components.LocalMaterialTheme
+import com.theveloper.voidplay.presentation.components.LyricsSheet
+import com.theveloper.voidplay.presentation.components.scoped.rememberSmoothProgress
+import com.theveloper.voidplay.presentation.components.subcomps.FetchLyricsDialog
+import com.theveloper.voidplay.presentation.viewmodel.LyricsSearchUiState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerSheetState
+import com.theveloper.voidplay.presentation.viewmodel.PlayerViewModel
+import com.theveloper.voidplay.ui.theme.GoogleSansRounded
+import com.theveloper.voidplay.utils.AudioMetaUtils.mimeTypeToFormat
+import com.theveloper.voidplay.utils.formatDuration
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -127,8 +127,8 @@ import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import timber.log.Timber
 import java.util.Locale
 import kotlin.math.roundToLong
-import com.theveloper.pixelplay.presentation.components.WavySliderExpressive
-import com.theveloper.pixelplay.presentation.components.ToggleSegmentButton
+import com.theveloper.voidplay.presentation.components.WavySliderExpressive
+import com.theveloper.voidplay.presentation.components.ToggleSegmentButton
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -1986,7 +1986,7 @@ private fun AlbumPlaceholder(
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             Icon(
                 modifier = Modifier.size(86.dp),
-                painter = painterResource(R.drawable.pixelplay_base_monochrome),
+                painter = painterResource(R.drawable.voidplay_base_monochrome),
                 contentDescription = null,
                 tint = onColor
             )

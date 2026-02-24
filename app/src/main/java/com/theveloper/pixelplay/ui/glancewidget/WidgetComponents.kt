@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.ui.glancewidget
+package com.theveloper.voidplay.ui.glancewidget
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -22,7 +22,7 @@ import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.size
 import androidx.glance.unit.ColorProvider
-import com.theveloper.pixelplay.R
+import com.theveloper.voidplay.R
 import timber.log.Timber
 
 @Composable

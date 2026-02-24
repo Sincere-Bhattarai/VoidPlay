@@ -1,13 +1,13 @@
-package com.theveloper.pixelplay.data.backup.format
+package com.theveloper.voidplay.data.backup.format
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.theveloper.pixelplay.data.backup.model.BackupManifest
-import com.theveloper.pixelplay.data.backup.model.BackupModuleInfo
-import com.theveloper.pixelplay.data.backup.model.DeviceInfo
-import com.theveloper.pixelplay.data.backup.module.PlaylistsModuleHandler
+import com.theveloper.voidplay.data.backup.model.BackupManifest
+import com.theveloper.voidplay.data.backup.model.BackupModuleInfo
+import com.theveloper.voidplay.data.backup.model.DeviceInfo
+import com.theveloper.voidplay.data.backup.module.PlaylistsModuleHandler
 import java.security.MessageDigest
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.theveloper.pixelplay.presentation.screens
+package com.theveloper.voidplay.presentation.screens
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -102,17 +102,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.theveloper.pixelplay.R
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
-import com.theveloper.pixelplay.data.stats.StatsTimeRange
-import com.theveloper.pixelplay.presentation.components.CollapsibleCommonTopBar
-import com.theveloper.pixelplay.presentation.components.ExpressiveTopBarContent
-import com.theveloper.pixelplay.presentation.components.MiniPlayerHeight
-import com.theveloper.pixelplay.presentation.components.SmartImage
-import com.theveloper.pixelplay.presentation.screens.TabAnimation
-import com.theveloper.pixelplay.presentation.viewmodel.StatsViewModel
-import com.theveloper.pixelplay.utils.formatListeningDurationCompact
-import com.theveloper.pixelplay.utils.formatListeningDurationLong
+import com.theveloper.voidplay.R
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository
+import com.theveloper.voidplay.data.stats.StatsTimeRange
+import com.theveloper.voidplay.presentation.components.CollapsibleCommonTopBar
+import com.theveloper.voidplay.presentation.components.ExpressiveTopBarContent
+import com.theveloper.voidplay.presentation.components.MiniPlayerHeight
+import com.theveloper.voidplay.presentation.components.SmartImage
+import com.theveloper.voidplay.presentation.screens.TabAnimation
+import com.theveloper.voidplay.presentation.viewmodel.StatsViewModel
+import com.theveloper.voidplay.utils.formatListeningDurationCompact
+import com.theveloper.voidplay.utils.formatListeningDurationLong
 import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.math.PI
@@ -120,10 +120,10 @@ import kotlinx.coroutines.launch
 import racra.compose.smooth_corner_rect_library.AbsoluteSmoothCornerShape
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.outlined.Album
-import com.theveloper.pixelplay.utils.shapes.RoundedStarShape
+import com.theveloper.voidplay.utils.shapes.RoundedStarShape
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.PlayCircleOutline
-import com.theveloper.pixelplay.ui.theme.ExpTitleTypography
+import com.theveloper.voidplay.ui.theme.ExpTitleTypography
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalFoundationApi::class)
 @Composable

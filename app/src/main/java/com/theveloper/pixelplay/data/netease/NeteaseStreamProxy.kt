@@ -1,7 +1,7 @@
-package com.theveloper.pixelplay.data.netease
+package com.theveloper.voidplay.data.netease
 
 import android.net.Uri
-import com.theveloper.pixelplay.data.stream.CloudStreamSecurity
+import com.theveloper.voidplay.data.stream.CloudStreamSecurity
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call

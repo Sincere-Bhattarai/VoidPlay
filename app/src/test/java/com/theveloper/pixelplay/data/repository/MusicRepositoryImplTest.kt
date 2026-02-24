@@ -1,15 +1,15 @@
-package com.theveloper.pixelplay.data.repository
+package com.theveloper.voidplay.data.repository
 
 import android.content.Context
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.SearchHistoryDao
-import com.theveloper.pixelplay.data.database.SongEntity // Necesario para datos de prueba
-import com.theveloper.pixelplay.data.database.AlbumEntity
-import com.theveloper.pixelplay.data.database.ArtistEntity
-import com.theveloper.pixelplay.data.model.Song // Para verificar el mapeo
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.database.FavoritesDao
-import com.theveloper.pixelplay.data.database.TelegramDao
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.SearchHistoryDao
+import com.theveloper.voidplay.data.database.SongEntity // Necesario para datos de prueba
+import com.theveloper.voidplay.data.database.AlbumEntity
+import com.theveloper.voidplay.data.database.ArtistEntity
+import com.theveloper.voidplay.data.model.Song // Para verificar el mapeo
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.database.FavoritesDao
+import com.theveloper.voidplay.data.database.TelegramDao
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,8 +36,8 @@ class MusicRepositoryImplTest {
     private val mockUserPreferencesRepository: UserPreferencesRepository = mockk()
     private val mockLyricsRepository: LyricsRepository = mockk(relaxed = true)
     private val mockTelegramDao: TelegramDao = mockk(relaxed = true)
-    private val mockTelegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager = mockk(relaxed = true)
-    private val mockTelegramRepository: com.theveloper.pixelplay.data.telegram.TelegramRepository = mockk(relaxed = true)
+    private val mockTelegramCacheManager: com.theveloper.voidplay.data.telegram.TelegramCacheManager = mockk(relaxed = true)
+    private val mockTelegramRepository: com.theveloper.voidplay.data.telegram.TelegramRepository = mockk(relaxed = true)
     private val mockSongRepository: SongRepository = mockk(relaxed = true)
     private val mockFavoritesDao: FavoritesDao = mockk(relaxed = true)
     private val mockArtistImageRepository: ArtistImageRepository = mockk(relaxed = true)

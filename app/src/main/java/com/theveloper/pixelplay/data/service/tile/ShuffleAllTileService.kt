@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.service.tile
+package com.theveloper.voidplay.data.service.tile
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -6,7 +6,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
-import com.theveloper.pixelplay.MainActivity
+import com.theveloper.voidplay.MainActivity
 
 /**
  * Quick Settings tile that shuffles and plays all songs.

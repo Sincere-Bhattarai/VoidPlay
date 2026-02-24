@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.subcomps
+package com.theveloper.voidplay.presentation.components.subcomps
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.theveloper.pixelplay.presentation.components.WavySliderExpressive
-import com.theveloper.pixelplay.utils.formatDuration
+import com.theveloper.voidplay.presentation.components.WavySliderExpressive
+import com.theveloper.voidplay.utils.formatDuration
 import kotlin.math.roundToLong
 
 @Composable

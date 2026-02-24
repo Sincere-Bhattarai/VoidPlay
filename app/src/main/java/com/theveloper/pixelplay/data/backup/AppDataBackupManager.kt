@@ -1,22 +1,22 @@
-package com.theveloper.pixelplay.data.backup
+package com.theveloper.voidplay.data.backup
 
 import android.content.Context
 import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.theveloper.pixelplay.data.database.EngagementDao
-import com.theveloper.pixelplay.data.database.FavoritesDao
-import com.theveloper.pixelplay.data.database.FavoritesEntity
-import com.theveloper.pixelplay.data.database.LyricsDao
-import com.theveloper.pixelplay.data.database.LyricsEntity
-import com.theveloper.pixelplay.data.database.SearchHistoryDao
-import com.theveloper.pixelplay.data.database.SearchHistoryEntity
-import com.theveloper.pixelplay.data.database.SongEngagementEntity
-import com.theveloper.pixelplay.data.database.TransitionDao
-import com.theveloper.pixelplay.data.database.TransitionRuleEntity
-import com.theveloper.pixelplay.data.preferences.PreferenceBackupEntry
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.stats.PlaybackStatsRepository
+import com.theveloper.voidplay.data.database.EngagementDao
+import com.theveloper.voidplay.data.database.FavoritesDao
+import com.theveloper.voidplay.data.database.FavoritesEntity
+import com.theveloper.voidplay.data.database.LyricsDao
+import com.theveloper.voidplay.data.database.LyricsEntity
+import com.theveloper.voidplay.data.database.SearchHistoryDao
+import com.theveloper.voidplay.data.database.SearchHistoryEntity
+import com.theveloper.voidplay.data.database.SongEngagementEntity
+import com.theveloper.voidplay.data.database.TransitionDao
+import com.theveloper.voidplay.data.database.TransitionRuleEntity
+import com.theveloper.voidplay.data.preferences.PreferenceBackupEntry
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.stats.PlaybackStatsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -255,7 +255,7 @@ class AppDataBackupManager @Inject constructor(
                 step = ++step,
                 totalSteps = totalSteps,
                 title = "Backup complete",
-                detail = "Your PixelPlay backup was created successfully."
+                detail = "Your VoidPlay backup was created successfully."
             )
         }
     }

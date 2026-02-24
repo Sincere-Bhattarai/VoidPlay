@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.network.deezer
+package com.theveloper.voidplay.data.network.deezer
 
 import retrofit2.http.GET
 import retrofit2.http.Query

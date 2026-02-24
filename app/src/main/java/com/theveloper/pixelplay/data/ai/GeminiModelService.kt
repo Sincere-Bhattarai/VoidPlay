@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.ai
+package com.theveloper.voidplay.data.ai
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

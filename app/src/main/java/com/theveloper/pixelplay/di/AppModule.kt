@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.di
+package com.theveloper.voidplay.di
 
 import android.content.Context
 import androidx.annotation.OptIn
@@ -12,33 +12,33 @@ import androidx.room.Room
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
-import com.theveloper.pixelplay.BuildConfig
-import com.theveloper.pixelplay.PixelPlayApplication
-import com.theveloper.pixelplay.data.database.AlbumArtThemeDao
-import com.theveloper.pixelplay.data.database.EngagementDao
-import com.theveloper.pixelplay.data.database.FavoritesDao
-import com.theveloper.pixelplay.data.database.GDriveDao
-import com.theveloper.pixelplay.data.database.LyricsDao
-import com.theveloper.pixelplay.data.database.MusicDao
-import com.theveloper.pixelplay.data.database.PixelPlayDatabase
-import com.theveloper.pixelplay.data.database.SearchHistoryDao
-import com.theveloper.pixelplay.data.database.TransitionDao
-import com.theveloper.pixelplay.data.preferences.UserPreferencesRepository
-import com.theveloper.pixelplay.data.preferences.dataStore
-import com.theveloper.pixelplay.data.media.SongMetadataEditor
-import com.theveloper.pixelplay.data.network.deezer.DeezerApiService
-import com.theveloper.pixelplay.data.network.netease.NeteaseApiService
-import com.theveloper.pixelplay.data.network.lyrics.LrcLibApiService
-import com.theveloper.pixelplay.data.repository.ArtistImageRepository
-import com.theveloper.pixelplay.data.repository.LyricsRepository
-import com.theveloper.pixelplay.data.repository.LyricsRepositoryImpl
-import com.theveloper.pixelplay.data.repository.MediaStoreSongRepository
-import com.theveloper.pixelplay.data.repository.MusicRepository
-import com.theveloper.pixelplay.data.repository.MusicRepositoryImpl
-import com.theveloper.pixelplay.data.repository.SongRepository
-import com.theveloper.pixelplay.data.repository.TransitionRepository
-import com.theveloper.pixelplay.data.repository.TransitionRepositoryImpl
-import com.theveloper.pixelplay.data.repository.FolderTreeBuilder
+import com.theveloper.voidplay.BuildConfig
+import com.theveloper.voidplay.VoidPlayApplication
+import com.theveloper.voidplay.data.database.AlbumArtThemeDao
+import com.theveloper.voidplay.data.database.EngagementDao
+import com.theveloper.voidplay.data.database.FavoritesDao
+import com.theveloper.voidplay.data.database.GDriveDao
+import com.theveloper.voidplay.data.database.LyricsDao
+import com.theveloper.voidplay.data.database.MusicDao
+import com.theveloper.voidplay.data.database.VoidPlayDatabase
+import com.theveloper.voidplay.data.database.SearchHistoryDao
+import com.theveloper.voidplay.data.database.TransitionDao
+import com.theveloper.voidplay.data.preferences.UserPreferencesRepository
+import com.theveloper.voidplay.data.preferences.dataStore
+import com.theveloper.voidplay.data.media.SongMetadataEditor
+import com.theveloper.voidplay.data.network.deezer.DeezerApiService
+import com.theveloper.voidplay.data.network.netease.NeteaseApiService
+import com.theveloper.voidplay.data.network.lyrics.LrcLibApiService
+import com.theveloper.voidplay.data.repository.ArtistImageRepository
+import com.theveloper.voidplay.data.repository.LyricsRepository
+import com.theveloper.voidplay.data.repository.LyricsRepositoryImpl
+import com.theveloper.voidplay.data.repository.MediaStoreSongRepository
+import com.theveloper.voidplay.data.repository.MusicRepository
+import com.theveloper.voidplay.data.repository.MusicRepositoryImpl
+import com.theveloper.voidplay.data.repository.SongRepository
+import com.theveloper.voidplay.data.repository.TransitionRepository
+import com.theveloper.voidplay.data.repository.TransitionRepositoryImpl
+import com.theveloper.voidplay.data.repository.FolderTreeBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,8 +60,8 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideApplication(@ApplicationContext app: Context): PixelPlayApplication {
-        return app as PixelPlayApplication
+    fun provideApplication(@ApplicationContext app: Context): VoidPlayApplication {
+        return app as VoidPlayApplication
     }
 
     @Singleton
@@ -76,7 +76,7 @@ object AppModule {
     fun provideSessionToken(@ApplicationContext context: Context): androidx.media3.session.SessionToken {
         return androidx.media3.session.SessionToken(
             context,
-            android.content.ComponentName(context, com.theveloper.pixelplay.data.service.MusicService::class.java)
+            android.content.ComponentName(context, com.theveloper.voidplay.data.service.MusicService::class.java)
         )
     }
 
@@ -98,33 +98,33 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePixelPlayDatabase(@ApplicationContext context: Context): PixelPlayDatabase {
+    fun provideVoidPlayDatabase(@ApplicationContext context: Context): VoidPlayDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
-            PixelPlayDatabase::class.java,
-            "pixelplay_database"
+            VoidPlayDatabase::class.java,
+            "voidplay_database"
         ).addMigrations(
-            PixelPlayDatabase.MIGRATION_3_4,
-            PixelPlayDatabase.MIGRATION_4_5,
-            PixelPlayDatabase.MIGRATION_5_6,
-            PixelPlayDatabase.MIGRATION_6_7,
-            PixelPlayDatabase.MIGRATION_7_8,
-            PixelPlayDatabase.MIGRATION_8_9,
-            PixelPlayDatabase.MIGRATION_9_10,
-            PixelPlayDatabase.MIGRATION_10_11,
-            PixelPlayDatabase.MIGRATION_11_12,
-            PixelPlayDatabase.MIGRATION_12_13,
-            PixelPlayDatabase.MIGRATION_13_14,
-            PixelPlayDatabase.MIGRATION_14_15,
-            PixelPlayDatabase.MIGRATION_15_16,
-            PixelPlayDatabase.MIGRATION_16_17,
-            PixelPlayDatabase.MIGRATION_17_18,
-            PixelPlayDatabase.MIGRATION_18_19,
-            PixelPlayDatabase.MIGRATION_19_20,
-            PixelPlayDatabase.MIGRATION_20_21,
-            PixelPlayDatabase.MIGRATION_21_22,
-            PixelPlayDatabase.MIGRATION_22_23,
-            PixelPlayDatabase.MIGRATION_23_24
+            VoidPlayDatabase.MIGRATION_3_4,
+            VoidPlayDatabase.MIGRATION_4_5,
+            VoidPlayDatabase.MIGRATION_5_6,
+            VoidPlayDatabase.MIGRATION_6_7,
+            VoidPlayDatabase.MIGRATION_7_8,
+            VoidPlayDatabase.MIGRATION_8_9,
+            VoidPlayDatabase.MIGRATION_9_10,
+            VoidPlayDatabase.MIGRATION_10_11,
+            VoidPlayDatabase.MIGRATION_11_12,
+            VoidPlayDatabase.MIGRATION_12_13,
+            VoidPlayDatabase.MIGRATION_13_14,
+            VoidPlayDatabase.MIGRATION_14_15,
+            VoidPlayDatabase.MIGRATION_15_16,
+            VoidPlayDatabase.MIGRATION_16_17,
+            VoidPlayDatabase.MIGRATION_17_18,
+            VoidPlayDatabase.MIGRATION_18_19,
+            VoidPlayDatabase.MIGRATION_19_20,
+            VoidPlayDatabase.MIGRATION_20_21,
+            VoidPlayDatabase.MIGRATION_21_22,
+            VoidPlayDatabase.MIGRATION_22_23,
+            VoidPlayDatabase.MIGRATION_23_24
         )
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
@@ -132,49 +132,49 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideAlbumArtThemeDao(database: PixelPlayDatabase): AlbumArtThemeDao {
+    fun provideAlbumArtThemeDao(database: VoidPlayDatabase): AlbumArtThemeDao {
         return database.albumArtThemeDao()
     }
 
     @Singleton
     @Provides
-    fun provideSearchHistoryDao(database: PixelPlayDatabase): SearchHistoryDao { // NUEVO MÉTODO
+    fun provideSearchHistoryDao(database: VoidPlayDatabase): SearchHistoryDao { // NUEVO MÉTODO
         return database.searchHistoryDao()
     }
 
     @Singleton
     @Provides
-    fun provideMusicDao(database: PixelPlayDatabase): MusicDao { // Proveer MusicDao
+    fun provideMusicDao(database: VoidPlayDatabase): MusicDao { // Proveer MusicDao
         return database.musicDao()
     }
 
     @Singleton
     @Provides
-    fun provideTransitionDao(database: PixelPlayDatabase): TransitionDao {
+    fun provideTransitionDao(database: VoidPlayDatabase): TransitionDao {
         return database.transitionDao()
     }
 
     @Singleton
     @Provides
-    fun provideEngagementDao(database: PixelPlayDatabase): EngagementDao {
+    fun provideEngagementDao(database: VoidPlayDatabase): EngagementDao {
         return database.engagementDao()
     }
 
     @Singleton
     @Provides
-    fun provideFavoritesDao(database: PixelPlayDatabase): FavoritesDao {
+    fun provideFavoritesDao(database: VoidPlayDatabase): FavoritesDao {
         return database.favoritesDao()
     }
 
     @Singleton
     @Provides
-    fun provideLyricsDao(database: PixelPlayDatabase): LyricsDao {
+    fun provideLyricsDao(database: VoidPlayDatabase): LyricsDao {
         return database.lyricsDao()
     }
 
     @Singleton
     @Provides
-    fun provideGDriveDao(database: PixelPlayDatabase): GDriveDao {
+    fun provideGDriveDao(database: VoidPlayDatabase): GDriveDao {
         return database.gdriveDao()
     }
 
@@ -221,7 +221,7 @@ object AppModule {
     @Singleton
     fun provideSongRepository(
         @ApplicationContext context: Context,
-        mediaStoreObserver: com.theveloper.pixelplay.data.observer.MediaStoreObserver,
+        mediaStoreObserver: com.theveloper.voidplay.data.observer.MediaStoreObserver,
         favoritesDao: FavoritesDao,
         userPreferencesRepository: UserPreferencesRepository,
         musicDao: MusicDao
@@ -237,13 +237,13 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideTelegramDao(database: PixelPlayDatabase): com.theveloper.pixelplay.data.database.TelegramDao {
+    fun provideTelegramDao(database: VoidPlayDatabase): com.theveloper.voidplay.data.database.TelegramDao {
         return database.telegramDao()
     }
 
     @Singleton
     @Provides
-    fun provideNeteaseDao(database: PixelPlayDatabase): com.theveloper.pixelplay.data.database.NeteaseDao {
+    fun provideNeteaseDao(database: VoidPlayDatabase): com.theveloper.voidplay.data.database.NeteaseDao {
         return database.neteaseDao()
     }
 
@@ -261,9 +261,9 @@ object AppModule {
         searchHistoryDao: SearchHistoryDao,
         musicDao: MusicDao,
         lyricsRepository: LyricsRepository,
-        telegramDao: com.theveloper.pixelplay.data.database.TelegramDao,
-        telegramCacheManager: com.theveloper.pixelplay.data.telegram.TelegramCacheManager,
-        telegramRepository: com.theveloper.pixelplay.data.telegram.TelegramRepository,
+        telegramDao: com.theveloper.voidplay.data.database.TelegramDao,
+        telegramCacheManager: com.theveloper.voidplay.data.telegram.TelegramCacheManager,
+        telegramRepository: com.theveloper.voidplay.data.telegram.TelegramRepository,
         songRepository: SongRepository,
         favoritesDao: FavoritesDao,
         artistImageRepository: ArtistImageRepository,
@@ -299,7 +299,7 @@ object AppModule {
     fun provideSongMetadataEditor(
         @ApplicationContext context: Context,
         musicDao: MusicDao,
-        telegramDao: com.theveloper.pixelplay.data.database.TelegramDao
+        telegramDao: com.theveloper.voidplay.data.database.TelegramDao
     ): SongMetadataEditor {
         return SongMetadataEditor(context, musicDao, telegramDao)
     }
@@ -337,7 +337,7 @@ object AppModule {
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
                 val requestWithUserAgent = originalRequest.newBuilder()
-                    .header("User-Agent", "PixelPlayer/1.0 (Android; Music Player)")
+                    .header("User-Agent", "VoidPlayer/1.0 (Android; Music Player)")
                     .build()
                 chain.proceed(requestWithUserAgent)
             }
@@ -394,7 +394,7 @@ object AppModule {
             .addInterceptor { chain ->
                 val originalRequest = chain.request()
                 val requestWithHeaders = originalRequest.newBuilder()
-                    .header("User-Agent", "PixelPlayer/1.0 (Android; Music Player)")
+                    .header("User-Agent", "VoidPlayer/1.0 (Android; Music Player)")
                     .header("Accept", "application/json")
                     .build()
                 chain.proceed(requestWithHeaders)

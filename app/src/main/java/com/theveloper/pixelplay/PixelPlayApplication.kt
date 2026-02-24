@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay
+package com.theveloper.voidplay
 
 import android.app.Application
 import android.app.NotificationChannel
@@ -17,7 +17,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
-class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Provider {
+class VoidPlayApplication : Application(), ImageLoaderFactory, Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -40,7 +40,7 @@ class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Pr
 
     // AÑADE EL COMPANION OBJECT
     companion object {
-        const val NOTIFICATION_CHANNEL_ID = "pixelplay_music_channel"
+        const val NOTIFICATION_CHANNEL_ID = "voidplay_music_channel"
     }
 
     override fun onCreate() {
@@ -62,7 +62,7 @@ class PixelPlayApplication : Application(), ImageLoaderFactory, Configuration.Pr
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "PixelPlayer Music Playback",
+                "VoidPlayer Music Playback",
                 NotificationManager.IMPORTANCE_LOW
             )
             val notificationManager = getSystemService(NotificationManager::class.java)

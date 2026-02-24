@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.presentation.components.scoped
+package com.theveloper.voidplay.presentation.components.scoped
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -9,8 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import com.theveloper.pixelplay.data.preferences.NavBarStyle
-import com.theveloper.pixelplay.presentation.viewmodel.PlayerSheetState
+import com.theveloper.voidplay.data.preferences.NavBarStyle
+import com.theveloper.voidplay.presentation.viewmodel.PlayerSheetState
 
 private const val PREDICTIVE_BACK_SWIPE_EDGE_LEFT = 0
 private const val PREDICTIVE_BACK_SWIPE_EDGE_RIGHT = 1
@@ -69,7 +69,7 @@ internal fun rememberSheetVisualState(
         derivedStateOf {
             if (showPlayerContentArea) {
                 lerp(
-                    start = com.theveloper.pixelplay.presentation.components.MiniPlayerHeight,
+                    start = com.theveloper.voidplay.presentation.components.MiniPlayerHeight,
                     stop = containerHeight,
                     fraction = playerContentExpansionFraction.value
                 )

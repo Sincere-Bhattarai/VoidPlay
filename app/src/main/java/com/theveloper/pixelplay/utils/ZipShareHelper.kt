@@ -1,11 +1,11 @@
-package com.theveloper.pixelplay.utils
+package com.theveloper.voidplay.utils
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import com.theveloper.pixelplay.data.model.Song
+import com.theveloper.voidplay.data.model.Song
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -58,7 +58,7 @@ object ZipShareHelper {
             
             // Generate unique filename
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-            val zipFile = File(zipDir, "PixelPlay_Songs_$timestamp.zip")
+            val zipFile = File(zipDir, "VoidPlay_Songs_$timestamp.zip")
             
             // Create ZIP file
             ZipOutputStream(BufferedOutputStream(FileOutputStream(zipFile))).use { zipOut ->
@@ -196,7 +196,7 @@ object ZipShareHelper {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/zip"
             putExtra(Intent.EXTRA_STREAM, zipUri)
-            putExtra(Intent.EXTRA_SUBJECT, "PixelPlay: $songCount Songs")
+            putExtra(Intent.EXTRA_SUBJECT, "VoidPlay: $songCount Songs")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         

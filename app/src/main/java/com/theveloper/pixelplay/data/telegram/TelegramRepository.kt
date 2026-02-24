@@ -1,4 +1,4 @@
-package com.theveloper.pixelplay.data.telegram
+package com.theveloper.voidplay.data.telegram
 
 import com.theveloper.pixelplay.data.database.TelegramDao
 import com.theveloper.pixelplay.data.database.TelegramSongEntity
