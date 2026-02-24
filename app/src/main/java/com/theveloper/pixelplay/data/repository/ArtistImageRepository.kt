@@ -103,21 +103,25 @@ class ArtistImageRepository @Inject constructor(
      * Useful for batch loading when displaying artist lists.
      */
     suspend fun prefetchArtistImages(artists: List<Pair<Long, String>>) = withContext(Dispatchers.IO) {
-        artists.map { (artistId, artistName) ->
-            async {
-                try {
-                    val normalizedName = artistName.trim().lowercase()
-                    // Only fetch if not in memory, not failed, and not pending
-                    if (memoryCache.get(normalizedName) == null && !failedFetches.contains(normalizedName)) {
-                        prefetchSemaphore.withPermit {
-                            getArtistImageUrl(artistName, artistId)
+        // Process in small chunks to avoid creating hundreds of coroutines simultaneously.
+        // Without this, a library with 500 artists creates 500 coroutine objects at once, all
+        // suspended at the semaphore, exhausting the heap and triggering OOM in coroutine machinery.
+        artists.chunked(PREFETCH_CONCURRENCY * 4).forEach { chunk ->
+            chunk.map { (artistId, artistName) ->
+                async {
+                    try {
+                        val normalizedName = artistName.trim().lowercase()
+                        if (memoryCache.get(normalizedName) == null && !failedFetches.contains(normalizedName)) {
+                            prefetchSemaphore.withPermit {
+                                getArtistImageUrl(artistName, artistId)
+                            }
                         }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Failed to prefetch image for $artistName: ${e.message}")
                     }
-                } catch (e: Exception) {
-                    Log.w(TAG, "Failed to prefetch image for $artistName: ${e.message}")
                 }
-            }
-        }.awaitAll()
+            }.awaitAll()
+        }
     }
     
     // ... fetchAndCacheArtistImage method ...

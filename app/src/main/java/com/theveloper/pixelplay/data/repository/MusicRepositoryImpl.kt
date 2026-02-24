@@ -68,6 +68,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.paging.filter
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.CoroutineScope
@@ -98,6 +99,8 @@ class MusicRepositoryImpl @Inject constructor(
 
     private val directoryScanMutex = Mutex()
     private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    // Tracks the active prefetch job so a new flow emission cancels the previous one.
+    @Volatile private var prefetchJob: Job? = null
 
     private fun normalizePath(path: String): String =
         runCatching { File(path).canonicalPath }.getOrElse { File(path).absolutePath }
@@ -232,7 +235,11 @@ class MusicRepositoryImpl @Inject constructor(
                         .distinctBy { (_, name) -> name.trim().lowercase() }
                         .toList()
                     if (missingImages.isNotEmpty()) {
-                        repositoryScope.launch {
+                        // Cancel any in-flight prefetch before starting a new one — the flow
+                        // can emit multiple times during sync, and concurrent launches would
+                        // create N × artist-count coroutines simultaneously.
+                        prefetchJob?.cancel()
+                        prefetchJob = repositoryScope.launch {
                             artistImageRepository.prefetchArtistImages(missingImages)
                         }
                     }
