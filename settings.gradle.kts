@@ -23,6 +23,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PixelPlay"
+rootProject.name = "VoidPlay"
 include(":app")
 include(":baselineprofile")

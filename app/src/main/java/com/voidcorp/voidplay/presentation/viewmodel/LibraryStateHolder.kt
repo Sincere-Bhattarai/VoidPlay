@@ -1,0 +1,401 @@
+package com.voidcorp.voidplay.presentation.viewmodel
+
+import android.os.Trace
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import androidx.compose.ui.graphics.toArgb
+import android.util.Log
+import com.voidcorp.voidplay.data.model.Album
+import com.voidcorp.voidplay.data.model.Artist
+import com.voidcorp.voidplay.data.model.LibraryTabId
+import com.voidcorp.voidplay.data.model.MusicFolder
+import com.voidcorp.voidplay.data.model.Song
+import com.voidcorp.voidplay.data.model.SortOption
+import com.voidcorp.voidplay.data.preferences.UserPreferencesRepository
+import com.voidcorp.voidplay.data.repository.MusicRepository
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
+
+private const val ENABLE_FOLDERS_STORAGE_FILTER = false
+
+/**
+ * Manages the data state of the music library: Songs, Albums, Artists, Folders.
+ * Handles loading from Repository and applying SortOptions.
+ */
+@Singleton
+class LibraryStateHolder @Inject constructor(
+    private val musicRepository: MusicRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
+) {
+
+    // --- State ---
+    private val _allSongs = MutableStateFlow<ImmutableList<Song>>(persistentListOf())
+    val allSongs = _allSongs.asStateFlow()
+
+    private val _albums = MutableStateFlow<ImmutableList<Album>>(persistentListOf())
+    val albums = _albums.asStateFlow()
+
+    private val _artists = MutableStateFlow<ImmutableList<Artist>>(persistentListOf())
+    val artists = _artists.asStateFlow()
+
+    private val _musicFolders = MutableStateFlow<ImmutableList<MusicFolder>>(persistentListOf())
+    val musicFolders = _musicFolders.asStateFlow()
+
+    private val _isLoadingLibrary = MutableStateFlow(false)
+    val isLoadingLibrary = _isLoadingLibrary.asStateFlow()
+
+    private val _isLoadingCategories = MutableStateFlow(false)
+    val isLoadingCategories = _isLoadingCategories.asStateFlow()
+
+    // Sort Options
+    private val _currentSongSortOption = MutableStateFlow<SortOption>(SortOption.SongDefaultOrder)
+    val currentSongSortOption = _currentSongSortOption.asStateFlow()
+
+    // Filter Options
+    private val _currentStorageFilter = MutableStateFlow(com.voidcorp.voidplay.data.model.StorageFilter.ALL)
+    val currentStorageFilter = _currentStorageFilter.asStateFlow()
+
+    private fun effectiveFoldersStorageFilter(
+        selectedFilter: com.voidcorp.voidplay.data.model.StorageFilter
+    ): com.voidcorp.voidplay.data.model.StorageFilter {
+        return if (ENABLE_FOLDERS_STORAGE_FILTER) {
+            selectedFilter
+        } else {
+            com.voidcorp.voidplay.data.model.StorageFilter.OFFLINE
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val songsPagingFlow: kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<Song>> = 
+        kotlinx.coroutines.flow.combine(_currentSongSortOption, _currentStorageFilter) { sort, filter ->
+            sort to filter
+        }.flatMapLatest { (sortOption, filter) ->
+            musicRepository.getPaginatedSongs(sortOption, filter)
+        }
+        .flowOn(Dispatchers.IO)
+
+
+    private val _currentAlbumSortOption = MutableStateFlow<SortOption>(SortOption.AlbumTitleAZ)
+    val currentAlbumSortOption = _currentAlbumSortOption.asStateFlow()
+
+    private val _currentArtistSortOption = MutableStateFlow<SortOption>(SortOption.ArtistNameAZ)
+    val currentArtistSortOption = _currentArtistSortOption.asStateFlow()
+
+    private val _currentFolderSortOption = MutableStateFlow<SortOption>(SortOption.FolderNameAZ)
+    val currentFolderSortOption = _currentFolderSortOption.asStateFlow()
+
+    private val _currentFavoriteSortOption = MutableStateFlow<SortOption>(SortOption.LikedSongDateLiked)
+    val currentFavoriteSortOption = _currentFavoriteSortOption.asStateFlow()
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val favoritesPagingFlow: kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<Song>> =
+        kotlinx.coroutines.flow.combine(_currentFavoriteSortOption, _currentStorageFilter) { sort, filter ->
+            sort to filter
+        }.flatMapLatest { (sortOption, storageFilter) ->
+            musicRepository.getPaginatedFavoriteSongs(sortOption, storageFilter)
+        }
+        .flowOn(Dispatchers.IO)
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val favoriteSongCountFlow: kotlinx.coroutines.flow.Flow<Int> = _currentStorageFilter
+        .flatMapLatest { filter -> musicRepository.getFavoriteSongCountFlow(filter) }
+        .flowOn(Dispatchers.IO)
+
+    @OptIn(ExperimentalStdlibApi::class)
+    val genres: kotlinx.coroutines.flow.Flow<ImmutableList<com.voidcorp.voidplay.data.model.Genre>> = _allSongs
+        .map { songs ->
+            val genreMap = mutableMapOf<String, MutableList<Song>>()
+            val unknownGenreName = "Unknown Genre"
+
+            songs.forEach { song ->
+                val genreName = song.genre?.trim()
+                if (genreName.isNullOrBlank()) {
+                    genreMap.getOrPut(unknownGenreName) { mutableListOf() }.add(song)
+                } else {
+                    genreMap.getOrPut(genreName) { mutableListOf() }.add(song)
+                }
+            }
+
+            genreMap.toList().mapIndexedNotNull { index, (genreName, songs) ->
+                if (songs.isNotEmpty()) {
+                    val id = if (genreName.equals(unknownGenreName, ignoreCase = true)) {
+                        "unknown"
+                    } else {
+                        genreName.lowercase().replace(" ", "_").replace("/", "_")
+                    }
+                    val lightThemeColor = com.voidcorp.voidplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = false)
+                    val darkThemeColor = com.voidcorp.voidplay.ui.theme.GenreThemeUtils.getGenreThemeColor(id, isDark = true)
+
+                    com.voidcorp.voidplay.data.model.Genre(
+                        id = id,
+                        name = genreName,
+                        lightColorHex = lightThemeColor.container.toHexString(),
+                        onLightColorHex = lightThemeColor.onContainer.toHexString(),
+                        darkColorHex = darkThemeColor.container.toHexString(),
+                        onDarkColorHex = darkThemeColor.onContainer.toHexString()
+                    )
+                } else {
+                    null
+                }
+            }
+                .distinctBy { it.id }
+                .sortedBy { it.name.lowercase() }
+                .toImmutableList()
+        }
+        .flowOn(Dispatchers.Default)
+
+
+    // Internal state
+    private var scope: CoroutineScope? = null
+
+    // --- Initialization ---
+
+    fun initialize(scope: CoroutineScope) {
+        this.scope = scope
+        // Initial load of sort preferences
+        scope.launch {
+            val songSortKey = userPreferencesRepository.songsSortOptionFlow.first()
+            _currentSongSortOption.value = SortOption.SONGS.find { it.storageKey == songSortKey } ?: SortOption.SongDefaultOrder
+
+            val albumSortKey = userPreferencesRepository.albumsSortOptionFlow.first()
+            _currentAlbumSortOption.value = SortOption.ALBUMS.find { it.storageKey == albumSortKey } ?: SortOption.AlbumTitleAZ
+
+            val artistSortKey = userPreferencesRepository.artistsSortOptionFlow.first()
+            _currentArtistSortOption.value = SortOption.ARTISTS.find { it.storageKey == artistSortKey } ?: SortOption.ArtistNameAZ
+
+            val folderSortKey = userPreferencesRepository.foldersSortOptionFlow.first()
+            _currentFolderSortOption.value = SortOption.FOLDERS.find { it.storageKey == folderSortKey } ?: SortOption.FolderNameAZ
+
+
+            val likedSortKey = userPreferencesRepository.likedSongsSortOptionFlow.first()
+            _currentFavoriteSortOption.value = SortOption.LIKED.find { it.storageKey == likedSortKey } ?: SortOption.LikedSongDateLiked
+        }
+    }
+
+    fun onCleared() {
+        scope = null
+    }
+
+    // --- Data Loading ---
+
+    // We observe the repository flows permanently in initialize(), or we start collecting here?
+    // Better to start collecting in initialize() or have these functions just be "ensure active".
+    // Actually, explicit "load" functions are legacy imperative style.
+    // We should launch collectors in initialize() that update the state.
+
+    private var songsJob: Job? = null
+    private var albumsJob: Job? = null
+    private var artistsJob: Job? = null
+    private var foldersJob: Job? = null
+
+    fun startObservingLibraryData() {
+        if (songsJob?.isActive == true) return
+
+        Log.d("LibraryStateHolder", "startObservingLibraryData called.")
+
+        songsJob = scope?.launch {
+            _isLoadingLibrary.value = true
+            musicRepository.getAudioFiles().collect { songs ->
+                // When the repository emits a new list (triggered by directory changes),
+                // we update our state and re-apply current sorting.
+                _allSongs.value = songs.toImmutableList()
+                // Apply sort to the new data
+                sortSongs(_currentSongSortOption.value, persist = false)
+                _isLoadingLibrary.value = false
+            }
+        }
+
+        albumsJob = scope?.launch {
+            _isLoadingCategories.value = true
+            @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+            _currentStorageFilter.flatMapLatest { filter ->
+                musicRepository.getAlbums(filter)
+            }.collect { albums ->
+                _albums.value = albums.toImmutableList()
+                sortAlbums(_currentAlbumSortOption.value, persist = false)
+                _isLoadingCategories.value = false
+            }
+        }
+
+        artistsJob = scope?.launch {
+            _isLoadingCategories.value = true
+            @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+            _currentStorageFilter.flatMapLatest { filter ->
+                musicRepository.getArtists(filter)
+            }.collect { artists ->
+                _artists.value = artists.toImmutableList()
+                sortArtists(_currentArtistSortOption.value, persist = false)
+                _isLoadingCategories.value = false
+            }
+        }
+
+        foldersJob = scope?.launch {
+            @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+            _currentStorageFilter.flatMapLatest { filter ->
+                musicRepository.getMusicFolders(effectiveFoldersStorageFilter(filter))
+            }.collect { folders ->
+                _musicFolders.value = folders.toImmutableList()
+                sortFolders(_currentFolderSortOption.value, persist = false)
+            }
+        }
+    }
+
+    // Deprecated imperative loaders - redirected to observer start
+    fun loadSongsFromRepository() {
+        startObservingLibraryData()
+    }
+
+    fun loadAlbumsFromRepository() {
+        startObservingLibraryData()
+    }
+
+    fun loadArtistsFromRepository() {
+        startObservingLibraryData()
+    }
+
+    fun loadFoldersFromRepository() {
+        startObservingLibraryData()
+    }
+
+    // --- Lazy Loading Checks ---
+
+    // --- Lazy Loading Checks ---
+    // We replace conditional "check if empty" with "ensure observing".
+    // If we are already observing, startObservingLibraryData returns early.
+    // If we are not (e.g. process death recovery?), it restarts.
+
+    fun loadSongsIfNeeded() {
+        startObservingLibraryData()
+    }
+
+    fun loadAlbumsIfNeeded() {
+        startObservingLibraryData()
+    }
+
+    fun loadArtistsIfNeeded() {
+        startObservingLibraryData()
+    }
+
+    // --- Sorting ---
+
+    fun sortSongs(sortOption: SortOption, persist: Boolean = true) {
+        scope?.launch {
+            if (persist) {
+                userPreferencesRepository.setSongsSortOption(sortOption.storageKey)
+            }
+            // Updating the sort option triggers songsPagingFlow to reload with new sort at DB level
+            _currentSongSortOption.value = sortOption
+        }
+    }
+
+    fun sortAlbums(sortOption: SortOption, persist: Boolean = true) {
+        scope?.launch {
+            if (persist) {
+                userPreferencesRepository.setAlbumsSortOption(sortOption.storageKey)
+            }
+            _currentAlbumSortOption.value = sortOption
+
+            val sorted = when (sortOption) {
+                SortOption.AlbumTitleAZ -> _albums.value.sortedBy { it.title.lowercase() }
+                SortOption.AlbumTitleZA -> _albums.value.sortedByDescending { it.title.lowercase() }
+                SortOption.AlbumArtist -> _albums.value.sortedBy { it.artist.lowercase() }
+                SortOption.AlbumReleaseYear -> _albums.value.sortedByDescending { it.year }
+                SortOption.AlbumSizeAsc -> _albums.value.sortedWith(compareBy<Album> { it.songCount }.thenBy { it.title.lowercase() })
+                SortOption.AlbumSizeDesc -> _albums.value.sortedWith(compareByDescending<Album> { it.songCount }.thenBy { it.title.lowercase() })
+                else -> _albums.value
+            }
+            _albums.value = sorted.toImmutableList()
+        }
+    }
+
+    fun sortArtists(sortOption: SortOption, persist: Boolean = true) {
+        scope?.launch {
+            if (persist) {
+                userPreferencesRepository.setArtistsSortOption(sortOption.storageKey)
+            }
+            _currentArtistSortOption.value = sortOption
+
+            val sorted = when (sortOption) {
+                SortOption.ArtistNameAZ -> _artists.value.sortedBy { it.name.lowercase() }
+                SortOption.ArtistNameZA -> _artists.value.sortedByDescending { it.name.lowercase() }
+                else -> _artists.value
+            }
+            _artists.value = sorted.toImmutableList()
+        }
+    }
+
+    fun sortFolders(sortOption: SortOption, persist: Boolean = true) {
+        scope?.launch {
+            if (persist) {
+                userPreferencesRepository.setFoldersSortOption(sortOption.storageKey)
+            }
+            _currentFolderSortOption.value = sortOption
+
+            val sorted = when (sortOption) {
+                SortOption.FolderNameAZ -> _musicFolders.value.sortedBy { it.name.lowercase() }
+                SortOption.FolderNameZA -> _musicFolders.value.sortedByDescending { it.name.lowercase() }
+                SortOption.FolderSongCountAsc -> _musicFolders.value.sortedWith(
+                    compareBy<MusicFolder> { it.totalSongCount }.thenBy { it.name.lowercase() }
+                )
+                SortOption.FolderSongCountDesc -> _musicFolders.value.sortedWith(
+                    compareByDescending<MusicFolder> { it.totalSongCount }.thenBy { it.name.lowercase() }
+                )
+                SortOption.FolderSubdirCountAsc -> _musicFolders.value.sortedWith(
+                    compareBy<MusicFolder> { it.totalSubFolderCount }.thenBy { it.name.lowercase() }
+                )
+                SortOption.FolderSubdirCountDesc -> _musicFolders.value.sortedWith(
+                    compareByDescending<MusicFolder> { it.totalSubFolderCount }.thenBy { it.name.lowercase() }
+                )
+                else -> _musicFolders.value
+            }
+            _musicFolders.value = sorted.toImmutableList()
+        }
+    }
+
+    fun sortFavoriteSongs(sortOption: SortOption, persist: Boolean = true) {
+        scope?.launch {
+            if (persist) {
+                userPreferencesRepository.setLikedSongsSortOption(sortOption.storageKey)
+            }
+            _currentFavoriteSortOption.value = sortOption
+            // The actual filtering/sorting of favorites happens in ViewModel using this flow
+        }
+    }
+
+    /**
+     * Updates a single song in the in-memory list.
+     * Used effectively after metadata edits to reflect changes immediately.
+     */
+    fun updateSong(updatedSong: Song) {
+        _allSongs.update { currentList ->
+            currentList.map { if (it.id == updatedSong.id) updatedSong else it }.toImmutableList()
+        }
+    }
+
+    fun removeSong(songId: String) {
+        _allSongs.update { currentList ->
+            currentList.filter { it.id != songId }.toImmutableList()
+        }
+    }
+
+    fun setStorageFilter(filter: com.voidcorp.voidplay.data.model.StorageFilter) {
+        _currentStorageFilter.value = filter
+    }
+}
+
+private fun androidx.compose.ui.graphics.Color.toHexString(): String {
+    return String.format("#%08X", this.toArgb())
+}
